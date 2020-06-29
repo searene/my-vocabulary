@@ -23,7 +23,7 @@ export class WordFormReader {
         if (!this.initiated) {
             throw new Error('WordFormReader.init() has to be called first.');
         }
-        if (!this.changedWordToOriginalWordMap.contains(changedWord)) {
+        if (!this.changedWordToOriginalWordMap.has(changedWord)) {
             return Optional.empty();
         }
         return Optional.ofNullable(this.changedWordToOriginalWordMap.get(changedWord));
