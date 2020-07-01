@@ -16,12 +16,8 @@ document.body.appendChild(mainElement);
 
 async function test() {
   EBookReadAgent.register("epub", EPubBookReader);
-  const contents = await EBookReadAgent.readAll("/home/searene/Documents/books/Martin Kleppmann-Designing Data-Intensive Applications_ The Big Ideas Behind Reliable, Scalable, and Maintainable Systems-O’Reilly Media (2017).epub");
-  if (contents.isPresent()) {
-    console.log(contents);
-  } else {
-    console.log("empty");
-  }
+  const words = await EBookReadAgent.readAllWords("/home/searene/Documents/books/Martin Kleppmann-Designing Data-Intensive Applications_ The Big Ideas Behind Reliable, Scalable, and Maintainable Systems-O’Reilly Media (2017).epub");
+  console.log(words);
 }
 test();
 
