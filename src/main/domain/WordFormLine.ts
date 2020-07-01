@@ -1,9 +1,7 @@
-import { List } from 'immutable';
-
 export class WordFormLine {
     private _originalWord = '';
 
-    private _changedWordList: List<string> = List();
+    private _changedWordList: string[] = [];
 
     get originalWord(): string {
         return this._originalWord;
@@ -13,11 +11,11 @@ export class WordFormLine {
         this._originalWord = value;
     }
 
-    get changedWordList(): List<string> {
+    get changedWordList(): string[] {
         return this._changedWordList;
     }
 
-    set changedWordList(value: List<string>) {
+    set changedWordList(value: string[]) {
         this._changedWordList = value;
     }
 }

@@ -1,7 +1,7 @@
 export interface IEBookReader {
 
-    new (filePath: string): IEBookReader;
+    init(): Promise<void>;
 
-    readAll: () => Promise<string>;
+    readAll(): Promise<string>;
 
 }

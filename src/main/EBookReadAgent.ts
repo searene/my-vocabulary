@@ -1,21 +1,27 @@
 import { IEBookReader } from './IEBookReader';
-import { Map } from 'immutable';
 import { Optional } from 'typescript-optional';
 import { extname } from 'path';
 
 export class EBookReadAgent {
-    static readers: Map<string, IEBookReader> = Map();
-    static register(ext: string, reader: IEBookReader) {
+    private static readers: Map<string, new (filePath: string) => IEBookReader> = new Map();
+    static register(ext: string, reader: new (filePath: string) => IEBookReader) {
         EBookReadAgent.readers.set(ext, reader);
     }
     static async readAll(filePath: string): Promise<Optional<string>> {
 
-        const ext = extname(filePath);
-        const reader = EBookReadAgent.readers.get(ext);
-        if (reader === undefined) {
+        const dotPlusExt = extname(filePath);
+        if (dotPlusExt === "") {
             return Optional.empty();
         }
+        const ext = dotPlusExt.substring(1); // remove the leading dot
+        const Reader = EBookReadAgent.readers.get(ext);
+        if (Reader === undefined) {
+            return Optional.empty();
+        }
+        const reader = new Reader(filePath);
+        await reader.init();
         const contents = await reader.readAll();
+        console.log(contents);
         return Optional.of(contents);
     }
 }

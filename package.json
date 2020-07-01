@@ -141,6 +141,9 @@
     "webpack-merge": "^4.2.1"
   },
   "dependencies": {
+    "@types/html-to-text": "^5.1.1",
+    "epub": "^1.2.1",
+    "html-to-text": "^5.1.1",
     "immutable": "^4.0.0-rc.12",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
