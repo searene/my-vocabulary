@@ -1,6 +1,7 @@
 import { IEBookReader } from "./IEBookReader";
 import { Optional } from "typescript-optional";
 import { extname } from "path";
+import { WordExtractor } from "./WordExtractor";
 
 export class EBookReadAgent {
   private static readers: Map<string, new (filePath: string) => IEBookReader> = new Map();
@@ -26,11 +27,21 @@ export class EBookReadAgent {
     return Optional.of(contents);
   }
 
-  static async readAllWords(filePath: string): Promise<Set<string>> {
+  static async readAllWords(filePath: string): Promise<Map<string, number[]>> {
     const contents = await this.readAllContents(filePath);
     if (!contents.isPresent()) {
-      return new Set();
+      return new Map();
     }
-    return new Set(contents.get().split(/[\s↵"',:.]+/).map(word => word.trim().toLowerCase()));
+    const wordExtractor = new WordExtractor(contents.get());
+    const words = new Map<string, number[]>();
+    for (const word of wordExtractor) {
+      if (words.has(word.word)) {
+        const posList = words.get(word.word) as number[];
+        posList.push(word.pos)
+      } else {
+        words.set(word.word, [word.pos]);
+      }
+    }
+    return words;
   }
 }

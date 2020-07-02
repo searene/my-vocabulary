@@ -1,6 +1,8 @@
 import { app, BrowserWindow } from 'electron';
 import * as path from 'path';
 import * as url from 'url';
+import { EBookReadAgent } from "./EBookReadAgent";
+import { EPubBookReader } from "./EPubBookReader";
 
 let win: BrowserWindow | null;
 
@@ -59,3 +61,11 @@ app.on('activate', () => {
         createWindow();
     }
 });
+
+async function test() {
+    EBookReadAgent.register("epub", EPubBookReader);
+    const words = await EBookReadAgent.readAllWords("/home/searene/Documents/books/Martin Kleppmann-Designing Data-Intensive Applications_ The Big Ideas Behind Reliable, Scalable, and Maintainable Systems-O’Reilly Media (2017).epub");
+    console.log(words);
+}
+test();
+
