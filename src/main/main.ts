@@ -3,6 +3,8 @@ import * as path from 'path';
 import * as url from 'url';
 import { EBookReadAgent } from "./EBookReadAgent";
 import { EPubBookReader } from "./EPubBookReader";
+import { SqliteDatabaseService } from "./database/SqliteDatabaseService";
+import { DatabaseService } from "./database/DatabaseService";
 
 let win: BrowserWindow | null;
 
@@ -64,8 +66,16 @@ app.on('activate', () => {
 
 async function test() {
     EBookReadAgent.register("epub", EPubBookReader);
-    const words = await EBookReadAgent.readAllWords("/home/searene/Documents/books/Martin Kleppmann-Designing Data-Intensive Applications_ The Big Ideas Behind Reliable, Scalable, and Maintainable Systems-O’Reilly Media (2017).epub");
-    console.log(words);
+    const filePath = "/home/searene/Documents/books/Ten Drugs How Plants, Powders, and Pills Have Shaped the History of Medicine/Ten Drugs  How Plants, Powders, and Pills Have Shaped the History of Medicine.epub";
+    const contents = await EBookReadAgent.readAllContents(filePath);
+    if (!contents.isPresent()) {
+        throw new Error("contents not available");
+    }
+    // const words = await EBookReadAgent.readAllWords(filePath);
+
+  const databaseService: DatabaseService = new SqliteDatabaseService();
+  await databaseService.init();
+  await databaseService.writeBookContents("Ten Drugs", contents.get());
 }
 test();
 

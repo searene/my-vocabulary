@@ -14,6 +14,7 @@ export class EBookReadAgent {
 
     const dotPlusExt = extname(filePath);
     if (dotPlusExt === "") {
+      console.log(dotPlusExt);
       return Optional.empty();
     }
     const ext = dotPlusExt.substring(1); // remove the leading dot
