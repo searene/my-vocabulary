@@ -6,6 +6,8 @@ import { EPubBookReader } from "./EPubBookReader";
 import { SqliteDatabaseService } from "./database/SqliteDatabaseService";
 import { DatabaseService } from "./database/DatabaseService";
 import * as fs from 'fs';
+import "reflect-metadata";
+import { container, Lifecycle } from "tsyringe";
 
 let win: BrowserWindow | null;
 
@@ -64,6 +66,14 @@ app.on("activate", () => {
     createWindow();
   }
 });
+
+function resisterTsyringe() {
+  container.register("databaseService", { useClass: SqliteDatabaseService }, {
+    lifecycle: Lifecycle.Singleton
+  });
+}
+
+resisterTsyringe();
 
 async function test() {
   if (fs.existsSync("/home/searene/.my-vocabulary")) {

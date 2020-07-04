@@ -4,6 +4,7 @@ import * as os from 'os';
 import {join} from 'path';
 import { Database, RunResult } from "sqlite3";
 import {existsSync, mkdirSync} from 'fs';
+import { singleton } from "tsyringe";
 
 const sqlite3 = sqliteImport.verbose();
 
