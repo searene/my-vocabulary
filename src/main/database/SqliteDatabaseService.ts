@@ -79,7 +79,7 @@ export class SqliteDatabaseService implements DatabaseService {
       sql += `${where}`;
     }
 
-    const limitExpression = this.getLimitExpression(wordQuery);
+    const limitExpression = SqliteDatabaseService.getLimitExpression(wordQuery);
     if (limitExpression.isPresent()) {
       sql += limitExpression.get();
     }
@@ -101,28 +101,28 @@ export class SqliteDatabaseService implements DatabaseService {
   }
 
   async queryBooks(bookQuery: BookQuery): Promise<BookDO[]> {
-    let sql = `SELECT id, name, contents, status FROM books`;
+    let sql = `SELECT id, name, contents, status FROM books WHERE 1 = 1`;
 
     // build where
     let where = "";
     let params: any = {};
     if (bookQuery.id != undefined) {
-      where += "id = $id";
+      where += "AND id = $id";
       params["$id"] = bookQuery.id;
     }
     if (bookQuery.status != undefined) {
-      where += "status = $status";
+      where += "AND status = $status";
       params["$status"] = bookQuery.status;
     }
     if (bookQuery.name != undefined) {
-      where += "name LIKE %$name%";
+      where += "AND name LIKE %$name%";
       params["$name"] = bookQuery.name;
     }
     if (where != "") {
-      sql += `WHERE ${where}`;
+      sql += `${where}`;
     }
 
-    const limitExpression = this.getLimitExpression(bookQuery);
+    const limitExpression = SqliteDatabaseService.getLimitExpression(bookQuery);
     if (limitExpression.isPresent()) {
       sql += limitExpression.get();
     }
@@ -207,7 +207,7 @@ export class SqliteDatabaseService implements DatabaseService {
     });
   }
 
-  private getLimitExpression(baseQuery: BaseQuery): Optional<string> {
+  private static getLimitExpression(baseQuery: BaseQuery): Optional<string> {
     if (baseQuery.pageNo != undefined && baseQuery.pageSize != undefined) {
       return Optional.of(`LIMIT ${baseQuery.pageSize * baseQuery.pageNo} ${baseQuery.pageSize}`);
     }
