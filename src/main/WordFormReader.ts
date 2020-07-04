@@ -2,7 +2,9 @@ import * as fs from "fs";
 import { Interface, createInterface } from "readline";
 import { Optional } from "typescript-optional";
 import { WordFormLine } from "./domain/WordFormLine";
+import { singleton } from "tsyringe";
 
+@singleton()
 export class WordFormReader {
   private changedWordToOriginalWordMap: Map<string, string> = new Map();
 

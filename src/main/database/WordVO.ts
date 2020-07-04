@@ -1,44 +1,17 @@
-export class WordVO {
+export type WordVO = {
+
+  id: number,
 
   /**
-   * Word shown in the book.
+   * Word in the book.
    */
-  private _changedWord: string;
+  word: string,
 
   /**
-   * The original form of {@code changedWord}
+   * The original word of the word in the book.
    */
-  private _originalWord: string;
+  originalWord: string,
 
-  private _contextList: string[];
+  contextList: string[];
 
-  constructor(changedWord: string, originalWord: string, contextList: string[]) {
-    this._changedWord = changedWord;
-    this._originalWord = originalWord;
-    this._contextList = contextList;
-  }
-
-  get changedWord(): string {
-    return this._changedWord;
-  }
-
-  set changedWord(value: string) {
-    this._changedWord = value;
-  }
-
-  get originalWord(): string {
-    return this._originalWord;
-  }
-
-  set originalWord(value: string) {
-    this._originalWord = value;
-  }
-
-  get contextList(): string[] {
-    return this._contextList;
-  }
-
-  set contextList(value: string[]) {
-    this._contextList = value;
-  }
 }

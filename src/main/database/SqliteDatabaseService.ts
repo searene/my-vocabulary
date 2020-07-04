@@ -1,16 +1,28 @@
 import { DatabaseService } from "./DatabaseService";
-import * as sqliteImport from 'sqlite3';
-import * as os from 'os';
-import {join} from 'path';
+import * as sqliteImport from "sqlite3";
 import { Database, RunResult } from "sqlite3";
-import {existsSync, mkdirSync} from 'fs';
-import { singleton } from "tsyringe";
+import * as os from "os";
+import { join } from "path";
+import { existsSync, mkdirSync } from "fs";
+import { container } from "tsyringe";
+import { WordStatus } from "../enum/WordStatus";
+import { WordQuery } from "../domain/WordQuery";
+import { WordDO } from "../domain/WordDO";
+import { BaseQuery } from "../domain/BaseQuery";
+import { Optional } from "typescript-optional";
+import { BookQuery } from "../domain/BookQuery";
+import { BookDO } from "../domain/BookDO";
+import "reflect-metadata";
+import { WordFormReader } from "../WordFormReader";
+import { WordStatusInDatabase } from "../enum/WordStatusInDatabase";
 
 const sqlite3 = sqliteImport.verbose();
 
 export class SqliteDatabaseService implements DatabaseService {
 
   private db: Database;
+
+  private wordFormReader = container.resolve(WordFormReader);
 
   constructor() {
     const dir = join(os.homedir(), ".my-vocabulary");
@@ -41,15 +53,105 @@ export class SqliteDatabaseService implements DatabaseService {
     }
   }
 
+  async queryWords(wordQuery: WordQuery): Promise<WordDO[]> {
+    let sql = `SELECT id, book_id, word, positions, status FROM words WHERE 1 = 1`;
+
+    // build where
+    let where = "";
+    let params: any = {};
+    if (wordQuery.bookId != undefined) {
+      where += "AND bookId = $bookId";
+      params["$bookId"] = wordQuery.bookId;
+    }
+    if (wordQuery.status != undefined && wordQuery.status != WordStatus.knownOrKnowOriginal) {
+      where += "AND status = $status";
+      params["$status"] = wordQuery.status;
+    } else if (wordQuery.status != undefined && wordQuery.word != undefined) {
+      where += "AND (word = $word OR original_word = $word) AND status = $status";
+      params["$word"] = wordQuery.word;
+      params["$status"] = WordStatusInDatabase.Known;
+    }
+    if (wordQuery.word != undefined) {
+      where += "AND word = $word";
+      params["$word"] = wordQuery.word;
+    }
+    if (where != "") {
+      sql += `${where}`;
+    }
+
+    const limitExpression = this.getLimitExpression(wordQuery);
+    if (limitExpression.isPresent()) {
+      sql += limitExpression.get();
+    }
+
+    const rows = await this.all(sql, params);
+    const wordDOList: WordDO[] = [];
+    for (const row of rows) {
+      wordDOList.push({
+        id: row.id,
+        bookId: row.book_id,
+        word: row.word,
+        originalWord: row.original_word,
+        positions: (row.positions as string).split(",")
+          .map(pos => parseInt(pos)),
+        status: row.status
+      });
+    }
+    return wordDOList;
+  }
+
+  async queryBooks(bookQuery: BookQuery): Promise<BookDO[]> {
+    let sql = `SELECT id, name, contents, status FROM books`;
+
+    // build where
+    let where = "";
+    let params: any = {};
+    if (bookQuery.id != undefined) {
+      where += "id = $id";
+      params["$id"] = bookQuery.id;
+    }
+    if (bookQuery.status != undefined) {
+      where += "status = $status";
+      params["$status"] = bookQuery.status;
+    }
+    if (bookQuery.name != undefined) {
+      where += "name LIKE %$name%";
+      params["$name"] = bookQuery.name;
+    }
+    if (where != "") {
+      sql += `WHERE ${where}`;
+    }
+
+    const limitExpression = this.getLimitExpression(bookQuery);
+    if (limitExpression.isPresent()) {
+      sql += limitExpression.get();
+    }
+
+    const rows = await this.all(sql, params);
+    const bookDOList: BookDO[] = [];
+    for (const row of rows) {
+      bookDOList.push({
+        id: row.id,
+        name: row.name,
+        status: row.status,
+        contents: row.contents
+      });
+    }
+    return bookDOList;
+
+  }
+
   private getInsertWordsSqlList(bookId: number, wordAndPosList: Map<string, number[]>): string[] {
     const sqlList = [];
     const sqlSuffix: string[] = [];
     wordAndPosList.forEach((posList: number[], word: string) => {
-      sqlSuffix.push(`(${bookId}, "${word}", "${posList.join(",")}", 0)`);
+      sqlSuffix.push(`(${bookId}, "${word}", "${this.wordFormReader.getOriginalWord(word)}",
+        "${posList.join(",")}", ${WordStatusInDatabase.Unknown})`);
     });
 
     const rowCountPerInsert = 2;
-    const sqlPrefix = "INSERT INTO words (book_id, word, positions, status) VALUES";
+    const sqlPrefix = ` INSERT INTO words
+      (book_id, word, original_word, positions, status) VALUES`;
     for (let i = 0; i < sqlSuffix.length; i+= rowCountPerInsert) {
       let sql = sqlPrefix;
       for (let j = i; j < Math.min(sqlSuffix.length, i + rowCountPerInsert); j += 1) {
@@ -76,7 +178,7 @@ export class SqliteDatabaseService implements DatabaseService {
         book_id INT,
         word TEXT,
         positions TEXT,
-        status INT -- -1: deleted, 0: unknown, 1: known
+        status INT -- -1: deleted, 0: unknown, 1: knowOriginal, 2: known
       );
     `);
   }
@@ -93,9 +195,9 @@ export class SqliteDatabaseService implements DatabaseService {
     });
   }
 
-  private async all(sql: string): Promise<any> {
+  private async all(sql: string, params?: any): Promise<any> {
     return new Promise<any>((resolve, reject) => {
-      this.db.all(sql, (err, rows) => {
+      this.db.all(sql, params, (err, rows) => {
         if (err != null) {
           reject(err);
         } else {
@@ -105,4 +207,10 @@ export class SqliteDatabaseService implements DatabaseService {
     });
   }
 
+  private getLimitExpression(baseQuery: BaseQuery): Optional<string> {
+    if (baseQuery.pageNo != undefined && baseQuery.pageSize != undefined) {
+      return Optional.of(`LIMIT ${baseQuery.pageSize * baseQuery.pageNo} ${baseQuery.pageSize}`);
+    }
+    return Optional.empty();
+  }
 }
