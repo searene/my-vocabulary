@@ -2,7 +2,7 @@ import { DatabaseService } from "./DatabaseService";
 import * as sqliteImport from 'sqlite3';
 import * as os from 'os';
 import {join} from 'path';
-import { Database } from "sqlite3";
+import { Database, RunResult } from "sqlite3";
 import {existsSync, mkdirSync} from 'fs';
 
 const sqlite3 = sqliteImport.verbose();
@@ -23,17 +23,41 @@ export class SqliteDatabaseService implements DatabaseService {
     await this.createTablesIfNotExists();
   }
 
-  async writeBookContents(bookName: string, bookContents: string): Promise<void> {
-    await this.run(`
+  async writeBookContents(bookName: string, bookContents: string): Promise<number> {
+    const runResult = await this.run(`
       INSERT INTO books (name, contents, status) VALUES ($bookName, $bookContents, 0)
     `, {
       $bookName: bookName,
       $bookContents: bookContents
     });
+    return runResult.lastID;
   }
 
-  async writeWords(wordAndPosList: Map<string, number[]>): Promise<void> {
-    return undefined;
+  async writeWords(bookId: number, wordAndPosList: Map<string, number[]>): Promise<void> {
+    const sqlList = this.getInsertWordsSqlList(bookId, wordAndPosList);
+    for (const sql of sqlList) {
+      await this.run(sql);
+    }
+  }
+
+  private getInsertWordsSqlList(bookId: number, wordAndPosList: Map<string, number[]>): string[] {
+    const sqlList = [];
+    const sqlSuffix: string[] = [];
+    wordAndPosList.forEach((posList: number[], word: string) => {
+      sqlSuffix.push(`(${bookId}, "${word}", "${posList.join(",")}", 0)`);
+    });
+
+    const rowCountPerInsert = 2;
+    const sqlPrefix = "INSERT INTO words (book_id, word, positions, status) VALUES";
+    for (let i = 0; i < sqlSuffix.length; i+= rowCountPerInsert) {
+      let sql = sqlPrefix;
+      for (let j = i; j < Math.min(sqlSuffix.length, i + rowCountPerInsert); j += 1) {
+        sql += sqlSuffix[j] + ",";
+      }
+      sql = sql.substring(0, sql.length - 1) + ";";
+      sqlList.push(sql);
+    }
+    return sqlList;
   }
 
   private async createTablesIfNotExists(): Promise<void> {
@@ -49,20 +73,20 @@ export class SqliteDatabaseService implements DatabaseService {
       CREATE TABLE IF NOT EXISTS words (
         id INT PRIMARY KEY,
         book_id INT,
-        contents TEXT,
+        word TEXT,
         positions TEXT,
-        status INT -- 0: normal, -1: deleted
-      )
+        status INT -- -1: deleted, 0: unknown, 1: known
+      );
     `);
   }
 
-  private async run(sql: string, params?: any): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this.db.run(sql, params, (err) => {
+  private async run(sql: string, params?: any): Promise<RunResult> {
+    return new Promise<RunResult>((resolve, reject) => {
+      this.db.run(sql, params, function (err) {
         if (err != null) {
           reject(err);
         } else {
-          resolve();
+          resolve(this);
         }
       })
     });
@@ -76,8 +100,7 @@ export class SqliteDatabaseService implements DatabaseService {
         } else {
           resolve(rows);
         }
-        }
-      );
+      });
     });
   }
 

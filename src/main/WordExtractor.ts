@@ -37,6 +37,7 @@ export class WordExtractor implements IterableIterator<Word> {
       }
     } else {
       const word = this.getWord(this._currentWord, this._currentPos);
+      this._currentWord = "";
       return {
         done: false,
         value: word
