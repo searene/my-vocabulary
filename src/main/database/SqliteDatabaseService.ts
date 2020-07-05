@@ -1,8 +1,8 @@
+import "reflect-metadata";
 import { DatabaseService } from "./DatabaseService";
 import * as sqliteImport from "sqlite3";
 import { Database, RunResult } from "sqlite3";
 import * as os from "os";
-import { join } from "path";
 import { existsSync, mkdirSync } from "fs";
 import { container } from "tsyringe";
 import { WordStatus } from "../enum/WordStatus";
@@ -12,9 +12,9 @@ import { BaseQuery } from "../domain/BaseQuery";
 import { Optional } from "typescript-optional";
 import { BookQuery } from "../domain/BookQuery";
 import { BookDO } from "../domain/BookDO";
-import "reflect-metadata";
 import { WordFormReader } from "../WordFormReader";
 import { WordStatusInDatabase } from "../enum/WordStatusInDatabase";
+import { ConfigReader } from "../ConfigReader";
 
 const sqlite3 = sqliteImport.verbose();
 
@@ -33,6 +33,11 @@ export class SqliteDatabaseService implements DatabaseService {
   }
 
   async init(): Promise<void> {
+    const formsENPath = await container.resolve(ConfigReader).getString("formsENPath");
+    if (formsENPath.isEmpty()) {
+      throw new Error("formsENPath config is not available");
+    }
+    await this.wordFormReader.init(formsENPath.get());
     await this.createTablesIfNotExists();
   }
 

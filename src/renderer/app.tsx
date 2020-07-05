@@ -5,10 +5,6 @@ import { AppContainer } from 'react-hot-loader';
 
 import Application from './components/Application';
 import store from './store';
-import { WordFormReader } from "../main/WordFormReader";
-import { Optional } from "typescript-optional";
-import { EPubBookReader } from "../main/EPubBookReader";
-import { EBookReadAgent } from "../main/EBookReadAgent";
 
 // Create main element
 const mainElement = document.createElement('div');

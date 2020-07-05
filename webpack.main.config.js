@@ -1,4 +1,3 @@
-const path = require('path');
 const webpack = require('webpack');
 const merge = require('webpack-merge');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
@@ -27,7 +26,8 @@ module.exports = merge.smart(baseConfig, {
                         '@babel/preset-typescript'
                     ],
                     plugins: [
-                        ['@babel/plugin-proposal-class-properties', { loose: true }]
+                        ["@babel/plugin-proposal-decorators", { "legacy": true }],
+                        ['@babel/plugin-proposal-class-properties', { loose: true }],
                     ]
                 }
             }

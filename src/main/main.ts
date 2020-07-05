@@ -5,9 +5,11 @@ import { EBookReadAgent } from "./EBookReadAgent";
 import { EPubBookReader } from "./EPubBookReader";
 import { SqliteDatabaseService } from "./database/SqliteDatabaseService";
 import { DatabaseService } from "./database/DatabaseService";
-import * as fs from 'fs';
+import * as fs from "fs";
 import "reflect-metadata";
 import { container, Lifecycle } from "tsyringe";
+import { WordService } from "./WordService";
+import { WordStatus } from "./enum/WordStatus";
 
 let win: BrowserWindow | null;
 
@@ -91,6 +93,10 @@ async function test() {
   await databaseService.init();
   const bookId = await databaseService.writeBookContents("Ten Drugs", contents.get());
   await databaseService.writeWords(bookId, words);
+
+  const wordService = container.resolve(WordService);
+  const queriedWords = await wordService.getWords(bookId, WordStatus.Unknown, 1, 10, 10);
+  console.log("queriedWords: " + queriedWords);
 }
 
 test();

@@ -10,15 +10,7 @@ export class WordFormReader {
 
   private initiated = false;
 
-  private readonly readlineInterface: Interface;
-
-  constructor(absFilePath: string) {
-    const fileStream = fs.createReadStream(absFilePath);
-    this.readlineInterface = createInterface({
-      input: fileStream,
-      crlfDelay: Infinity
-    });
-  }
+  private readlineInterface?: Interface;
 
   public getOriginalWord(changedWord: string): Optional<string> {
     if (!this.initiated) {
@@ -30,7 +22,16 @@ export class WordFormReader {
     return Optional.ofNullable(this.changedWordToOriginalWordMap.get(changedWord));
   }
 
-  public async init(): Promise<void> {
+  public async init(absFilePath: string): Promise<void> {
+    if (this.initiated) {
+      return;
+    }
+    const fileStream = fs.createReadStream(absFilePath);
+    this.readlineInterface = createInterface({
+      input: fileStream,
+      crlfDelay: Infinity
+    });
+
     this.readlineInterface.on("line", line => {
       const wordFormLine = WordFormReader.parseLine(line);
       if (!wordFormLine.isPresent()) {
@@ -40,8 +41,8 @@ export class WordFormReader {
         this.changedWordToOriginalWordMap.set(changedWord, wordFormLine.get().originalWord);
       });
     });
-    return new Promise((resolve, reject) => {
-      this.readlineInterface.on("close", () => {
+    return new Promise((resolve) => {
+      this.readlineInterface!.on("close", () => {
         this.initiated = true;
         resolve();
       });
