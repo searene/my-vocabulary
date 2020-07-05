@@ -2,7 +2,9 @@ import * as fs from "fs";
 import { Interface, createInterface } from "readline";
 import { Optional } from "typescript-optional";
 import { WordFormLine } from "./domain/WordFormLine";
-import { singleton } from "tsyringe";
+import { container, singleton } from "tsyringe";
+import "reflect-metadata";
+import { ConfigReader } from "./ConfigReader";
 
 @singleton()
 export class WordFormReader {
@@ -12,21 +14,23 @@ export class WordFormReader {
 
   private readlineInterface?: Interface;
 
-  public getOriginalWord(changedWord: string): Optional<string> {
-    if (!this.initiated) {
-      throw new Error("WordFormReader.init() has to be called first.");
-    }
+  async getOriginalWord(changedWord: string): Promise<Optional<string>> {
+    await this.init();
     if (!this.changedWordToOriginalWordMap.has(changedWord)) {
       return Optional.empty();
     }
     return Optional.ofNullable(this.changedWordToOriginalWordMap.get(changedWord));
   }
 
-  public async init(absFilePath: string): Promise<void> {
+  public async init(): Promise<void> {
     if (this.initiated) {
       return;
     }
-    const fileStream = fs.createReadStream(absFilePath);
+    const formsENPath = await container.resolve(ConfigReader).getPath("formsENPath");
+    if (formsENPath.isEmpty()) {
+      throw new Error("formsENPath config is not available");
+    }
+    const fileStream = fs.createReadStream(formsENPath.get());
     this.readlineInterface = createInterface({
       input: fileStream,
       crlfDelay: Infinity

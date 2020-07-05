@@ -14,13 +14,24 @@ export class ConfigReader {
     if (this.initialized) {
       return;
     }
-    const rawFileContents = await fs.readFile(join(__filename, "../resources/config.json"));
-    this.config = rawFileContents.toJSON();
+    const configFilePath = join(__dirname, "..", "resources", "config.json");
+    const rawFileContents = await fs.readFile(configFilePath);
+    this.config = JSON.parse(rawFileContents.toString());
     this.initialized = true;
   }
 
   async getString(key: string): Promise<Optional<string>> {
     await this.init();
     return Optional.ofNullable(this.config[key]);
+  }
+
+  async getPath(key: string): Promise<Optional<string>> {
+    await this.init();
+    const value = await this.getString(key);
+    if (value.isEmpty()) {
+      return Optional.empty();
+    }
+    const dirs = value.get().split("/");
+    return Optional.of(join(__dirname, ...dirs));
   }
 }

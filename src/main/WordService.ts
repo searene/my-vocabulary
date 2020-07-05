@@ -1,6 +1,6 @@
 import { WordVO } from "./database/WordVO";
 import "reflect-metadata";
-import { inject, singleton } from "tsyringe";
+import { inject, injectable, singleton } from "tsyringe";
 import { DatabaseService } from "./database/DatabaseService";
 import { WordStatus } from "./enum/WordStatus";
 import { BookStatus } from "./enum/BookStatus";

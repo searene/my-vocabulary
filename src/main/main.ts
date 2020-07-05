@@ -89,8 +89,7 @@ async function test() {
   }
   const words = await EBookReadAgent.readAllWords(filePath);
 
-  const databaseService: DatabaseService = new SqliteDatabaseService();
-  await databaseService.init();
+  const databaseService = container.resolve<DatabaseService>("databaseService");
   const bookId = await databaseService.writeBookContents("Ten Drugs", contents.get());
   await databaseService.writeWords(bookId, words);
 

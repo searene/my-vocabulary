@@ -3,8 +3,9 @@ import { DatabaseService } from "./DatabaseService";
 import * as sqliteImport from "sqlite3";
 import { Database, RunResult } from "sqlite3";
 import * as os from "os";
+import {join} from "path";
 import { existsSync, mkdirSync } from "fs";
-import { container } from "tsyringe";
+import { container, injectable } from "tsyringe";
 import { WordStatus } from "../enum/WordStatus";
 import { WordQuery } from "../domain/WordQuery";
 import { WordDO } from "../domain/WordDO";
@@ -14,13 +15,13 @@ import { BookQuery } from "../domain/BookQuery";
 import { BookDO } from "../domain/BookDO";
 import { WordFormReader } from "../WordFormReader";
 import { WordStatusInDatabase } from "../enum/WordStatusInDatabase";
-import { ConfigReader } from "../ConfigReader";
 
 const sqlite3 = sqliteImport.verbose();
 
 export class SqliteDatabaseService implements DatabaseService {
 
   private db: Database;
+  private initiated = false;
 
   private wordFormReader = container.resolve(WordFormReader);
 
@@ -33,15 +34,15 @@ export class SqliteDatabaseService implements DatabaseService {
   }
 
   async init(): Promise<void> {
-    const formsENPath = await container.resolve(ConfigReader).getString("formsENPath");
-    if (formsENPath.isEmpty()) {
-      throw new Error("formsENPath config is not available");
+    if (this.initiated) {
+      return;
     }
-    await this.wordFormReader.init(formsENPath.get());
     await this.createTablesIfNotExists();
+    this.initiated = true;
   }
 
   async writeBookContents(bookName: string, bookContents: string): Promise<number> {
+    await this.init();
     const runResult = await this.run(`
       INSERT INTO books (name, contents, status) VALUES ($bookName, $bookContents, 0)
     `, {
@@ -52,13 +53,15 @@ export class SqliteDatabaseService implements DatabaseService {
   }
 
   async writeWords(bookId: number, wordAndPosList: Map<string, number[]>): Promise<void> {
-    const sqlList = this.getInsertWordsSqlList(bookId, wordAndPosList);
+    await this.init();
+    const sqlList = await this.getInsertWordsSqlList(bookId, wordAndPosList);
     for (const sql of sqlList) {
       await this.run(sql);
     }
   }
 
   async queryWords(wordQuery: WordQuery): Promise<WordDO[]> {
+    await this.init();
     let sql = `SELECT id, book_id, word, positions, status FROM words WHERE 1 = 1`;
 
     // build where
@@ -106,6 +109,7 @@ export class SqliteDatabaseService implements DatabaseService {
   }
 
   async queryBooks(bookQuery: BookQuery): Promise<BookDO[]> {
+    await this.init();
     let sql = `SELECT id, name, contents, status FROM books WHERE 1 = 1`;
 
     // build where
@@ -146,13 +150,14 @@ export class SqliteDatabaseService implements DatabaseService {
 
   }
 
-  private getInsertWordsSqlList(bookId: number, wordAndPosList: Map<string, number[]>): string[] {
+  private async getInsertWordsSqlList(bookId: number, wordAndPosListMap: Map<string, number[]>): Promise<string[]> {
     const sqlList = [];
     const sqlSuffix: string[] = [];
-    wordAndPosList.forEach((posList: number[], word: string) => {
-      sqlSuffix.push(`(${bookId}, "${word}", "${this.wordFormReader.getOriginalWord(word)}",
+    for (const [word, posList] of wordAndPosListMap) {
+      const originalWord = await this.wordFormReader.getOriginalWord(word);
+      sqlSuffix.push(`(${bookId}, "${word}", "${originalWord.isPresent() ? originalWord.get() : ""}",
         "${posList.join(",")}", ${WordStatusInDatabase.Unknown})`);
-    });
+    }
 
     const rowCountPerInsert = 2;
     const sqlPrefix = ` INSERT INTO words
@@ -182,6 +187,7 @@ export class SqliteDatabaseService implements DatabaseService {
         id INT PRIMARY KEY,
         book_id INT,
         word TEXT,
+        original_word TEXT,
         positions TEXT,
         status INT -- -1: deleted, 0: unknown, 1: knowOriginal, 2: known
       );
