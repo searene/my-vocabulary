@@ -6,7 +6,7 @@ const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const baseConfig = require('./webpack.base.config');
 
 module.exports = merge.smart(baseConfig, {
-    target: 'electron-renderer',
+    target: 'web',
     entry: {
         app: ['@babel/polyfill','./src/renderer/app.tsx']
     },
@@ -42,7 +42,7 @@ module.exports = merge.smart(baseConfig, {
                 loaders: ['style-loader', 'css-loader']
             },
             {
-                test: /\.(gif|png|jpe?g|svg)$/,
+                test: /\.(gif|png|jpe?g|svg|woff|woff2|eot|ttf)$/,
                 use: [
                     'file-loader',
                     {
