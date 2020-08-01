@@ -1,6 +1,7 @@
 const webpack = require('webpack');
 const merge = require('webpack-merge');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
 const baseConfig = require('./webpack.base.config');
@@ -34,15 +35,14 @@ module.exports = merge.smart(baseConfig, {
                 }
             },
             {
-                test: /\.scss$/,
-                loaders: ['style-loader', 'css-loader', 'sass-loader']
+                test: /\.css$/i,
+                use: [
+                    MiniCssExtractPlugin.loader,
+                    'css-loader'
+                ],
             },
             {
-                test: /\.css$/,
-                loaders: ['style-loader', 'css-loader']
-            },
-            {
-                test: /\.(gif|png|jpe?g|svg|woff|woff2|eot|ttf)$/,
+                test: /\.(gif|png|jpe?g|svg)$/,
                 use: [
                     'file-loader',
                     {
@@ -52,6 +52,18 @@ module.exports = merge.smart(baseConfig, {
                         }
                     }
                 ]
+            },
+            // Font files
+            {
+                test: /\.(woff|woff2|ttf|otf|eot)$/,
+                loader: 'file-loader',
+
+                options: {
+                    name: '[name].[ext]',
+                    outputPath: 'css/',
+                    esModule: false,
+                    publicPath: url => './css/' + url
+                }
             },
             // All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
             {
@@ -69,6 +81,12 @@ module.exports = merge.smart(baseConfig, {
         new HtmlWebpackPlugin(),
         new webpack.DefinePlugin({
             'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development')
-        })
+        }),
+        new MiniCssExtractPlugin({
+            // Options similar to the same options in webpackOptions.output
+            // both options are optional
+            filename: '[name].css',
+            chunkFilename: '[id].css',
+        }),
     ]
 });

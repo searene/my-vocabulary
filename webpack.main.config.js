@@ -33,6 +33,9 @@ module.exports = merge.smart(baseConfig, {
             }
         ]
     },
+    externals: {
+        'sqlite3': 'commonjs sqlite3'
+    },
     plugins: [
         new ForkTsCheckerWebpackPlugin({
             reportFiles: ['src/main/**/*']

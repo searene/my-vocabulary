@@ -16,9 +16,7 @@ module.exports = {
         extensions: ['.tsx', '.ts', '.js', '.json']
     },
     devtool: 'source-map',
-    plugins: [
-    ],
-    externals: {
-        'sqlite3': 'commonjs sqlite3'
-    }
+    devServer: {
+        writeToDisk: true
+    },
 };
