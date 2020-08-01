@@ -1,5 +1,6 @@
 import * as React from "react";
-import { Header, Container, Divider, Table, Icon } from "semantic-ui-react";
+import { Header, Container, Divider, Table, Icon, Grid, Button, ButtonProps } from "semantic-ui-react";
+import { AddBookModal } from "./AddBookModal";
 
 interface Book {
   name: string;
@@ -11,7 +12,8 @@ interface LibraryProps {
 
 interface LibraryStates {
   books: Book[],
-  initiated: boolean
+  initiated: boolean,
+  showAddBookModal: boolean;
 }
 
 export class Library extends React.Component<LibraryProps, LibraryStates> {
@@ -21,6 +23,7 @@ export class Library extends React.Component<LibraryProps, LibraryStates> {
     this.state = {
       books: [],
       initiated: false,
+      showAddBookModal: false
     };
   }
 
@@ -34,13 +37,23 @@ export class Library extends React.Component<LibraryProps, LibraryStates> {
     }
     return (
       <Container>
-        <Header>
-          <Header.Content>
-            <div>Books</div>
-            <div>
-              <Icon name={"add"}/></div>
-          </Header.Content>
-        </Header>
+            <Grid columns={3}>
+              <Grid.Row>
+                <Grid.Column width={8}>
+                  <Header>Books</Header>
+                </Grid.Column>
+                <Grid.Column textAlign={"right"} width={8}>
+                  <AddBookModal visible={this.state.showAddBookModal}
+                                onOpen={() => this.setState({showAddBookModal: true})}
+                                onCancel={() => this.setState({showAddBookModal: false})}
+                                onConfirm={this.addBook}
+                                trigger={<Button icon labelPosition={"left"}>
+                                            <Icon name={"add"}/> Add
+                                          </Button>}
+                  />
+                </Grid.Column>
+              </Grid.Row>
+            </Grid>
         <Divider/>
         <Table basic="very">
           <Table.Header>
@@ -90,4 +103,6 @@ export class Library extends React.Component<LibraryProps, LibraryStates> {
     return books;
   }
 
+  private async addBook(bookFilePath: string): Promise<void> {
+  }
 }
