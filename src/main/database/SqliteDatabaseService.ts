@@ -5,7 +5,7 @@ import { Database, RunResult } from "sqlite3";
 import * as os from "os";
 import {join} from "path";
 import { existsSync, mkdirSync } from "fs";
-import { container, injectable } from "tsyringe";
+import { inject, injectable } from "inversify";
 import { WordStatus } from "../enum/WordStatus";
 import { WordQuery } from "../domain/WordQuery";
 import { WordDO } from "../domain/WordDO";
@@ -18,14 +18,13 @@ import { WordStatusInDatabase } from "../enum/WordStatusInDatabase";
 
 const sqlite3 = sqliteImport.verbose();
 
+@injectable()
 export class SqliteDatabaseService implements DatabaseService {
 
   private db: Database;
   private initiated = false;
 
-  private wordFormReader = container.resolve(WordFormReader);
-
-  constructor() {
+  constructor(@inject(WordFormReader) private wordFormReader: WordFormReader) {
     const dir = join(os.homedir(), ".my-vocabulary");
     if (!existsSync(dir)) {
       mkdirSync(dir)

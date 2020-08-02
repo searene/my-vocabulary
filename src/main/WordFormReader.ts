@@ -2,17 +2,21 @@ import * as fs from "fs";
 import { Interface, createInterface } from "readline";
 import { Optional } from "typescript-optional";
 import { WordFormLine } from "./domain/WordFormLine";
-import { container, singleton } from "tsyringe";
+import {inject, injectable} from "inversify";
 import "reflect-metadata";
 import { ConfigReader } from "./ConfigReader";
 
-@singleton()
+@injectable()
 export class WordFormReader {
   private changedWordToOriginalWordMap: Map<string, string> = new Map();
 
   private initiated = false;
 
   private readlineInterface?: Interface;
+
+  public constructor(@inject(ConfigReader) private configReader: ConfigReader) {
+
+  }
 
   async getOriginalWord(changedWord: string): Promise<Optional<string>> {
     await this.init();
@@ -26,7 +30,7 @@ export class WordFormReader {
     if (this.initiated) {
       return;
     }
-    const formsENPath = await container.resolve(ConfigReader).getPath("formsENPath");
+    const formsENPath = await this.configReader.getPath("formsENPath");
     if (formsENPath.isEmpty()) {
       throw new Error("formsENPath config is not available");
     }

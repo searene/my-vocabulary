@@ -1,9 +1,9 @@
 import * as fs from "fs-extra";
 import { join } from "path";
 import { Optional } from "typescript-optional";
-import { singleton } from "tsyringe";
+import { injectable } from "inversify";
 
-@singleton()
+@injectable()
 export class ConfigReader {
 
   private config: any;

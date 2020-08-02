@@ -134,7 +134,8 @@
     "webpack": "^4.32.2",
     "webpack-cli": "^3.3.2",
     "webpack-dev-server": "^3.4.1",
-    "webpack-merge": "^4.2.1"
+    "webpack-merge": "^4.2.1",
+    "babel-plugin-parameter-decorator": "^1.0.16"
   },
   "dependencies": {
     "@babel/plugin-proposal-decorators": "^7.10.4",
@@ -143,6 +144,7 @@
     "epub": "^1.2.1",
     "html-to-text": "^5.1.1",
     "immutable": "^4.0.0-rc.12",
+    "inversify": "^5.0.1",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-redux": "^7.0.3",
@@ -151,7 +153,6 @@
     "semantic-ui-css": "^2.4.1",
     "semantic-ui-react": "^0.88.2",
     "sqlite3": "^5.0.0",
-    "tsyringe": "^4.3.0",
     "typescript-optional": "^2.0.1",
     "url-loader": "^4.1.0"
   }

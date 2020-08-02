@@ -1,15 +1,19 @@
 import { WordVO } from "./database/WordVO";
 import "reflect-metadata";
-import { inject, injectable, singleton } from "tsyringe";
+import { inject, injectable} from "inversify";
 import { DatabaseService } from "./database/DatabaseService";
 import { WordStatus } from "./enum/WordStatus";
 import { BookStatus } from "./enum/BookStatus";
 import { getContextList, WordDO } from "./domain/WordDO";
+import { TYPES } from "./config/inversify.config";
 
-@singleton()
+@injectable()
 export class WordService {
 
-  constructor(@inject("databaseService") private databaseService: DatabaseService) {}
+  constructor(
+    @inject(TYPES.DatabaseService) private databaseService: DatabaseService) {
+
+  }
 
   async getWords(bookId: number,
                  wordStatus: WordStatus,

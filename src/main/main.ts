@@ -3,13 +3,12 @@ import * as path from "path";
 import * as url from "url";
 import { EBookReadAgent } from "./EBookReadAgent";
 import { EPubBookReader } from "./EPubBookReader";
-import { SqliteDatabaseService } from "./database/SqliteDatabaseService";
 import { DatabaseService } from "./database/DatabaseService";
-import * as fs from "fs";
+import * as fs from "fs-extra";
 import "reflect-metadata";
-import { container, Lifecycle } from "tsyringe";
 import { WordService } from "./WordService";
 import { WordStatus } from "./enum/WordStatus";
+import { container, TYPES } from "./config/inversify.config";
 
 let win: BrowserWindow | null;
 
@@ -69,17 +68,9 @@ app.on("activate", () => {
   }
 });
 
-function resisterTsyringe() {
-  container.register("databaseService", { useClass: SqliteDatabaseService }, {
-    lifecycle: Lifecycle.Singleton
-  });
-}
-
-resisterTsyringe();
-
 async function test() {
   if (fs.existsSync("/home/searene/.my-vocabulary")) {
-    fs.rmdirSync("/home/searene/.my-vocabulary", {recursive: true});
+    fs.removeSync("/home/searene/.my-vocabulary");
   }
   EBookReadAgent.register("epub", EPubBookReader);
   const filePath = "/home/searene/Documents/books/Ten Drugs How Plants, Powders, and Pills Have Shaped the History of Medicine/Ten Drugs  How Plants, Powders, and Pills Have Shaped the History of Medicine.epub";
@@ -89,11 +80,11 @@ async function test() {
   }
   const words = await EBookReadAgent.readAllWords(filePath);
 
-  const databaseService = container.resolve<DatabaseService>("databaseService");
+  const databaseService = container.get<DatabaseService>(TYPES.DatabaseService);
   const bookId = await databaseService.writeBookContents("Ten Drugs", contents.get());
   await databaseService.writeWords(bookId, words);
 
-  const wordService = container.resolve(WordService);
+  const wordService = container.get<WordService>(WordService);
   const queriedWords = await wordService.getWords(bookId, WordStatus.Unknown, 1, 10, 10);
   console.log("queriedWords: " + queriedWords);
 }
