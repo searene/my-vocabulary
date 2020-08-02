@@ -1,4 +1,3 @@
-import "reflect-metadata";
 import { DatabaseService } from "./DatabaseService";
 import * as sqliteImport from "sqlite3";
 import { Database, RunResult } from "sqlite3";
@@ -67,19 +66,19 @@ export class SqliteDatabaseService implements DatabaseService {
     let where = "";
     let params: any = {};
     if (wordQuery.bookId != undefined) {
-      where += "AND bookId = $bookId";
+      where += " AND book_id = $bookId";
       params["$bookId"] = wordQuery.bookId;
     }
     if (wordQuery.status != undefined && wordQuery.status != WordStatus.knownOrKnowOriginal) {
-      where += "AND status = $status";
+      where += " AND status = $status";
       params["$status"] = wordQuery.status;
     } else if (wordQuery.status != undefined && wordQuery.word != undefined) {
-      where += "AND (word = $word OR original_word = $word) AND status = $status";
+      where += " AND (word = $word OR original_word = $word) AND status = $status";
       params["$word"] = wordQuery.word;
       params["$status"] = WordStatusInDatabase.Known;
     }
     if (wordQuery.word != undefined) {
-      where += "AND word = $word";
+      where += " AND word = $word";
       params["$word"] = wordQuery.word;
     }
     if (where != "") {
@@ -115,15 +114,15 @@ export class SqliteDatabaseService implements DatabaseService {
     let where = "";
     let params: any = {};
     if (bookQuery.id != undefined) {
-      where += "AND id = $id";
+      where += " AND id = $id";
       params["$id"] = bookQuery.id;
     }
     if (bookQuery.status != undefined) {
-      where += "AND status = $status";
+      where += " AND status = $status";
       params["$status"] = bookQuery.status;
     }
     if (bookQuery.name != undefined) {
-      where += "AND name LIKE %$name%";
+      where += " AND name LIKE %$name%";
       params["$name"] = bookQuery.name;
     }
     if (where != "") {
@@ -135,6 +134,7 @@ export class SqliteDatabaseService implements DatabaseService {
       sql += limitExpression.get();
     }
 
+    console.log(sql, params);
     const rows = await this.all(sql, params);
     const bookDOList: BookDO[] = [];
     for (const row of rows) {
@@ -175,7 +175,7 @@ export class SqliteDatabaseService implements DatabaseService {
   private async createTablesIfNotExists(): Promise<void> {
     await this.run(`
       CREATE TABLE IF NOT EXISTS books (
-        id INT PRIMARY KEY,
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT,
         contents TEXT,
         status INT -- 0: normal, -1: deleted
@@ -183,7 +183,7 @@ export class SqliteDatabaseService implements DatabaseService {
     `);
     await this.run(`
       CREATE TABLE IF NOT EXISTS words (
-        id INT PRIMARY KEY,
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
         book_id INT,
         word TEXT,
         original_word TEXT,
@@ -219,7 +219,7 @@ export class SqliteDatabaseService implements DatabaseService {
 
   private static getLimitExpression(baseQuery: BaseQuery): Optional<string> {
     if (baseQuery.pageNo != undefined && baseQuery.pageSize != undefined) {
-      return Optional.of(`LIMIT ${baseQuery.pageSize * baseQuery.pageNo} ${baseQuery.pageSize}`);
+      return Optional.of(` LIMIT ${baseQuery.pageSize * baseQuery.pageNo}, ${baseQuery.pageSize}`);
     }
     return Optional.empty();
   }

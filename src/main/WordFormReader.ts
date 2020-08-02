@@ -3,7 +3,6 @@ import { Interface, createInterface } from "readline";
 import { Optional } from "typescript-optional";
 import { WordFormLine } from "./domain/WordFormLine";
 import {inject, injectable} from "inversify";
-import "reflect-metadata";
 import { ConfigReader } from "./ConfigReader";
 
 @injectable()

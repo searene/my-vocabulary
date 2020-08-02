@@ -1,14 +1,14 @@
 import { app, BrowserWindow } from "electron";
 import * as path from "path";
 import * as url from "url";
-import { EBookReadAgent } from "./EBookReadAgent";
-import { EPubBookReader } from "./EPubBookReader";
-import { DatabaseService } from "./database/DatabaseService";
-import * as fs from "fs-extra";
-import "reflect-metadata";
-import { WordService } from "./WordService";
 import { WordStatus } from "./enum/WordStatus";
-import { container, TYPES } from "./config/inversify.config";
+import { container } from "./config/inversify.config";
+import { WordService } from "./WordService";
+import * as fs from "fs-extra";
+import { EPubBookReader } from "./EPubBookReader";
+import { EBookReadAgent } from "./EBookReadAgent";
+import { DatabaseService } from "./database/DatabaseService";
+import { TYPES } from "./config/types";
 
 let win: BrowserWindow | null;
 
@@ -78,13 +78,20 @@ async function test() {
   if (!contents.isPresent()) {
     throw new Error("contents not available");
   }
+  console.log("a");
   const words = await EBookReadAgent.readAllWords(filePath);
 
+  console.log("b");
   const databaseService = container.get<DatabaseService>(TYPES.DatabaseService);
+  console.log("c");
   const bookId = await databaseService.writeBookContents("Ten Drugs", contents.get());
+  console.log("d");
   await databaseService.writeWords(bookId, words);
+  console.log("e");
 
+  console.log("f");
   const wordService = container.get<WordService>(WordService);
+  console.log("g");
   const queriedWords = await wordService.getWords(bookId, WordStatus.Unknown, 1, 10, 10);
   console.log("queriedWords: " + queriedWords);
 }

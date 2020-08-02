@@ -1,11 +1,10 @@
 import { WordVO } from "./database/WordVO";
-import "reflect-metadata";
 import { inject, injectable} from "inversify";
 import { DatabaseService } from "./database/DatabaseService";
 import { WordStatus } from "./enum/WordStatus";
 import { BookStatus } from "./enum/BookStatus";
-import { getContextList, WordDO } from "./domain/WordDO";
-import { TYPES } from "./config/inversify.config";
+import { getContextList } from "./domain/WordDO";
+import { TYPES } from "./config/types";
 
 @injectable()
 export class WordService {
