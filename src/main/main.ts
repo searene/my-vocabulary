@@ -69,19 +69,14 @@ app.on("activate", () => {
   }
 });
 
-async function test() {
+async function init() {
+
+  // only for test
   if (fs.existsSync("/home/searene/.my-vocabulary")) {
     fs.removeSync("/home/searene/.my-vocabulary");
   }
-  EBookReadAgent.register("epub", EPubBookReader);
-  const filePath = path.join(__dirname, "..", "test", "resources", "GeographyofBliss_oneChapter.epub");
-  console.log(filePath);
-  const bookId = await BookService.addBook(filePath);
 
-  const wordService = container.get<WordService>(WordService);
-  const queriedWords = await wordService.getWords(bookId, WordStatus.Unknown, 1, 10, 10);
-  console.dir(queriedWords, {depth: null});
+  EBookReadAgent.register("epub", EPubBookReader);
 }
 
-test();
-
+init();

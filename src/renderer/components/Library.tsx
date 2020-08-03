@@ -1,17 +1,15 @@
 import * as React from "react";
-import { Header, Container, Divider, Table, Icon, Grid, Button, ButtonProps } from "semantic-ui-react";
+import { Header, Container, Divider, Table, Icon, Grid, Button} from "semantic-ui-react";
 import { AddBookModal } from "./AddBookModal";
-
-interface Book {
-  name: string;
-  totalWordCount: number;
-}
+// import { BookService } from "../../main/BookService";
+import { BookVO } from "../../main/domain/BookVO";
+// import { container } from "../../main/config/inversify.config";
 
 interface LibraryProps {
 }
 
 interface LibraryStates {
-  books: Book[],
+  books: BookVO[],
   initiated: boolean,
   showAddBookModal: boolean;
 }
@@ -45,8 +43,7 @@ export class Library extends React.Component<LibraryProps, LibraryStates> {
                 <Grid.Column textAlign={"right"} width={8}>
                   <AddBookModal visible={this.state.showAddBookModal}
                                 onOpen={() => this.setState({showAddBookModal: true})}
-                                onCancel={() => this.setState({showAddBookModal: false})}
-                                onConfirm={this.addBook}
+                                onClose={this.handleCloseOnAddBookModal}
                                 trigger={<Button icon labelPosition={"left"}>
                                             <Icon name={"add"}/> Add
                                           </Button>}
@@ -85,24 +82,12 @@ export class Library extends React.Component<LibraryProps, LibraryStates> {
   }
 
   private async initBooks() {
-    const books = await this.getBooks();
+    // return await container.get(BookService).getBooks();
   }
 
-  private async getBooks(): Promise<Book[]> {
-    const books: Book[] = [];
-    const book1: Book = {
-      name: "Ten Drugs",
-      totalWordCount: 123498,
-    };
-    const book2: Book = {
-      name: "Mock book2",
-      totalWordCount: 729347,
-    };
-    books.push(book1);
-    books.push(book2);
-    return books;
-  }
-
-  private async addBook(bookFilePath: string): Promise<void> {
+  private handleCloseOnAddBookModal() {
+    this.setState({
+      showAddBookModal: false
+    });
   }
 }
