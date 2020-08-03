@@ -7,7 +7,7 @@ import { ConfigReader } from "./ConfigReader";
 
 @injectable()
 export class WordFormReader {
-  private changedWordToOriginalWordMap: Map<string, string> = new Map();
+  private variousWordToOriginalWordMap: Map<string, string> = new Map();
 
   private initiated = false;
 
@@ -19,10 +19,10 @@ export class WordFormReader {
 
   async getOriginalWord(changedWord: string): Promise<Optional<string>> {
     await this.init();
-    if (!this.changedWordToOriginalWordMap.has(changedWord)) {
+    if (!this.variousWordToOriginalWordMap.has(changedWord)) {
       return Optional.empty();
     }
-    return Optional.ofNullable(this.changedWordToOriginalWordMap.get(changedWord));
+    return Optional.ofNullable(this.variousWordToOriginalWordMap.get(changedWord));
   }
 
   public async init(): Promise<void> {
@@ -45,8 +45,10 @@ export class WordFormReader {
         return;
       }
       wordFormLine.get().changedWordList.forEach(changedWord => {
-        this.changedWordToOriginalWordMap.set(changedWord, wordFormLine.get().originalWord);
+        this.variousWordToOriginalWordMap.set(changedWord, wordFormLine.get().originalWord);
       });
+      this.variousWordToOriginalWordMap.set(wordFormLine.get().originalWord,
+        wordFormLine.get().originalWord);
     });
     return new Promise((resolve) => {
       this.readlineInterface!.on("close", () => {

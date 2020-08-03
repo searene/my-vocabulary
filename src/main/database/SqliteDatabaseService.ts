@@ -90,6 +90,7 @@ export class SqliteDatabaseService implements DatabaseService {
       sql += limitExpression.get();
     }
 
+    console.log(sql, params);
     const rows = await this.all(sql, params);
     const wordDOList: WordDO[] = [];
     for (const row of rows) {

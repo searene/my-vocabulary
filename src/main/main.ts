@@ -9,6 +9,7 @@ import { EPubBookReader } from "./EPubBookReader";
 import { EBookReadAgent } from "./EBookReadAgent";
 import { DatabaseService } from "./database/DatabaseService";
 import { TYPES } from "./config/types";
+import { BookService } from "./BookService";
 
 let win: BrowserWindow | null;
 
@@ -73,27 +74,13 @@ async function test() {
     fs.removeSync("/home/searene/.my-vocabulary");
   }
   EBookReadAgent.register("epub", EPubBookReader);
-  const filePath = "/home/searene/Documents/books/Ten Drugs How Plants, Powders, and Pills Have Shaped the History of Medicine/Ten Drugs  How Plants, Powders, and Pills Have Shaped the History of Medicine.epub";
-  const contents = await EBookReadAgent.readAllContents(filePath);
-  if (!contents.isPresent()) {
-    throw new Error("contents not available");
-  }
-  console.log("a");
-  const words = await EBookReadAgent.readAllWords(filePath);
+  const filePath = path.join(__dirname, "..", "test", "resources", "GeographyofBliss_oneChapter.epub");
+  console.log(filePath);
+  const bookId = await BookService.addBook(filePath);
 
-  console.log("b");
-  const databaseService = container.get<DatabaseService>(TYPES.DatabaseService);
-  console.log("c");
-  const bookId = await databaseService.writeBookContents("Ten Drugs", contents.get());
-  console.log("d");
-  await databaseService.writeWords(bookId, words);
-  console.log("e");
-
-  console.log("f");
   const wordService = container.get<WordService>(WordService);
-  console.log("g");
   const queriedWords = await wordService.getWords(bookId, WordStatus.Unknown, 1, 10, 10);
-  console.log("queriedWords: " + queriedWords);
+  console.dir(queriedWords, {depth: null});
 }
 
 test();
