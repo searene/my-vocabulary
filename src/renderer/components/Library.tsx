@@ -2,9 +2,7 @@ import * as React from "react";
 import { Header, Container, Divider, Table, Icon, Grid, Button} from "semantic-ui-react";
 import { AddBookModal } from "./AddBookModal";
 import { BookVO } from "../../main/domain/BookVO";
-import { remote } from 'electron';
-const mainJs = remote.require("./main.js");
-const bookService = mainJs.bookService;
+import serviceProvider from '../ServiceProvider';
 
 interface LibraryProps {
 }
@@ -55,17 +53,19 @@ export class Library extends React.Component<LibraryProps, LibraryStates> {
         <Divider/>
         <Table basic="very">
           <Table.Header>
-            <Table.HeaderCell>Name</Table.HeaderCell>
-            <Table.HeaderCell>Total Word Count</Table.HeaderCell>
+            <Table.Row>
+              <Table.HeaderCell>Name</Table.HeaderCell>
+              <Table.HeaderCell>Total Word Count</Table.HeaderCell>
+            </Table.Row>
           </Table.Header>
           <Table.Body>
             {this.state.books.map(book =>
-              <Table.Row>
+              <Table.Row key={book.id}>
                 <Table.Cell>
-                  book.name
+                  {book.name}
                 </Table.Cell>
                 <Table.Cell>
-                  book.totalWordCount
+                  {book.totalWordCount}
                 </Table.Cell>
               </Table.Row>,
             )}
@@ -83,12 +83,17 @@ export class Library extends React.Component<LibraryProps, LibraryStates> {
   }
 
   private async initBooks() {
-    const books = await bookService.getBooks();
+    const books = await serviceProvider.bookService.getBooks();
     this.setState({ books });
   }
 
-  private handleCloseOnAddBookModal = () => {
+  private handleCloseOnAddBookModal = (addedBook?: BookVO) => {
+    const books = addedBook === undefined ? this.state.books
+      : this.state.books.concat(addedBook);
+    console.log(addedBook);
+    console.log(books);
     this.setState({
+      books,
       showAddBookModal: false
     });
   }

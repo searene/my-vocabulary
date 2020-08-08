@@ -6,6 +6,7 @@ import { BookVO } from "./domain/BookVO";
 import { inject, injectable } from "inversify";
 import { BookStatus } from "./enum/BookStatus";
 import { BookService } from "./BookService";
+import { BookDO } from "./domain/BookDO";
 
 @injectable()
 export class BookServiceImpl implements BookService {
@@ -19,7 +20,7 @@ export class BookServiceImpl implements BookService {
    * @param filePath absolute path of the EBook file
    * @return bookId
    */
-  async addBook(filePath: string): Promise<number> {
+  async addBook(filePath: string): Promise<BookVO> {
     const contents = await EBookReadAgent.readAllContents(filePath);
     if (!contents.isPresent()) {
       throw new Error("contents not available");
@@ -29,7 +30,13 @@ export class BookServiceImpl implements BookService {
     const databaseService = container.get<DatabaseService>(TYPES.DatabaseService);
     const bookId = await databaseService.writeBookContents("Ten Drugs", contents.get());
     await databaseService.writeWords(bookId, words);
-    return bookId;
+    const bookDOList = await databaseService.queryBooks({
+      id: bookId
+    });
+    if (bookDOList.length !== 1) {
+      throw new Error("bookDOList.length is not 1, the actual value is" + bookDOList.length);
+    }
+    return BookServiceImpl.toBookVO(bookDOList[0]);
   }
 
   async getBooks(): Promise<BookVO[]> {
@@ -37,10 +44,15 @@ export class BookServiceImpl implements BookService {
       status: BookStatus.Normal
     });
     return bookDOList.map(bookDO => {
-      return {
-        name: bookDO.name,
-        totalWordCount: bookDO.contents.split(/\s/).length
-      }
+      return BookServiceImpl.toBookVO(bookDO);
     });
+  }
+
+  static toBookVO(bookDO: BookDO): BookVO {
+    return {
+      id: bookDO.id,
+      name: bookDO.name,
+      totalWordCount: bookDO.contents.split(/\s/).length
+    }
   }
 }

@@ -1,13 +1,12 @@
 import { Button, Dimmer, Grid, Input, InputOnChangeData, Loader, Modal } from "semantic-ui-react";
 import * as React from "react";
-import { remote } from 'electron';
-const mainJs = remote.require("./main.js");
-const bookService = mainJs.bookService;
+import serviceProvider from '../ServiceProvider';
+import { BookVO } from "../../main/domain/BookVO";
 
 interface AddBookModalProps {
   visible: boolean
   onOpen: () => void;
-  onClose: () => void;
+  onClose: (addedBook?: BookVO) => void;
   trigger: React.ReactNode;
 }
 
@@ -30,7 +29,7 @@ export class AddBookModal extends React.Component<AddBookModalProps, AddBookModa
     return (
       <Modal
         onOpen={this.props.onOpen}
-        onClose={this.props.onClose}
+        onClose={() => this.props.onClose()}
         open={this.props.visible}
         trigger={this.props.trigger}
       >
@@ -44,7 +43,9 @@ export class AddBookModal extends React.Component<AddBookModalProps, AddBookModa
             </Grid.Row>
             <Grid.Row>
               <div style={{width: "100%", textAlign: "right"}}>
-                <Loader inverted disabled={!this.state.loading}/>
+                <Dimmer active={this.state.loading} inverted>
+                  <Loader active={this.state.loading}/>
+                </Dimmer>
                 <Button primary
                         onClick={this.handleOK}>
                   OK
@@ -69,17 +70,14 @@ export class AddBookModal extends React.Component<AddBookModalProps, AddBookModa
 
 
   private handleOK = async () => {
-    console.log("here");
     this.setState({
       loading: true
     });
-    console.log(bookService);
-    const booKId = await bookService.addBook(this.state.bookFilePath);
+    const bookVO = await serviceProvider.bookService.addBook(this.state.bookFilePath);
     this.setState({
       loading: false
     });
-    this.props.onClose();
-    console.log("there");
+    this.props.onClose(bookVO);
   }
 
 }
