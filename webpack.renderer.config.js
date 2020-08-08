@@ -87,6 +87,6 @@ module.exports = merge.smart(baseConfig, {
             // both options are optional
             filename: '[name].css',
             chunkFilename: '[id].css',
-        }),
+        })
     ]
 });

@@ -1,9 +1,10 @@
 import * as React from "react";
 import { Header, Container, Divider, Table, Icon, Grid, Button} from "semantic-ui-react";
 import { AddBookModal } from "./AddBookModal";
-// import { BookService } from "../../main/BookService";
 import { BookVO } from "../../main/domain/BookVO";
-// import { container } from "../../main/config/inversify.config";
+import { remote } from 'electron';
+const mainJs = remote.require("./main.js");
+const bookService = mainJs.bookService;
 
 interface LibraryProps {
 }
@@ -82,10 +83,11 @@ export class Library extends React.Component<LibraryProps, LibraryStates> {
   }
 
   private async initBooks() {
-    // return await container.get(BookService).getBooks();
+    const books = await bookService.getBooks();
+    this.setState({ books });
   }
 
-  private handleCloseOnAddBookModal() {
+  private handleCloseOnAddBookModal = () => {
     this.setState({
       showAddBookModal: false
     });

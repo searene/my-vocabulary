@@ -1,7 +1,8 @@
-import { Button, Grid, Input, InputOnChangeData, Loader, Modal } from "semantic-ui-react";
+import { Button, Dimmer, Grid, Input, InputOnChangeData, Loader, Modal } from "semantic-ui-react";
 import * as React from "react";
-import { container } from "../../main/config/inversify.config";
-import { BookService } from "../../main/BookService";
+import { remote } from 'electron';
+const mainJs = remote.require("./main.js");
+const bookService = mainJs.bookService;
 
 interface AddBookModalProps {
   visible: boolean
@@ -33,7 +34,6 @@ export class AddBookModal extends React.Component<AddBookModalProps, AddBookModa
         open={this.props.visible}
         trigger={this.props.trigger}
       >
-        <Loader active={this.state.loading}/>
         <Modal.Header>Input the Book Path</Modal.Header>
         <Modal.Content>
           <Grid>
@@ -44,6 +44,7 @@ export class AddBookModal extends React.Component<AddBookModalProps, AddBookModa
             </Grid.Row>
             <Grid.Row>
               <div style={{width: "100%", textAlign: "right"}}>
+                <Loader inverted disabled={!this.state.loading}/>
                 <Button primary
                         onClick={this.handleOK}>
                   OK
@@ -59,23 +60,26 @@ export class AddBookModal extends React.Component<AddBookModalProps, AddBookModa
     );
   }
 
-  private handleBookFilePathChange(event: React.ChangeEvent<HTMLInputElement>,
-                                   data: InputOnChangeData) {
+  private handleBookFilePathChange: (event: React.ChangeEvent<HTMLInputElement>,
+                 data: InputOnChangeData) => void = (event, data) => {
     this.setState({
       bookFilePath: data.value
     });
-  }
+  };
 
-  private async handleOK() {
+
+  private handleOK = async () => {
+    console.log("here");
     this.setState({
       loading: true
     });
-    const bookService = container.get(BookService);
-    // const booKId = await bookService.addBook(this.state.bookFilePath);
+    console.log(bookService);
+    const booKId = await bookService.addBook(this.state.bookFilePath);
     this.setState({
       loading: false
     });
     this.props.onClose();
+    console.log("there");
   }
 
 }

@@ -1,15 +1,11 @@
 import { app, BrowserWindow } from "electron";
 import * as path from "path";
 import * as url from "url";
-import { WordStatus } from "./enum/WordStatus";
 import { container } from "./config/inversify.config";
-import { WordService } from "./WordService";
 import * as fs from "fs-extra";
 import { EPubBookReader } from "./EPubBookReader";
 import { EBookReadAgent } from "./EBookReadAgent";
-import { DatabaseService } from "./database/DatabaseService";
 import { TYPES } from "./config/types";
-import { BookService } from "./BookService";
 
 let win: BrowserWindow | null;
 
@@ -80,3 +76,6 @@ async function init() {
 }
 
 init();
+
+exports.bookService = container.get(TYPES.BookService);
+
