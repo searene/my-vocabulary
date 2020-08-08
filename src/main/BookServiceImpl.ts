@@ -48,6 +48,13 @@ export class BookServiceImpl implements BookService {
     });
   }
 
+  async getBook(bookId: number): Promise<BookVO> {
+    const bookDOArray = await this.databaseService.queryBooks({
+      id: bookId
+    });
+    return bookDOArray.map(bookDO => BookServiceImpl.toBookVO(bookDO))[0];
+  }
+
   static toBookVO(bookDO: BookDO): BookVO {
     return {
       id: bookDO.id,
@@ -55,4 +62,5 @@ export class BookServiceImpl implements BookService {
       totalWordCount: bookDO.contents.split(/\s/).length
     }
   }
+
 }

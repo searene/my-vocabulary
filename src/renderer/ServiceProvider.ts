@@ -43,6 +43,13 @@ if (process.env.RENDERER_ENV === "electron") {
           totalWordCount: 1209412804
         };
         return Promise.resolve([bookVO1, bookVO2]);
+      },
+      async getBook(bookId: number): Promise<BookVO> {
+        return Promise.resolve({
+          id: 1,
+          name: "Test Book",
+          totalWordCount: 1125479
+        })
       }
     }
 
