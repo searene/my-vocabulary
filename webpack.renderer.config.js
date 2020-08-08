@@ -35,10 +35,11 @@ module.exports = merge.smart(baseConfig, {
                 }
             },
             {
-                test: /\.css$/i,
+                test: /\.css|\.less$/i,
                 use: [
                     MiniCssExtractPlugin.loader,
-                    'css-loader'
+                    'css-loader',
+                    'less-loader'
                 ],
             },
             {

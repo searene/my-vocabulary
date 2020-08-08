@@ -3,6 +3,7 @@ import { Header, Container, Divider, Table, Icon, Grid, Button} from "semantic-u
 import { AddBookModal } from "./AddBookModal";
 import { BookVO } from "../../main/domain/BookVO";
 import serviceProvider from '../ServiceProvider';
+import '../style/Library.less';
 
 interface LibraryProps {
 }
@@ -14,7 +15,6 @@ interface LibraryStates {
 }
 
 export class Library extends React.Component<LibraryProps, LibraryStates> {
-
   constructor(props: LibraryProps) {
     super(props);
     this.state = {
@@ -51,7 +51,7 @@ export class Library extends React.Component<LibraryProps, LibraryStates> {
               </Grid.Row>
             </Grid>
         <Divider/>
-        <Table basic="very">
+        <Table basic="very" selectable>
           <Table.Header>
             <Table.Row>
               <Table.HeaderCell>Name</Table.HeaderCell>
@@ -60,7 +60,9 @@ export class Library extends React.Component<LibraryProps, LibraryStates> {
           </Table.Header>
           <Table.Body>
             {this.state.books.map(book =>
-              <Table.Row key={book.id}>
+              <Table.Row key={book.id}
+                          onClick={() => this.handleClickOnBook(book)}
+                          className={"book-row"}>
                 <Table.Cell>
                   {book.name}
                 </Table.Cell>
@@ -90,11 +92,14 @@ export class Library extends React.Component<LibraryProps, LibraryStates> {
   private handleCloseOnAddBookModal = (addedBook?: BookVO) => {
     const books = addedBook === undefined ? this.state.books
       : this.state.books.concat(addedBook);
-    console.log(addedBook);
-    console.log(books);
     this.setState({
       books,
       showAddBookModal: false
     });
+  };
+
+  private handleClickOnBook = (book: BookVO) => {
+    console.log(book);
   }
+
 }
