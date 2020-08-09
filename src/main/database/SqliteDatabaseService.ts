@@ -150,6 +150,25 @@ export class SqliteDatabaseService implements DatabaseService {
 
   }
 
+  async updateWord(wordQuery: WordQuery): Promise<number> {
+    if (wordQuery.id === undefined) {
+      throw new Error("id must be provided.");
+    }
+    let setExpr: string[] = [];
+    if (wordQuery.status != undefined) {
+      setExpr.push(`status = ${wordQuery.status}`);
+    }
+    if (wordQuery.bookId != undefined) {
+      setExpr.push(`bookId = ${wordQuery.bookId}`);
+    }
+    if (wordQuery.word != undefined) {
+      setExpr.push(`word = "${wordQuery.word}"`);
+    }
+    const runResult = await this.run(`UPDATE words SET (${setExpr.join(",")})
+      WHERE id = ${wordQuery.id}`);
+    return runResult.changes;
+  }
+
   private async getInsertWordsSqlList(bookId: number, wordAndPosListMap: Map<string, number[]>): Promise<string[]> {
     const sqlList = [];
     const sqlSuffix: string[] = [];
@@ -224,4 +243,5 @@ export class SqliteDatabaseService implements DatabaseService {
     }
     return Optional.empty();
   }
+
 }

@@ -1,3 +1,5 @@
+import { WordStatus } from "../enum/WordStatus";
+
 export type WordVO = {
 
   id: number,
@@ -14,4 +16,5 @@ export type WordVO = {
 
   contextList: string[];
 
+  status: WordStatus;
 }

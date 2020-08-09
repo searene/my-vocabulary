@@ -1,9 +1,14 @@
 import { BookService } from "../main/BookService";
 import { BookVO } from "../main/domain/BookVO";
 import { Utils } from "./utils/Utils";
+import { WordService } from "../main/WordService";
+import { WordStatus } from "../main/enum/WordStatus";
+import { WordVO } from "../main/database/WordVO";
+import { WordQuery } from "../main/domain/WordQuery";
 
 interface ServiceProvider {
-  bookService: BookService
+  bookService: BookService,
+  wordService: WordService,
 }
 
 let serviceProvider: ServiceProvider;
@@ -11,10 +16,10 @@ if (process.env.RENDERER_ENV === "electron") {
 
   const remote = require("electron");
   const mainJs = remote.require("./main.js");
-  const bookService: BookService = mainJs.bookService;
 
   serviceProvider = {
-    bookService: bookService,
+    bookService: mainJs.bookService,
+    wordService: mainJs.wordService
   };
 
 } else {
@@ -50,6 +55,30 @@ if (process.env.RENDERER_ENV === "electron") {
           name: "Test Book",
           totalWordCount: 1125479
         })
+      }
+    },
+
+    wordService: {
+      async getWords(bookId: number,
+               wordStatus: WordStatus,
+               pageNo: number,
+               pageSize: number,
+               contextStep: number): Promise<WordVO[]> {
+        return [{
+          id: 1,
+          word: "tests",
+          originalWord: "test",
+          contextList: [
+            "This is just a simple test",
+            "This is another simple test",
+            "This is a really long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long test."
+          ],
+          status: WordStatus.Unknown
+        }];
+      },
+      async updateWord(wordQuery: WordQuery): Promise<void> {
+        console.log("mock update");
+        return Promise.resolve();
       }
     }
 
