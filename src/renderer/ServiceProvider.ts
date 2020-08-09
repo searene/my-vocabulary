@@ -74,7 +74,8 @@ if (process.env.RENDERER_ENV === "electron") {
                   wordPos: 20,
                   endPos: 50,
                   plainContents: "This is just a simple test",
-                  htmlContents: "<b>Test</b>",
+                  htmlContents:
+                    "Here is a <span class='highlight'>Test</span>. Please check out.",
                 },
               },
             ],
