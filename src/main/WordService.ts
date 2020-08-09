@@ -1,6 +1,7 @@
 import { WordVO } from "./database/WordVO";
 import { WordStatus } from "./enum/WordStatus";
 import { WordQuery } from "./domain/WordQuery";
+import { WordCount } from "./domain/WordCount";
 
 export interface WordService {
   getWords(
@@ -13,4 +14,6 @@ export interface WordService {
   ): Promise<WordVO[]>;
 
   updateWord(wordQuery: WordQuery): Promise<void>;
+
+  getWordCount(bookId: number): Promise<WordCount>;
 }

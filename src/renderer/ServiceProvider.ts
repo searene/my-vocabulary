@@ -72,6 +72,12 @@ if (process.env.RENDERER_ENV === "electron") {
         console.log("mock update");
         return Promise.resolve();
       },
+      async getWordCount() {
+        return Promise.resolve({
+          unknown: 10,
+          known: 1234,
+        });
+      },
     },
   };
 }

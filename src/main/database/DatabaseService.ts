@@ -2,6 +2,7 @@ import { WordQuery } from "../domain/WordQuery";
 import { WordDO } from "../domain/WordDO";
 import { BookQuery } from "../domain/BookQuery";
 import { BookDO } from "../domain/BookDO";
+import { WordCount } from "../domain/WordCount";
 
 export interface DatabaseService {
   init(): Promise<void>;
@@ -25,4 +26,9 @@ export interface DatabaseService {
    * @returns the number of lines being changed.
    */
   updateWord(wordQuery: WordQuery): Promise<number>;
+
+  /**
+   * Calculate the count of words by status in a book.
+   */
+  getWordCount(bookId: number): Promise<WordCount>;
 }

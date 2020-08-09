@@ -12,6 +12,7 @@ import serviceProvider from "../ServiceProvider";
 import { WordVO } from "../../main/database/WordVO";
 import { Link } from "react-router-dom";
 import { Optional } from "typescript-optional";
+import { WordCount } from "../../main/domain/WordCount";
 
 interface MatchParams {
   bookId: string;
@@ -25,6 +26,7 @@ interface BookStates {
   wordStatus: WordStatus;
   pageNo: Map<WordStatus, number>;
   wordVO: Optional<WordVO>;
+  wordCount: WordCount;
 }
 
 export class Book extends React.Component<BookProps, BookStates> {
@@ -43,6 +45,7 @@ export class Book extends React.Component<BookProps, BookStates> {
       wordStatus: WordStatus.Unknown,
       pageNo: pageNo,
       wordVO: Optional.empty(),
+      wordCount: { unknown: 0, known: 0 },
     };
   }
 
@@ -74,6 +77,10 @@ export class Book extends React.Component<BookProps, BookStates> {
               value={this.state.wordStatus}
               onChange={this.handleStatusChange}
             />
+          </Grid.Column>
+          <Grid.Column width={4}>
+            Known: {this.state.wordCount.known} / Unknown:{" "}
+            {this.state.wordCount.unknown}
           </Grid.Column>
         </Grid.Row>
         {this.state.wordVO.isEmpty() ? (
@@ -202,20 +209,38 @@ export class Book extends React.Component<BookProps, BookStates> {
     const bookId = parseInt(this.props.match.params.bookId);
     const bookName = await Book.getBookName(bookId);
     const wordVO = await this.getCurrentWord(bookId, this.getPageNo());
-    if (wordVO.isEmpty() && this.state.wordVO.isEmpty()) {
-      return;
+    const wordCount = await serviceProvider.wordService.getWordCount(bookId);
+    if (this.needRefresh(wordVO, wordCount)) {
+      this.setState({ initiated: true, bookName, wordVO, wordCount });
     }
-    if (
-      wordVO.isPresent() &&
-      this.state.wordVO.isPresent() &&
-      wordVO.get().id === this.state.wordVO.get().id
-    ) {
-      return;
-    }
-    this.setState({ initiated: true, bookName, wordVO });
   };
 
   private getPageNo(): number {
     return this.state.pageNo.get(this.state.wordStatus) as number;
+  }
+
+  private needRefresh(wordVO: Optional<WordVO>, wordCount: WordCount) {
+    return this.isWordVOChanged(wordVO) || this.isWordCountChanged(wordCount);
+  }
+
+  /**
+   * Check if wordVO is changed
+   */
+  private isWordVOChanged(wordVO: Optional<WordVO>) {
+    if (wordVO.isEmpty() && this.state.wordVO.isEmpty()) {
+      return false;
+    }
+    return !(
+      wordVO.isPresent() &&
+      this.state.wordVO.isPresent() &&
+      wordVO.get().id === this.state.wordVO.get().id
+    );
+  }
+
+  private isWordCountChanged(wordCount: WordCount) {
+    return (
+      wordCount.known !== this.state.wordCount.known ||
+      wordCount.unknown !== this.state.wordCount.unknown
+    );
   }
 }

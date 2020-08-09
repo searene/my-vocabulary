@@ -7,6 +7,7 @@ import { getContextList } from "./domain/WordDO";
 import { TYPES } from "./config/types";
 import { WordService } from "./WordService";
 import { WordQuery } from "./domain/WordQuery";
+import { WordCount } from "./domain/WordCount";
 
 @injectable()
 export class WordServiceImpl implements WordService {
@@ -57,5 +58,9 @@ export class WordServiceImpl implements WordService {
     if (updatedRecords === 0) {
       console.error("Nothing was updated");
     }
+  }
+
+  async getWordCount(bookId: number): Promise<WordCount> {
+    return await this.databaseService.getWordCount(bookId);
   }
 }

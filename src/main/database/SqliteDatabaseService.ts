@@ -12,7 +12,8 @@ import { Optional } from "typescript-optional";
 import { BookQuery } from "../domain/BookQuery";
 import { BookDO } from "../domain/BookDO";
 import { WordFormReader } from "../WordFormReader";
-import { WordStatusInDatabase } from "../enum/WordStatusInDatabase";
+import { WordCount } from "../domain/WordCount";
+import { WordStatus } from "../enum/WordStatus";
 
 const sqlite3 = sqliteImport.verbose();
 
@@ -83,7 +84,7 @@ export class SqliteDatabaseService implements DatabaseService {
       where +=
         " AND (word = $word OR original_word = $word) AND status = $status";
       params["$word"] = wordQuery.word;
-      params["$status"] = WordStatusInDatabase.Known;
+      params["$status"] = WordStatus.Known;
     }
     if (wordQuery.word != undefined) {
       where += " AND word = $word";
@@ -156,6 +157,24 @@ export class SqliteDatabaseService implements DatabaseService {
     return bookDOList;
   }
 
+  async getWordCount(bookId: number): Promise<WordCount> {
+    await this.init();
+    const rows = await this.all(`SELECT status, COUNT(*) AS cnt
+    FROM words GROUP BY status`);
+    const wordCount: WordCount = {
+      unknown: 0,
+      known: 0,
+    };
+    for (const row of rows) {
+      if (row.status === WordStatus.Unknown) {
+        wordCount.unknown = row.cnt;
+      } else if (row.status === WordStatus.Known) {
+        wordCount.known = row.cnt;
+      }
+    }
+    return wordCount;
+  }
+
   async updateWord(wordQuery: WordQuery): Promise<number> {
     await this.init();
     if (wordQuery.id === undefined) {
@@ -188,7 +207,7 @@ export class SqliteDatabaseService implements DatabaseService {
       sqlSuffix.push(`(${bookId}, "${word}", "${
         originalWord.isPresent() ? originalWord.get() : ""
       }",
-        "${posList.join(",")}", ${WordStatusInDatabase.Unknown})`);
+        "${posList.join(",")}", ${WordStatus.Unknown})`);
     }
 
     const rowCountPerInsert = 2;
