@@ -2,6 +2,7 @@ import { WordVO } from "./database/WordVO";
 import { WordStatus } from "./enum/WordStatus";
 import { WordQuery } from "./domain/WordQuery";
 import { WordCount } from "./domain/WordCount";
+import { WordContextStep } from "./domain/WordContextStep";
 
 export interface WordService {
   getWords(
@@ -9,7 +10,7 @@ export interface WordService {
     wordStatus: WordStatus,
     pageNo: number,
     pageSize: number,
-    contextStep: number,
+    contextStep: WordContextStep,
     contextLimit: number
   ): Promise<WordVO[]>;
 

@@ -3,11 +3,12 @@ import { inject, injectable } from "inversify";
 import { DatabaseService } from "./database/DatabaseService";
 import { WordStatus } from "./enum/WordStatus";
 import { BookStatus } from "./enum/BookStatus";
-import { getContextList } from "./domain/WordDO";
 import { TYPES } from "./config/types";
 import { WordService } from "./WordService";
 import { WordQuery } from "./domain/WordQuery";
 import { WordCount } from "./domain/WordCount";
+import { WordContextService } from "./WordContextService";
+import { WordContextStep } from "./domain/WordContextStep";
 
 @injectable()
 export class WordServiceImpl implements WordService {
@@ -20,7 +21,7 @@ export class WordServiceImpl implements WordService {
     wordStatus: WordStatus,
     pageNo: number,
     pageSize: number,
-    contextStep: number,
+    contextStep: WordContextStep,
     contextLimit: number
   ): Promise<WordVO[]> {
     const bookDOList = await this.databaseService.queryBooks({
@@ -42,7 +43,7 @@ export class WordServiceImpl implements WordService {
         id: wordDO.id,
         word: wordDO.word,
         originalWord: wordDO.originalWord,
-        contextList: getContextList(
+        contextList: WordContextService.getContextList(
           wordDO.positions,
           bookDO.contents,
           contextStep,

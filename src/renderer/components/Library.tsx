@@ -11,7 +11,6 @@ import {
 import { AddBookModal } from "./AddBookModal";
 import { BookVO } from "../../main/domain/BookVO";
 import serviceProvider from "../ServiceProvider";
-import "../style/Library.less";
 import { RouteComponentProps } from "react-router";
 
 interface LibraryProps extends RouteComponentProps {}
@@ -74,7 +73,7 @@ export class Library extends React.Component<LibraryProps, LibraryStates> {
               <Table.Row
                 key={book.id}
                 onClick={() => this.handleClickOnBook(book)}
-                className={"book-row"}
+                className={"hover-link"}
               >
                 <Table.Cell>{book.name}</Table.Cell>
                 <Table.Cell>{book.totalWordCount}</Table.Cell>

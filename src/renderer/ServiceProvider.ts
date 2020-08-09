@@ -60,9 +60,20 @@ if (process.env.RENDERER_ENV === "electron") {
             word: "tests",
             originalWord: "test",
             contextList: [
-              "This is just a simple test",
-              "This is another simple test",
-              "This is a really long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long test.",
+              {
+                short: {
+                  startPos: 10,
+                  wordPos: 20,
+                  endPos: 50,
+                  contents: "This is just a simple test",
+                },
+                long: {
+                  startPos: 10,
+                  wordPos: 20,
+                  endPos: 50,
+                  contents: "This is just a simple test",
+                },
+              },
             ],
             status: WordStatus.Unknown,
           },

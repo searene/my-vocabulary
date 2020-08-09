@@ -5,6 +5,7 @@ import {
   DropdownItemProps,
   DropdownProps,
   Grid,
+  Modal,
 } from "semantic-ui-react";
 import { WordStatus } from "../../main/enum/WordStatus";
 import { RouteComponentProps } from "react-router";
@@ -27,6 +28,7 @@ interface BookStates {
   pageNo: Map<WordStatus, number>;
   wordVO: Optional<WordVO>;
   wordCount: WordCount;
+  longWordContextModalIndex: Optional<number>;
 }
 
 export class Book extends React.Component<BookProps, BookStates> {
@@ -38,7 +40,6 @@ export class Book extends React.Component<BookProps, BookStates> {
         pageNo.set(Number(wordStatus), 1);
       }
     }
-    console.log(pageNo);
     this.state = {
       initiated: false,
       bookName: "",
@@ -46,6 +47,7 @@ export class Book extends React.Component<BookProps, BookStates> {
       pageNo: pageNo,
       wordVO: Optional.empty(),
       wordCount: { unknown: 0, known: 0 },
+      longWordContextModalIndex: Optional.empty(),
     };
   }
 
@@ -99,7 +101,34 @@ export class Book extends React.Component<BookProps, BookStates> {
                 <Grid>
                   <Grid.Row>Context:</Grid.Row>
                   {this.state.wordVO.get().contextList.map((context, i) => (
-                    <Grid.Row key={i}>{context}</Grid.Row>
+                    <Modal
+                      key={i}
+                      trigger={
+                        <Grid.Row className={"hover-link"}>
+                          {context.short.contents}
+                        </Grid.Row>
+                      }
+                      onClose={() =>
+                        this.setState({
+                          longWordContextModalIndex: Optional.empty(),
+                        })
+                      }
+                      onOpen={() =>
+                        this.setState({
+                          longWordContextModalIndex: Optional.of(i),
+                        })
+                      }
+                      open={this.state.longWordContextModalIndex.isPresent()}
+                      header="Context"
+                      content={
+                        this.state.longWordContextModalIndex.isPresent()
+                          ? this.state.wordVO.get().contextList[
+                              this.state.longWordContextModalIndex.get()
+                            ].long.contents
+                          : ""
+                      }
+                      actions={["Close"]}
+                    />
                   ))}
                 </Grid>
               </Grid.Row>
@@ -158,7 +187,10 @@ export class Book extends React.Component<BookProps, BookStates> {
       this.state.wordStatus,
       pageNo,
       1,
-      50,
+      {
+        short: 50,
+        long: 500,
+      },
       5
     );
     if (wordVOArray.length === 0) {
@@ -243,4 +275,11 @@ export class Book extends React.Component<BookProps, BookStates> {
       wordCount.unknown !== this.state.wordCount.unknown
     );
   }
+
+  private handleContextClick = (contextIndex: number) => {
+    console.log("here");
+    this.setState({
+      longWordContextModalIndex: Optional.of(contextIndex),
+    });
+  };
 }
