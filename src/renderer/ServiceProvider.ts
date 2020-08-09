@@ -4,7 +4,6 @@ import { Utils } from "./utils/Utils";
 import { WordService } from "../main/WordService";
 import { WordStatus } from "../main/enum/WordStatus";
 import { WordVO } from "../main/database/WordVO";
-import { WordQuery } from "../main/domain/WordQuery";
 
 interface ServiceProvider {
   bookService: BookService,
@@ -14,8 +13,7 @@ interface ServiceProvider {
 let serviceProvider: ServiceProvider;
 if (process.env.RENDERER_ENV === "electron") {
 
-  const remote = require("electron");
-  const mainJs = remote.require("./main.js");
+  const mainJs = require("electron").remote.require("./main.js");
 
   serviceProvider = {
     bookService: mainJs.bookService,
@@ -49,7 +47,7 @@ if (process.env.RENDERER_ENV === "electron") {
         };
         return Promise.resolve([bookVO1, bookVO2]);
       },
-      async getBook(bookId: number): Promise<BookVO> {
+      async getBook(): Promise<BookVO> {
         return Promise.resolve({
           id: 1,
           name: "Test Book",
@@ -59,11 +57,7 @@ if (process.env.RENDERER_ENV === "electron") {
     },
 
     wordService: {
-      async getWords(bookId: number,
-               wordStatus: WordStatus,
-               pageNo: number,
-               pageSize: number,
-               contextStep: number): Promise<WordVO[]> {
+      async getWords(): Promise<WordVO[]> {
         return [{
           id: 1,
           word: "tests",
@@ -76,7 +70,7 @@ if (process.env.RENDERER_ENV === "electron") {
           status: WordStatus.Unknown
         }];
       },
-      async updateWord(wordQuery: WordQuery): Promise<void> {
+      async updateWord(): Promise<void> {
         console.log("mock update");
         return Promise.resolve();
       }

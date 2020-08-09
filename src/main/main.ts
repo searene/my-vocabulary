@@ -2,7 +2,6 @@ import { app, BrowserWindow } from "electron";
 import * as path from "path";
 import * as url from "url";
 import { container } from "./config/inversify.config";
-import * as fs from "fs-extra";
 import { EPubBookReader } from "./EPubBookReader";
 import { EBookReadAgent } from "./EBookReadAgent";
 import { TYPES } from "./config/types";
@@ -68,9 +67,9 @@ app.on("activate", () => {
 async function init() {
 
   // only for test
-  if (fs.existsSync("/home/searene/.my-vocabulary")) {
-    fs.removeSync("/home/searene/.my-vocabulary");
-  }
+  // if (fs.existsSync("/home/searene/.my-vocabulary")) {
+  //   fs.removeSync("/home/searene/.my-vocabulary");
+  // }
 
   EBookReadAgent.register("epub", EPubBookReader);
 }
@@ -78,4 +77,5 @@ async function init() {
 init();
 
 exports.bookService = container.get(TYPES.BookService);
+exports.wordService = container.get(TYPES.WordService);
 

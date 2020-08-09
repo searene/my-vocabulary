@@ -7,7 +7,7 @@ module.exports = {
     output: {
         path: path.resolve(__dirname, 'dist'),
         filename: '[name].js',
-        publicPath: "/",
+        publicPath: process.env.RENDERER_ENV === "web" ? "/" : "./",
     },
     node: {
         __dirname: false,

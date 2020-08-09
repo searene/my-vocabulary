@@ -20,7 +20,8 @@ export class WordServiceImpl implements WordService {
                  wordStatus: WordStatus,
                  pageNo: number,
                  pageSize: number,
-                 contextStep: number): Promise<WordVO[]> {
+                 contextStep: number,
+                 contextLimit: number): Promise<WordVO[]> {
     const bookDOList = await this.databaseService.queryBooks({
       id: bookId,
       status: BookStatus.Normal
@@ -40,7 +41,8 @@ export class WordServiceImpl implements WordService {
         id: wordDO.id,
         word: wordDO.word,
         originalWord: wordDO.originalWord,
-        contextList: getContextList(wordDO.positions, bookDO.contents, contextStep),
+        contextList: getContextList(wordDO.positions, bookDO.contents,
+          contextStep, contextLimit),
         status: wordDO.status
       };
     });

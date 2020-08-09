@@ -63,7 +63,9 @@ module.exports = merge.smart(baseConfig, {
                     name: '[name].[ext]',
                     outputPath: 'css/',
                     esModule: false,
-                    publicPath: url => './css/' + url
+                    publicPath: (url) => {
+                        return './css/' + url;
+                    }
                 }
             },
             // All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
@@ -82,7 +84,8 @@ module.exports = merge.smart(baseConfig, {
         new HtmlWebpackPlugin(),
         new webpack.DefinePlugin({
             'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
-            'process.env.RENDERER_ENV': JSON.stringify(process.env.RENDERER_ENV)
+            'process.env.RENDERER_ENV': JSON.stringify(process.env.RENDERER_ENV),
+            'testVar': JSON.stringify("blah")
         }),
         new MiniCssExtractPlugin({
             // Options similar to the same options in webpackOptions.output

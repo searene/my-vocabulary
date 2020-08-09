@@ -4,10 +4,9 @@ import { AddBookModal } from "./AddBookModal";
 import { BookVO } from "../../main/domain/BookVO";
 import serviceProvider from "../ServiceProvider";
 import "../style/Library.less";
-import { Route, useHistory } from "react-router";
-import { Book } from "./Book";
+import { RouteComponentProps} from "react-router";
 
-interface LibraryProps {
+interface LibraryProps extends RouteComponentProps {
 }
 
 interface LibraryStates {
@@ -101,7 +100,7 @@ export class Library extends React.Component<LibraryProps, LibraryStates> {
   };
 
   private handleClickOnBook = (book: BookVO) => {
-    window.location.assign(`/book/${book.id}`);
+    this.props.history.push("/book/" + book.id);
   };
 
 }

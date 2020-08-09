@@ -8,7 +8,8 @@ export interface WordService {
            wordStatus: WordStatus,
            pageNo: number,
            pageSize: number,
-           contextStep: number): Promise<WordVO[]>;
+           contextStep: number,
+           contextLimit: number): Promise<WordVO[]>;
 
   updateWord(wordQuery: WordQuery): Promise<void>;
 }

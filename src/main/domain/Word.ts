@@ -1,6 +1,10 @@
 export class Word {
 
   private _word: string;
+
+  /**
+   * Position of the word in the book, starting with 0.
+   */
   private _pos: number;
 
   constructor(word: string, pos: number) {

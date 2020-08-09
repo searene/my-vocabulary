@@ -151,6 +151,7 @@ export class SqliteDatabaseService implements DatabaseService {
   }
 
   async updateWord(wordQuery: WordQuery): Promise<number> {
+    await this.init();
     if (wordQuery.id === undefined) {
       throw new Error("id must be provided.");
     }

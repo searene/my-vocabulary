@@ -20,10 +20,11 @@ export type WordDO = BaseDO & {
 
 export function getContextList(positions: number[],
                                bookContents: string,
-                               contextStep: number): string[] {
+                               contextStep: number,
+                               contextLimit: number): string[] {
   const contextList: string[] = [];
-  for (const pos of positions) {
-    const start = Math.min(0, pos - contextStep);
+  for (const pos of positions.slice(0, contextLimit)) {
+    const start = Math.max(0, pos - contextStep);
     const end = Math.min(bookContents.length, pos + contextStep);
     const context = bookContents.substring(start, end);
     contextList.push(context);

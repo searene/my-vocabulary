@@ -42,7 +42,7 @@ export class Book extends React.Component<BookProps, BookStates> {
 
   async componentDidMount() {
     const bookId = parseInt(this.props.match.params.bookId);
-    const bookName = await this.getBookName(bookId);
+    const bookName = await Book.getBookName(bookId);
     const wordVO = await this.getCurrentWord(bookId, this.state.pageNo);
     this.setState({ initiated: true, bookName, wordVO });
   }
@@ -62,7 +62,7 @@ export class Book extends React.Component<BookProps, BookStates> {
           </Grid.Column>
           <Grid.Column width={4}>
             <Dropdown fluid multiple selection placeholder={"Status"}
-                      options={this.getWordStatusArray()}
+                      options={Book.getWordStatusArray()}
                       value={this.state.statuses}
                       onChange={this.handleStatusChange}/>
           </Grid.Column>
@@ -72,8 +72,9 @@ export class Book extends React.Component<BookProps, BookStates> {
             <Grid.Row>Word: {this.state.wordVO.word}</Grid.Row>
             <Grid.Row>Original Word: {this.state.wordVO.originalWord}</Grid.Row>
             <Grid.Row>Status: {WordStatus[this.state.wordVO.status]}</Grid.Row>
-            <Grid.Row>Context:
+            <Grid.Row>
               <Grid>
+                <Grid.Row>Context:</Grid.Row>
                 {this.state.wordVO.contextList.map((context, i) =>
                   <Grid.Row key={i}>
                     {context}
@@ -88,7 +89,7 @@ export class Book extends React.Component<BookProps, BookStates> {
             <Grid.Row>
               <Grid.Column width={16} textAlign={"right"}>
                 <Button onClick={this.handleKnowAndNext}>Know and Next</Button>
-                <Button>Next</Button>
+                <Button onClick={this.handleNext}>Next</Button>
               </Grid.Column>
             </Grid.Row>
           </Grid>
@@ -97,7 +98,7 @@ export class Book extends React.Component<BookProps, BookStates> {
     )
   }
 
-  private getWordStatusArray(): DropdownItemProps[] {
+  private static getWordStatusArray(): DropdownItemProps[] {
     const result = [];
     for (const key in WordStatus) {
       if (isNaN(Number(key))) {
@@ -111,7 +112,7 @@ export class Book extends React.Component<BookProps, BookStates> {
     return result;
   }
 
-  private async getBookName(bookId: number): Promise<string> {
+  private static async getBookName(bookId: number): Promise<string> {
     const bookVO = await serviceProvider.bookService.getBook(bookId);
     return bookVO.name;
   }
@@ -122,6 +123,7 @@ export class Book extends React.Component<BookProps, BookStates> {
       this.state.statuses[0],
       pageNo,
       1,
+      50,
       5
       );
     if (wordVOArray.length === 0) {
@@ -145,7 +147,15 @@ export class Book extends React.Component<BookProps, BookStates> {
     const wordVO = await this.getCurrentWord(
       parseInt(this.props.match.params.bookId), this.state.pageNo);
     this.setState({
+      wordVO
+    });
+  };
+
+  private handleNext = async (): Promise<void> => {
+    const wordVO = await this.getCurrentWord(
+      parseInt(this.props.match.params.bookId), this.state.pageNo + 1);
+    this.setState({
       wordVO, pageNo: this.state.pageNo + 1
     });
-  }
+  };
 }
