@@ -5,7 +5,6 @@ import { injectable } from "inversify";
 
 @injectable()
 export class ConfigReader {
-
   private config: any;
 
   private initialized: boolean = false;

@@ -6,4 +6,4 @@ export type WordQuery = BaseQuery & {
   bookId?: number;
   word?: string;
   status?: WordStatus;
-}
+};

@@ -2,7 +2,7 @@ import { DatabaseService } from "./DatabaseService";
 import * as sqliteImport from "sqlite3";
 import { Database, RunResult } from "sqlite3";
 import * as os from "os";
-import {join} from "path";
+import { join } from "path";
 import { existsSync, mkdirSync } from "fs";
 import { inject, injectable } from "inversify";
 import { WordQuery } from "../domain/WordQuery";
@@ -18,14 +18,13 @@ const sqlite3 = sqliteImport.verbose();
 
 @injectable()
 export class SqliteDatabaseService implements DatabaseService {
-
   private db: Database;
   private initiated = false;
 
   constructor(@inject(WordFormReader) private wordFormReader: WordFormReader) {
     const dir = join(os.homedir(), ".my-vocabulary");
     if (!existsSync(dir)) {
-      mkdirSync(dir)
+      mkdirSync(dir);
     }
     this.db = new sqlite3.Database(join(dir, "vocabulary.db"));
   }
@@ -38,18 +37,27 @@ export class SqliteDatabaseService implements DatabaseService {
     this.initiated = true;
   }
 
-  async writeBookContents(bookName: string, bookContents: string): Promise<number> {
+  async writeBookContents(
+    bookName: string,
+    bookContents: string
+  ): Promise<number> {
     await this.init();
-    const runResult = await this.run(`
+    const runResult = await this.run(
+      `
       INSERT INTO books (name, contents, status) VALUES ($bookName, $bookContents, 0)
-    `, {
-      $bookName: bookName,
-      $bookContents: bookContents
-    });
+    `,
+      {
+        $bookName: bookName,
+        $bookContents: bookContents,
+      }
+    );
     return runResult.lastID;
   }
 
-  async writeWords(bookId: number, wordAndPosList: Map<string, number[]>): Promise<void> {
+  async writeWords(
+    bookId: number,
+    wordAndPosList: Map<string, number[]>
+  ): Promise<void> {
     await this.init();
     const sqlList = await this.getInsertWordsSqlList(bookId, wordAndPosList);
     for (const sql of sqlList) {
@@ -72,7 +80,8 @@ export class SqliteDatabaseService implements DatabaseService {
       where += " AND status = $status";
       params["$status"] = wordQuery.status;
     } else if (wordQuery.status != undefined && wordQuery.word != undefined) {
-      where += " AND (word = $word OR original_word = $word) AND status = $status";
+      where +=
+        " AND (word = $word OR original_word = $word) AND status = $status";
       params["$word"] = wordQuery.word;
       params["$status"] = WordStatusInDatabase.Known;
     }
@@ -98,9 +107,10 @@ export class SqliteDatabaseService implements DatabaseService {
         bookId: row.book_id,
         word: row.word,
         originalWord: row.original_word,
-        positions: (row.positions as string).split(",")
+        positions: (row.positions as string)
+          .split(",")
           .map(pos => parseInt(pos)),
-        status: row.status
+        status: row.status,
       });
     }
     return wordDOList;
@@ -142,11 +152,10 @@ export class SqliteDatabaseService implements DatabaseService {
         id: row.id,
         name: row.name,
         status: row.status,
-        contents: row.contents
+        contents: row.contents,
       });
     }
     return bookDOList;
-
   }
 
   async updateWord(wordQuery: WordQuery): Promise<number> {
@@ -169,21 +178,30 @@ export class SqliteDatabaseService implements DatabaseService {
     return runResult.changes;
   }
 
-  private async getInsertWordsSqlList(bookId: number, wordAndPosListMap: Map<string, number[]>): Promise<string[]> {
+  private async getInsertWordsSqlList(
+    bookId: number,
+    wordAndPosListMap: Map<string, number[]>
+  ): Promise<string[]> {
     const sqlList = [];
     const sqlSuffix: string[] = [];
     for (const [word, posList] of wordAndPosListMap) {
       const originalWord = await this.wordFormReader.getOriginalWord(word);
-      sqlSuffix.push(`(${bookId}, "${word}", "${originalWord.isPresent() ? originalWord.get() : ""}",
+      sqlSuffix.push(`(${bookId}, "${word}", "${
+        originalWord.isPresent() ? originalWord.get() : ""
+      }",
         "${posList.join(",")}", ${WordStatusInDatabase.Unknown})`);
     }
 
     const rowCountPerInsert = 2;
     const sqlPrefix = ` INSERT INTO words
       (book_id, word, original_word, positions, status) VALUES`;
-    for (let i = 0; i < sqlSuffix.length; i+= rowCountPerInsert) {
+    for (let i = 0; i < sqlSuffix.length; i += rowCountPerInsert) {
       let sql = sqlPrefix;
-      for (let j = i; j < Math.min(sqlSuffix.length, i + rowCountPerInsert); j += 1) {
+      for (
+        let j = i;
+        j < Math.min(sqlSuffix.length, i + rowCountPerInsert);
+        j += 1
+      ) {
         sql += sqlSuffix[j] + ",";
       }
       sql = sql.substring(0, sql.length - 1) + ";";
@@ -215,13 +233,13 @@ export class SqliteDatabaseService implements DatabaseService {
 
   private async run(sql: string, params?: any): Promise<RunResult> {
     return new Promise<RunResult>((resolve, reject) => {
-      this.db.run(sql, params, function (err) {
+      this.db.run(sql, params, function(err) {
         if (err != null) {
           reject(err);
         } else {
           resolve(this);
         }
-      })
+      });
     });
   }
 
@@ -239,9 +257,10 @@ export class SqliteDatabaseService implements DatabaseService {
 
   private static getLimitExpression(baseQuery: BaseQuery): Optional<string> {
     if (baseQuery.pageNo != undefined && baseQuery.pageSize != undefined) {
-      return Optional.of(` LIMIT ${baseQuery.pageSize * baseQuery.pageNo}, ${baseQuery.pageSize}`);
+      return Optional.of(
+        ` LIMIT ${baseQuery.pageSize * baseQuery.pageNo}, ${baseQuery.pageSize}`
+      );
     }
     return Optional.empty();
   }
-
 }

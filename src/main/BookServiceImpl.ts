@@ -10,11 +10,9 @@ import { BookDO } from "./domain/BookDO";
 
 @injectable()
 export class BookServiceImpl implements BookService {
-
   constructor(
-    @inject(TYPES.DatabaseService) private databaseService: DatabaseService) {
-
-  }
+    @inject(TYPES.DatabaseService) private databaseService: DatabaseService
+  ) {}
 
   /**
    * @param filePath absolute path of the EBook file
@@ -27,21 +25,28 @@ export class BookServiceImpl implements BookService {
     }
     const words = await EBookReadAgent.readAllWords(filePath);
 
-    const databaseService = container.get<DatabaseService>(TYPES.DatabaseService);
-    const bookId = await databaseService.writeBookContents("Ten Drugs", contents.get());
+    const databaseService = container.get<DatabaseService>(
+      TYPES.DatabaseService
+    );
+    const bookId = await databaseService.writeBookContents(
+      "Ten Drugs",
+      contents.get()
+    );
     await databaseService.writeWords(bookId, words);
     const bookDOList = await databaseService.queryBooks({
-      id: bookId
+      id: bookId,
     });
     if (bookDOList.length !== 1) {
-      throw new Error("bookDOList.length is not 1, the actual value is" + bookDOList.length);
+      throw new Error(
+        "bookDOList.length is not 1, the actual value is" + bookDOList.length
+      );
     }
     return BookServiceImpl.toBookVO(bookDOList[0]);
   }
 
   async getBooks(): Promise<BookVO[]> {
     const bookDOList = await this.databaseService.queryBooks({
-      status: BookStatus.Normal
+      status: BookStatus.Normal,
     });
     return bookDOList.map(bookDO => {
       return BookServiceImpl.toBookVO(bookDO);
@@ -50,7 +55,7 @@ export class BookServiceImpl implements BookService {
 
   async getBook(bookId: number): Promise<BookVO> {
     const bookDOArray = await this.databaseService.queryBooks({
-      id: bookId
+      id: bookId,
     });
     return bookDOArray.map(bookDO => BookServiceImpl.toBookVO(bookDO))[0];
   }
@@ -59,8 +64,7 @@ export class BookServiceImpl implements BookService {
     return {
       id: bookDO.id,
       name: bookDO.name,
-      totalWordCount: bookDO.contents.split(/\s/).length
-    }
+      totalWordCount: bookDO.contents.split(/\s/).length,
+    };
   }
-
 }

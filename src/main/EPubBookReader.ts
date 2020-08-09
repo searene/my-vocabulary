@@ -3,13 +3,12 @@ import { IEBookReader } from "./IEBookReader";
 import { HtmlToText } from "./HtmlToText";
 
 export class EPubBookReader implements IEBookReader {
-
   private filePath: string;
   private epub: EPub;
 
   constructor(filePath: string) {
     this.filePath = filePath;
-    this.epub = new EPub(filePath)
+    this.epub = new EPub(filePath);
   }
 
   async init(): Promise<void> {
@@ -50,5 +49,4 @@ export class EPubBookReader implements IEBookReader {
       });
     });
   }
-
 }

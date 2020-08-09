@@ -1,5 +1,4 @@
 export class Word {
-
   private _word: string;
 
   /**

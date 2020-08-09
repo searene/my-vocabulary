@@ -4,14 +4,16 @@ import { extname } from "path";
 import { WordExtractor } from "./WordExtractor";
 
 export class EBookReadAgent {
-  private static readers: Map<string, new (filePath: string) => IEBookReader> = new Map();
+  private static readers: Map<
+    string,
+    new (filePath: string) => IEBookReader
+  > = new Map();
 
   static register(ext: string, reader: new (filePath: string) => IEBookReader) {
     EBookReadAgent.readers.set(ext, reader);
   }
 
   static async readAllContents(filePath: string): Promise<Optional<string>> {
-
     const dotPlusExt = extname(filePath);
     if (dotPlusExt === "") {
       console.log(dotPlusExt);
@@ -38,7 +40,7 @@ export class EBookReadAgent {
     for (const word of wordExtractor) {
       if (words.has(word.word)) {
         const posList = words.get(word.word) as number[];
-        posList.push(word.pos)
+        posList.push(word.pos);
       } else {
         words.set(word.word, [word.pos]);
       }

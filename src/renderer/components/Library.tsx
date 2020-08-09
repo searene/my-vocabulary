@@ -1,17 +1,24 @@
 import * as React from "react";
-import { Header, Container, Divider, Table, Icon, Grid, Button } from "semantic-ui-react";
+import {
+  Header,
+  Container,
+  Divider,
+  Table,
+  Icon,
+  Grid,
+  Button,
+} from "semantic-ui-react";
 import { AddBookModal } from "./AddBookModal";
 import { BookVO } from "../../main/domain/BookVO";
 import serviceProvider from "../ServiceProvider";
 import "../style/Library.less";
-import { RouteComponentProps} from "react-router";
+import { RouteComponentProps } from "react-router";
 
-interface LibraryProps extends RouteComponentProps {
-}
+interface LibraryProps extends RouteComponentProps {}
 
 interface LibraryStates {
-  books: BookVO[],
-  initiated: boolean,
+  books: BookVO[];
+  initiated: boolean;
   showAddBookModal: boolean;
 }
 
@@ -41,17 +48,20 @@ export class Library extends React.Component<LibraryProps, LibraryStates> {
               <Header>Books</Header>
             </Grid.Column>
             <Grid.Column textAlign={"right"} width={8}>
-              <AddBookModal visible={this.state.showAddBookModal}
-                            onOpen={() => this.setState({ showAddBookModal: true })}
-                            onClose={this.handleCloseOnAddBookModal}
-                            trigger={<Button icon labelPosition={"left"}>
-                              <Icon name={"add"}/> Add
-                            </Button>}
+              <AddBookModal
+                visible={this.state.showAddBookModal}
+                onOpen={() => this.setState({ showAddBookModal: true })}
+                onClose={this.handleCloseOnAddBookModal}
+                trigger={
+                  <Button icon labelPosition={"left"}>
+                    <Icon name={"add"} /> Add
+                  </Button>
+                }
               />
             </Grid.Column>
           </Grid.Row>
         </Grid>
-        <Divider/>
+        <Divider />
         <Table basic="very" selectable>
           <Table.Header>
             <Table.Row>
@@ -60,18 +70,16 @@ export class Library extends React.Component<LibraryProps, LibraryStates> {
             </Table.Row>
           </Table.Header>
           <Table.Body>
-            {this.state.books.map(book =>
-              <Table.Row key={book.id}
-                         onClick={() => this.handleClickOnBook(book)}
-                         className={"book-row"}>
-                <Table.Cell>
-                  {book.name}
-                </Table.Cell>
-                <Table.Cell>
-                  {book.totalWordCount}
-                </Table.Cell>
-              </Table.Row>,
-            )}
+            {this.state.books.map(book => (
+              <Table.Row
+                key={book.id}
+                onClick={() => this.handleClickOnBook(book)}
+                className={"book-row"}
+              >
+                <Table.Cell>{book.name}</Table.Cell>
+                <Table.Cell>{book.totalWordCount}</Table.Cell>
+              </Table.Row>
+            ))}
           </Table.Body>
         </Table>
       </Container>
@@ -91,8 +99,10 @@ export class Library extends React.Component<LibraryProps, LibraryStates> {
   }
 
   private handleCloseOnAddBookModal = (addedBook?: BookVO) => {
-    const books = addedBook === undefined ? this.state.books
-      : this.state.books.concat(addedBook);
+    const books =
+      addedBook === undefined
+        ? this.state.books
+        : this.state.books.concat(addedBook);
     this.setState({
       books,
       showAddBookModal: false,
@@ -102,5 +112,4 @@ export class Library extends React.Component<LibraryProps, LibraryStates> {
   private handleClickOnBook = (book: BookVO) => {
     this.props.history.push("/book/" + book.id);
   };
-
 }

@@ -33,7 +33,7 @@ const createWindow = async () => {
       url.format({
         pathname: path.join(__dirname, "index.html"),
         protocol: "file:",
-        slashes: true
+        slashes: true,
       })
     );
   }
@@ -65,7 +65,6 @@ app.on("activate", () => {
 });
 
 async function init() {
-
   // only for test
   // if (fs.existsSync("/home/searene/.my-vocabulary")) {
   //   fs.removeSync("/home/searene/.my-vocabulary");
@@ -78,4 +77,3 @@ init();
 
 exports.bookService = container.get(TYPES.BookService);
 exports.wordService = container.get(TYPES.WordService);
-

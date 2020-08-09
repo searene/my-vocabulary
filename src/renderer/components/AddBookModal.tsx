@@ -1,10 +1,18 @@
-import { Button, Dimmer, Grid, Input, InputOnChangeData, Loader, Modal } from "semantic-ui-react";
+import {
+  Button,
+  Dimmer,
+  Grid,
+  Input,
+  InputOnChangeData,
+  Loader,
+  Modal,
+} from "semantic-ui-react";
 import * as React from "react";
-import serviceProvider from '../ServiceProvider';
+import serviceProvider from "../ServiceProvider";
 import { BookVO } from "../../main/domain/BookVO";
 
 interface AddBookModalProps {
-  visible: boolean
+  visible: boolean;
   onOpen: () => void;
   onClose: (addedBook?: BookVO) => void;
   trigger: React.ReactNode;
@@ -15,13 +23,17 @@ interface AddBookModalStates {
   loading: boolean;
 }
 
-export class AddBookModal extends React.Component<AddBookModalProps, AddBookModalStates> {
+export class AddBookModal extends React.Component<
+  AddBookModalProps,
+  AddBookModalStates
+> {
   constructor(props: AddBookModalProps) {
     super(props);
     this.state = {
       // TODO this is only for test, remove it after testing
-      bookFilePath: "/home/searene/WebstormProjects/my-vocabulary/test/resources/GeographyofBliss_oneChapter.epub",
-      loading: false
+      bookFilePath:
+        "/home/searene/WebstormProjects/my-vocabulary/test/resources/GeographyofBliss_oneChapter.epub",
+      loading: false,
     };
   }
 
@@ -37,22 +49,21 @@ export class AddBookModal extends React.Component<AddBookModalProps, AddBookModa
         <Modal.Content>
           <Grid>
             <Grid.Row>
-              <Input value={this.state.bookFilePath}
-                     onChange={this.handleBookFilePathChange}
-                     style={{width: "100%"}}/>
+              <Input
+                value={this.state.bookFilePath}
+                onChange={this.handleBookFilePathChange}
+                style={{ width: "100%" }}
+              />
             </Grid.Row>
             <Grid.Row>
-              <div style={{width: "100%", textAlign: "right"}}>
+              <div style={{ width: "100%", textAlign: "right" }}>
                 <Dimmer active={this.state.loading} inverted>
-                  <Loader active={this.state.loading}/>
+                  <Loader active={this.state.loading} />
                 </Dimmer>
-                <Button primary
-                        onClick={this.handleOK}>
+                <Button primary onClick={this.handleOK}>
                   OK
                 </Button>
-                <Button onClick={() => this.props.onClose()}>
-                  Cancel
-                </Button>
+                <Button onClick={() => this.props.onClose()}>Cancel</Button>
               </div>
             </Grid.Row>
           </Grid>
@@ -61,23 +72,25 @@ export class AddBookModal extends React.Component<AddBookModalProps, AddBookModa
     );
   }
 
-  private handleBookFilePathChange: (event: React.ChangeEvent<HTMLInputElement>,
-                 data: InputOnChangeData) => void = (event, data) => {
+  private handleBookFilePathChange: (
+    event: React.ChangeEvent<HTMLInputElement>,
+    data: InputOnChangeData
+  ) => void = (event, data) => {
     this.setState({
-      bookFilePath: data.value
+      bookFilePath: data.value,
     });
   };
 
-
   private handleOK = async () => {
     this.setState({
-      loading: true
+      loading: true,
     });
-    const bookVO = await serviceProvider.bookService.addBook(this.state.bookFilePath);
+    const bookVO = await serviceProvider.bookService.addBook(
+      this.state.bookFilePath
+    );
     this.setState({
-      loading: false
+      loading: false,
     });
     this.props.onClose(bookVO);
-  }
-
+  };
 }

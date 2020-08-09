@@ -6,24 +6,20 @@ import { WordStatus } from "../main/enum/WordStatus";
 import { WordVO } from "../main/database/WordVO";
 
 interface ServiceProvider {
-  bookService: BookService,
-  wordService: WordService,
+  bookService: BookService;
+  wordService: WordService;
 }
 
 let serviceProvider: ServiceProvider;
 if (process.env.RENDERER_ENV === "electron") {
-
   const mainJs = require("electron").remote.require("./main.js");
 
   serviceProvider = {
     bookService: mainJs.bookService,
-    wordService: mainJs.wordService
+    wordService: mainJs.wordService,
   };
-
 } else {
-
   serviceProvider = {
-
     bookService: {
       async addBook(filePath: string): Promise<BookVO> {
         console.log("mock addBook: " + filePath);
@@ -31,19 +27,19 @@ if (process.env.RENDERER_ENV === "electron") {
         return {
           id: 3,
           name: "A New Book",
-          totalWordCount: 123409128
+          totalWordCount: 123409128,
         };
       },
       async getBooks(): Promise<BookVO[]> {
         const bookVO1 = {
           id: 1,
           name: "Test Book",
-          totalWordCount: 1125479
+          totalWordCount: 1125479,
         };
         const bookVO2 = {
           id: 2,
           name: "Another Test Book",
-          totalWordCount: 1209412804
+          totalWordCount: 1209412804,
         };
         return Promise.resolve([bookVO1, bookVO2]);
       },
@@ -51,31 +47,32 @@ if (process.env.RENDERER_ENV === "electron") {
         return Promise.resolve({
           id: 1,
           name: "Test Book",
-          totalWordCount: 1125479
-        })
-      }
+          totalWordCount: 1125479,
+        });
+      },
     },
 
     wordService: {
       async getWords(): Promise<WordVO[]> {
-        return [{
-          id: 1,
-          word: "tests",
-          originalWord: "test",
-          contextList: [
-            "This is just a simple test",
-            "This is another simple test",
-            "This is a really long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long test."
-          ],
-          status: WordStatus.Unknown
-        }];
+        return [
+          {
+            id: 1,
+            word: "tests",
+            originalWord: "test",
+            contextList: [
+              "This is just a simple test",
+              "This is another simple test",
+              "This is a really long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long test.",
+            ],
+            status: WordStatus.Unknown,
+          },
+        ];
       },
       async updateWord(): Promise<void> {
         console.log("mock update");
         return Promise.resolve();
-      }
-    }
-
+      },
+    },
   };
 }
 export default serviceProvider;

@@ -1,5 +1,11 @@
 import * as React from "react";
-import { Button, Dropdown, DropdownItemProps, DropdownProps, Grid } from "semantic-ui-react";
+import {
+  Button,
+  Dropdown,
+  DropdownItemProps,
+  DropdownProps,
+  Grid,
+} from "semantic-ui-react";
 import { WordStatus } from "../../main/enum/WordStatus";
 import { RouteComponentProps } from "react-router";
 import serviceProvider from "../ServiceProvider";
@@ -11,8 +17,7 @@ interface MatchParams {
   bookId: string;
 }
 
-interface BookProps extends RouteComponentProps<MatchParams> {
-}
+interface BookProps extends RouteComponentProps<MatchParams> {}
 
 interface BookStates {
   initiated: boolean;
@@ -23,7 +28,6 @@ interface BookStates {
 }
 
 export class Book extends React.Component<BookProps, BookStates> {
-
   constructor(props: BookProps) {
     super(props);
     this.state = {
@@ -45,7 +49,7 @@ export class Book extends React.Component<BookProps, BookStates> {
 
   render(): React.ReactNode {
     if (!this.state.initiated) {
-      return <></>
+      return <></>;
     }
     return (
       <Grid>
@@ -53,47 +57,63 @@ export class Book extends React.Component<BookProps, BookStates> {
           <Grid.Column width={4}>
             <Link to={"/"}>Back to Library</Link>
           </Grid.Column>
+          <Grid.Column width={4}>Book: {this.state.bookName}</Grid.Column>
           <Grid.Column width={4}>
-            Book: {this.state.bookName}
-          </Grid.Column>
-          <Grid.Column width={4}>
-            <Dropdown fluid selection placeholder={"Status"}
-                      options={Book.getWordStatusArray()}
-                      value={this.state.wordStatus}
-                      onChange={this.handleStatusChange}/>
+            <Dropdown
+              fluid
+              selection
+              placeholder={"Status"}
+              options={Book.getWordStatusArray()}
+              value={this.state.wordStatus}
+              onChange={this.handleStatusChange}
+            />
           </Grid.Column>
         </Grid.Row>
-        {this.state.wordVO.isEmpty() ? <div>No more words.</div> :
+        {this.state.wordVO.isEmpty() ? (
+          <div>No more words.</div>
+        ) : (
           <Grid.Row>
             <Grid>
               <Grid.Row>Word: {this.state.wordVO.get().word}</Grid.Row>
-              <Grid.Row>Original Word: {this.state.wordVO.get().originalWord}</Grid.Row>
-              <Grid.Row>Status: {WordStatus[this.state.wordVO.get().status]}</Grid.Row>
+              <Grid.Row>
+                Original Word: {this.state.wordVO.get().originalWord}
+              </Grid.Row>
+              <Grid.Row>
+                Status: {WordStatus[this.state.wordVO.get().status]}
+              </Grid.Row>
               <Grid.Row>
                 <Grid>
                   <Grid.Row>Context:</Grid.Row>
-                  {this.state.wordVO.get().contextList.map((context, i) =>
-                    <Grid.Row key={i}>
-                      {context}
-                    </Grid.Row>
-                  )}
+                  {this.state.wordVO.get().contextList.map((context, i) => (
+                    <Grid.Row key={i}>{context}</Grid.Row>
+                  ))}
                 </Grid>
               </Grid.Row>
             </Grid>
           </Grid.Row>
-        }
+        )}
         <Grid.Row>
           <Grid>
             <Grid.Row>
               <Grid.Column width={16} textAlign={"right"}>
-                <Button disabled={this.state.wordVO.isEmpty()} onClick={this.handleKnowAndNext}>Know and Next</Button>
-                <Button disabled={this.state.wordVO.isEmpty()} onClick={this.handleNext}>Next</Button>
+                <Button
+                  disabled={this.state.wordVO.isEmpty()}
+                  onClick={this.handleKnowAndNext}
+                >
+                  Know and Next
+                </Button>
+                <Button
+                  disabled={this.state.wordVO.isEmpty()}
+                  onClick={this.handleNext}
+                >
+                  Next
+                </Button>
               </Grid.Column>
             </Grid.Row>
           </Grid>
         </Grid.Row>
       </Grid>
-    )
+    );
   }
 
   private static getWordStatusArray(): DropdownItemProps[] {
@@ -103,7 +123,7 @@ export class Book extends React.Component<BookProps, BookStates> {
         result.push({
           key: key,
           text: key,
-          value: WordStatus[key]
+          value: WordStatus[key],
         });
       }
     }
@@ -115,7 +135,10 @@ export class Book extends React.Component<BookProps, BookStates> {
     return bookVO.name;
   }
 
-  private async getCurrentWord(bookId: number, pageNo: number): Promise<Optional<WordVO>> {
+  private async getCurrentWord(
+    bookId: number,
+    pageNo: number
+  ): Promise<Optional<WordVO>> {
     const wordVOArray = await serviceProvider.wordService.getWords(
       bookId,
       this.state.wordStatus,
@@ -123,37 +146,44 @@ export class Book extends React.Component<BookProps, BookStates> {
       1,
       50,
       5
-      );
+    );
     if (wordVOArray.length === 0) {
       return Optional.empty();
     }
     return Optional.of(wordVOArray[0]);
   }
 
-  private handleStatusChange = (event: React.SyntheticEvent<HTMLElement>,
-                                data: DropdownProps): void => {
+  private handleStatusChange = (
+    event: React.SyntheticEvent<HTMLElement>,
+    data: DropdownProps
+  ): void => {
     this.setState({
-      wordStatus: data.value as number
+      wordStatus: data.value as number,
     });
   };
 
   private handleKnowAndNext = async (): Promise<void> => {
     await serviceProvider.wordService.updateWord({
       id: this.state.wordVO.get().id,
-      status: WordStatus.Known
+      status: WordStatus.Known,
     });
     const wordVO = await this.getCurrentWord(
-      parseInt(this.props.match.params.bookId), this.state.pageNo);
+      parseInt(this.props.match.params.bookId),
+      this.state.pageNo
+    );
     this.setState({
-      wordVO
+      wordVO,
     });
   };
 
   private handleNext = async (): Promise<void> => {
     const wordVO = await this.getCurrentWord(
-      parseInt(this.props.match.params.bookId), this.state.pageNo + 1);
+      parseInt(this.props.match.params.bookId),
+      this.state.pageNo + 1
+    );
     this.setState({
-      wordVO, pageNo: this.state.pageNo + 1
+      wordVO,
+      pageNo: this.state.pageNo + 1,
     });
   };
 
@@ -164,10 +194,13 @@ export class Book extends React.Component<BookProps, BookStates> {
     if (wordVO.isEmpty() && this.state.wordVO.isEmpty()) {
       return;
     }
-    if (wordVO.isPresent() && this.state.wordVO.isPresent()
-        && wordVO.get().id === this.state.wordVO.get().id) {
+    if (
+      wordVO.isPresent() &&
+      this.state.wordVO.isPresent() &&
+      wordVO.get().id === this.state.wordVO.get().id
+    ) {
       return;
     }
     this.setState({ initiated: true, bookName, wordVO });
-  }
+  };
 }

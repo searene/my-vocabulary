@@ -1,7 +1,5 @@
 export interface IEBookReader {
+  init(): Promise<void>;
 
-    init(): Promise<void>;
-
-    readAll(): Promise<string>;
-
+  readAll(): Promise<string>;
 }

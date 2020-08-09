@@ -2,7 +2,7 @@ import * as fs from "fs";
 import { Interface, createInterface } from "readline";
 import { Optional } from "typescript-optional";
 import { WordFormLine } from "./domain/WordFormLine";
-import {inject, injectable} from "inversify";
+import { inject, injectable } from "inversify";
 import { ConfigReader } from "./ConfigReader";
 
 @injectable()
@@ -13,16 +13,18 @@ export class WordFormReader {
 
   private readlineInterface?: Interface;
 
-  public constructor(@inject(ConfigReader) private configReader: ConfigReader) {
-
-  }
+  public constructor(
+    @inject(ConfigReader) private configReader: ConfigReader
+  ) {}
 
   async getOriginalWord(changedWord: string): Promise<Optional<string>> {
     await this.init();
     if (!this.variousWordToOriginalWordMap.has(changedWord)) {
       return Optional.empty();
     }
-    return Optional.ofNullable(this.variousWordToOriginalWordMap.get(changedWord));
+    return Optional.ofNullable(
+      this.variousWordToOriginalWordMap.get(changedWord)
+    );
   }
 
   public async init(): Promise<void> {
@@ -36,7 +38,7 @@ export class WordFormReader {
     const fileStream = fs.createReadStream(formsENPath.get());
     this.readlineInterface = createInterface({
       input: fileStream,
-      crlfDelay: Infinity
+      crlfDelay: Infinity,
     });
 
     this.readlineInterface.on("line", line => {
@@ -45,12 +47,17 @@ export class WordFormReader {
         return;
       }
       wordFormLine.get().changedWordList.forEach(changedWord => {
-        this.variousWordToOriginalWordMap.set(changedWord, wordFormLine.get().originalWord);
+        this.variousWordToOriginalWordMap.set(
+          changedWord,
+          wordFormLine.get().originalWord
+        );
       });
-      this.variousWordToOriginalWordMap.set(wordFormLine.get().originalWord,
-        wordFormLine.get().originalWord);
+      this.variousWordToOriginalWordMap.set(
+        wordFormLine.get().originalWord,
+        wordFormLine.get().originalWord
+      );
     });
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       this.readlineInterface!.on("close", () => {
         this.initiated = true;
         resolve();

@@ -1,20 +1,19 @@
 import { WordStatus } from "../enum/WordStatus";
 
 export type WordVO = {
-
-  id: number,
+  id: number;
 
   /**
    * Word in the book.
    */
-  word: string,
+  word: string;
 
   /**
    * The original word of the word in the book.
    */
-  originalWord: string,
+  originalWord: string;
 
   contextList: string[];
 
   status: WordStatus;
-}
+};

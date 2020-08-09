@@ -3,4 +3,3 @@ export const TYPES = {
   BookService: Symbol.for("BookService"),
   WordService: Symbol.for("WordService"),
 };
-

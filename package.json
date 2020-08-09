@@ -26,12 +26,11 @@
     }
   },
   "lint-staged": {
-    "{src,test,mocks}/**/*.{json,css,scss,md}": [
+    "{src,test,mocks}/**/*.{json,css,scss,less,md}": [
       "prettier --config ./.prettierrc --write"
     ],
     "{src,test,mocks}/**/*.{js,ts,tsx}": [
-      "prettier --config ./.prettierrc --write",
-      "eslint --ext=jsx,js,ts,tsx --fix src"
+      "prettier --config ./.prettierrc --write"
     ]
   },
   "jest": {

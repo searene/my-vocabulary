@@ -1,5 +1,5 @@
 import "reflect-metadata";
-import {Container} from 'inversify';
+import { Container } from "inversify";
 import { WordFormReader } from "../WordFormReader";
 import { SqliteDatabaseService } from "../database/SqliteDatabaseService";
 import { DatabaseService } from "../database/DatabaseService";
@@ -14,6 +14,8 @@ export const container = new Container();
 
 container.bind<WordService>(TYPES.WordService).to(WordServiceImpl);
 container.bind(WordFormReader).to(WordFormReader);
-container.bind<DatabaseService>(TYPES.DatabaseService).to(SqliteDatabaseService);
+container
+  .bind<DatabaseService>(TYPES.DatabaseService)
+  .to(SqliteDatabaseService);
 container.bind(ConfigReader).to(ConfigReader);
 container.bind<BookService>(TYPES.BookService).to(BookServiceImpl);

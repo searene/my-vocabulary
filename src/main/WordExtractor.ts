@@ -1,7 +1,6 @@
 import { Word } from "./domain/Word";
 
 export class WordExtractor implements IterableIterator<Word> {
-
   private _contents: string;
   private _currentPos = -1;
   private static splitters = "↵\"',:.[]/#* \t()-_{};~$1234567890";
@@ -26,28 +25,29 @@ export class WordExtractor implements IterableIterator<Word> {
         this._currentWord = "";
         return {
           done: false,
-          value: word
+          value: word,
         };
       }
     }
     if (this._currentWord == "") {
       return {
         done: true,
-        value: null
-      }
+        value: null,
+      };
     } else {
       const word = this.getWord(this._currentWord, this._currentPos);
       this._currentWord = "";
       return {
         done: false,
-        value: word
-      }
+        value: word,
+      };
     }
   }
 
   private getWord(_currentWord: string, _currentPos: number): Word {
-    return new Word(this._currentWord.trim().toLowerCase(),
-      this._currentPos - this._currentWord.length);
+    return new Word(
+      this._currentWord.trim().toLowerCase(),
+      this._currentPos - this._currentWord.length
+    );
   }
-
 }

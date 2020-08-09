@@ -1,3 +1,3 @@
 export type BaseDO = {
-  id: number
-}
+  id: number;
+};

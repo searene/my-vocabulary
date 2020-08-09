@@ -1,5 +1,5 @@
 export type BaseQuery = {
-  id?: number,
-  pageNo?: number,
-  pageSize?: number
-}
+  id?: number;
+  pageNo?: number;
+  pageSize?: number;
+};

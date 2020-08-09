@@ -2,26 +2,28 @@ import { WordStatus } from "../enum/WordStatus";
 import { BaseDO } from "./BaseDO";
 
 export type WordDO = BaseDO & {
-  bookId: number,
+  bookId: number;
 
   /**
    * word shown in the book
    */
-  word: string,
+  word: string;
 
   /**
    * the original word of the word shown in the book
    */
-  originalWord: string,
+  originalWord: string;
 
+  positions: number[];
+  status: WordStatus;
+};
+
+export function getContextList(
   positions: number[],
-  status: WordStatus
-}
-
-export function getContextList(positions: number[],
-                               bookContents: string,
-                               contextStep: number,
-                               contextLimit: number): string[] {
+  bookContents: string,
+  contextStep: number,
+  contextLimit: number
+): string[] {
   const contextList: string[] = [];
   for (const pos of positions.slice(0, contextLimit)) {
     const start = Math.max(0, pos - contextStep);

@@ -4,7 +4,6 @@ import { BookQuery } from "../domain/BookQuery";
 import { BookDO } from "../domain/BookDO";
 
 export interface DatabaseService {
-
   init(): Promise<void>;
 
   /**
@@ -12,7 +11,10 @@ export interface DatabaseService {
    */
   writeBookContents(bookName: string, bookContents: string): Promise<number>;
 
-  writeWords(bookId: number, wordAndPosList: Map<string, number[]>): Promise<void>;
+  writeWords(
+    bookId: number,
+    wordAndPosList: Map<string, number[]>
+  ): Promise<void>;
 
   queryWords(wordQuery: WordQuery): Promise<WordDO[]>;
 
