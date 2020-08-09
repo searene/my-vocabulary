@@ -5,7 +5,6 @@ import * as os from "os";
 import {join} from "path";
 import { existsSync, mkdirSync } from "fs";
 import { inject, injectable } from "inversify";
-import { WordStatus } from "../enum/WordStatus";
 import { WordQuery } from "../domain/WordQuery";
 import { WordDO } from "../domain/WordDO";
 import { BaseQuery } from "../domain/BaseQuery";
@@ -69,7 +68,7 @@ export class SqliteDatabaseService implements DatabaseService {
       where += " AND book_id = $bookId";
       params["$bookId"] = wordQuery.bookId;
     }
-    if (wordQuery.status != undefined && wordQuery.status != WordStatus.knownOrKnowOriginal) {
+    if (wordQuery.status != undefined) {
       where += " AND status = $status";
       params["$status"] = wordQuery.status;
     } else if (wordQuery.status != undefined && wordQuery.word != undefined) {
@@ -209,7 +208,7 @@ export class SqliteDatabaseService implements DatabaseService {
         word TEXT,
         original_word TEXT,
         positions TEXT,
-        status INT -- -1: deleted, 0: unknown, 1: knowOriginal, 2: known
+        status INT -- -1: deleted, 0: unknown, 1: known
       );
     `);
   }
