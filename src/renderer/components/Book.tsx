@@ -104,9 +104,12 @@ export class Book extends React.Component<BookProps, BookStates> {
                     <Modal
                       key={i}
                       trigger={
-                        <Grid.Row className={"hover-link"}>
-                          {context.short.contents}
-                        </Grid.Row>
+                        <Grid.Row
+                          className={"hover-link"}
+                          dangerouslySetInnerHTML={{
+                            __html: context.short.htmlContents,
+                          }}
+                        />
                       }
                       onClose={() =>
                         this.setState({
@@ -119,16 +122,29 @@ export class Book extends React.Component<BookProps, BookStates> {
                         })
                       }
                       open={this.state.longWordContextModalIndex.isPresent()}
-                      header="Context"
-                      content={
-                        this.state.longWordContextModalIndex.isPresent()
-                          ? this.state.wordVO.get().contextList[
-                              this.state.longWordContextModalIndex.get()
-                            ].long.contents
-                          : ""
-                      }
-                      actions={["Close"]}
-                    />
+                    >
+                      <Modal.Header>Context</Modal.Header>
+                      <Modal.Content
+                        dangerouslySetInnerHTML={{
+                          __html: this.state.longWordContextModalIndex.isPresent()
+                            ? this.state.wordVO.get().contextList[
+                                this.state.longWordContextModalIndex.get()
+                              ].long.htmlContents
+                            : "",
+                        }}
+                      ></Modal.Content>
+                      <Modal.Actions>
+                        <Button
+                          onClick={() =>
+                            this.setState({
+                              longWordContextModalIndex: Optional.empty(),
+                            })
+                          }
+                        >
+                          Close
+                        </Button>
+                      </Modal.Actions>
+                    </Modal>
                   ))}
                 </Grid>
               </Grid.Row>

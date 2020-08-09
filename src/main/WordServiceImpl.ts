@@ -44,6 +44,7 @@ export class WordServiceImpl implements WordService {
         word: wordDO.word,
         originalWord: wordDO.originalWord,
         contextList: WordContextService.getContextList(
+          wordDO.word,
           wordDO.positions,
           bookDO.contents,
           contextStep,

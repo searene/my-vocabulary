@@ -21,7 +21,7 @@ export class BookServiceImpl implements BookService {
   async addBook(filePath: string): Promise<BookVO> {
     const contents = await EBookReadAgent.readAllContents(filePath);
     if (!contents.isPresent()) {
-      throw new Error("contents not available");
+      throw new Error("plainContents not available");
     }
     const words = await EBookReadAgent.readAllWords(filePath);
 

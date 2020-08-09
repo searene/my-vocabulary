@@ -65,13 +65,16 @@ if (process.env.RENDERER_ENV === "electron") {
                   startPos: 10,
                   wordPos: 20,
                   endPos: 50,
-                  contents: "This is just a simple test",
+                  plainContents: "This is just a simple test",
+                  htmlContents:
+                    "Here is a <span class='highlight'>Test</span>. Please check out.",
                 },
                 long: {
                   startPos: 10,
                   wordPos: 20,
                   endPos: 50,
-                  contents: "This is just a simple test",
+                  plainContents: "This is just a simple test",
+                  htmlContents: "<b>Test</b>",
                 },
               },
             ],
