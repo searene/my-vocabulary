@@ -55,7 +55,7 @@ export class WordServiceImpl implements WordService {
   async updateWord(wordQuery: WordQuery): Promise<void> {
     const updatedRecords = await this.databaseService.updateWord(wordQuery);
     if (updatedRecords === 0) {
-      throw new Error("Nothing was updated");
+      console.error("Nothing was updated");
     }
   }
 }

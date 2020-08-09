@@ -98,7 +98,6 @@ export class SqliteDatabaseService implements DatabaseService {
       sql += limitExpression.get();
     }
 
-    console.log(sql, params);
     const rows = await this.all(sql, params);
     const wordDOList: WordDO[] = [];
     for (const row of rows) {
@@ -144,7 +143,6 @@ export class SqliteDatabaseService implements DatabaseService {
       sql += limitExpression.get();
     }
 
-    console.log(sql, params);
     const rows = await this.all(sql, params);
     const bookDOList: BookDO[] = [];
     for (const row of rows) {
@@ -161,7 +159,8 @@ export class SqliteDatabaseService implements DatabaseService {
   async updateWord(wordQuery: WordQuery): Promise<number> {
     await this.init();
     if (wordQuery.id === undefined) {
-      throw new Error("id must be provided.");
+      console.error("id must be provided.");
+      return 0;
     }
     let setExpr: string[] = [];
     if (wordQuery.status != undefined) {
@@ -173,8 +172,8 @@ export class SqliteDatabaseService implements DatabaseService {
     if (wordQuery.word != undefined) {
       setExpr.push(`word = "${wordQuery.word}"`);
     }
-    const runResult = await this.run(`UPDATE words SET (${setExpr.join(",")})
-      WHERE id = ${wordQuery.id}`);
+    const runResult = await this.run(`UPDATE words SET ${setExpr.join(",")}
+    WHERE id = ${wordQuery.id}`);
     return runResult.changes;
   }
 
@@ -232,6 +231,7 @@ export class SqliteDatabaseService implements DatabaseService {
   }
 
   private async run(sql: string, params?: any): Promise<RunResult> {
+    console.log(sql, params);
     return new Promise<RunResult>((resolve, reject) => {
       this.db.run(sql, params, function(err) {
         if (err != null) {
@@ -244,6 +244,7 @@ export class SqliteDatabaseService implements DatabaseService {
   }
 
   private async all(sql: string, params?: any): Promise<any> {
+    console.log(sql, params);
     return new Promise<any>((resolve, reject) => {
       this.db.all(sql, params, (err, rows) => {
         if (err != null) {
