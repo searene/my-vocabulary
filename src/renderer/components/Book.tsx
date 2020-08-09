@@ -23,18 +23,25 @@ interface BookStates {
   initiated: boolean;
   bookName: string;
   wordStatus: WordStatus;
-  pageNo: number;
+  pageNo: Map<WordStatus, number>;
   wordVO: Optional<WordVO>;
 }
 
 export class Book extends React.Component<BookProps, BookStates> {
   constructor(props: BookProps) {
     super(props);
+    const pageNo = new Map<WordStatus, number>();
+    for (const wordStatus in WordStatus) {
+      if (!isNaN(Number(wordStatus))) {
+        pageNo.set(Number(wordStatus), 1);
+      }
+    }
+    console.log(pageNo);
     this.state = {
       initiated: false,
       bookName: "",
       wordStatus: WordStatus.Unknown,
-      pageNo: 1,
+      pageNo: pageNo,
       wordVO: Optional.empty(),
     };
   }
@@ -169,7 +176,7 @@ export class Book extends React.Component<BookProps, BookStates> {
     });
     const wordVO = await this.getCurrentWord(
       parseInt(this.props.match.params.bookId),
-      this.state.pageNo
+      this.getPageNo()
     );
     this.setState({
       wordVO,
@@ -179,18 +186,22 @@ export class Book extends React.Component<BookProps, BookStates> {
   private handleNext = async (): Promise<void> => {
     const wordVO = await this.getCurrentWord(
       parseInt(this.props.match.params.bookId),
-      this.state.pageNo + 1
+      this.getPageNo() + 1
     );
+    console.log(this.state.pageNo);
+    const newPageNo = new Map<WordStatus, number>(this.state.pageNo);
+    newPageNo.set(this.state.wordStatus, this.getPageNo() + 1);
+    console.log(newPageNo);
     this.setState({
       wordVO,
-      pageNo: this.state.pageNo + 1,
+      pageNo: newPageNo,
     });
   };
 
   private refresh = async (): Promise<void> => {
     const bookId = parseInt(this.props.match.params.bookId);
     const bookName = await Book.getBookName(bookId);
-    const wordVO = await this.getCurrentWord(bookId, this.state.pageNo);
+    const wordVO = await this.getCurrentWord(bookId, this.getPageNo());
     if (wordVO.isEmpty() && this.state.wordVO.isEmpty()) {
       return;
     }
@@ -203,4 +214,8 @@ export class Book extends React.Component<BookProps, BookStates> {
     }
     this.setState({ initiated: true, bookName, wordVO });
   };
+
+  private getPageNo(): number {
+    return this.state.pageNo.get(this.state.wordStatus) as number;
+  }
 }
