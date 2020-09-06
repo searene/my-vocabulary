@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity } from "typeorm";
 
 @Entity()
 export class Word {
@@ -8,18 +8,21 @@ export class Word {
   /**
    * The related book id
    */
-  @Column()
+  @Column("int", { nullable: false, name: "book_id" })
   bookId: number;
 
   /**
    * Word
    */
-  @Column()
+  @Column("text", { nullable: true })
   word: string;
 
   /**
    * Positions of the word in the book, separated by commas if there are multiple.
    */
-  @Column()
+  @Column("text", { nullable: true })
   positions: string;
+
+  @Column("int", { nullable: false })
+  status: number;
 }

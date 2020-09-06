@@ -9,11 +9,15 @@ import { WordQuery } from "./domain/WordQuery";
 import { WordCount } from "./domain/WordCount";
 import { WordContextService } from "./WordContextService";
 import { WordContextStep } from "./domain/WordContextStep";
+import { IWordRepository } from "./database/entity/IWordRepository";
+import { WordFormReader } from "./WordFormReader";
 
 @injectable()
 export class WordServiceImpl implements WordService {
   constructor(
-    @inject(TYPES.DatabaseService) private databaseService: DatabaseService
+    @inject(TYPES.DatabaseService) private databaseService: DatabaseService,
+    @inject(TYPES.IWordRepository) private wordRepository: IWordRepository,
+    @inject(WordFormReader) private wordFormReader: WordFormReader
   ) {}
 
   async getWords(
@@ -32,27 +36,32 @@ export class WordServiceImpl implements WordService {
       throw new Error("The size of bookDOList must be 1");
     }
     const bookDO = bookDOList[0];
-    const wordDOList = await this.databaseService.queryWords({
+    const wordDOList = await this.wordRepository.find({
       bookId: bookId,
       status: wordStatus,
-      pageNo: pageNo,
-      pageSize: pageSize,
+      skip: (pageNo - 1) * pageSize,
+      take: pageSize,
     });
-    return wordDOList.map(wordDO => {
-      return {
+    const wordVOList: WordVO[] = [];
+    for (const wordDO of wordDOList) {
+      const originalWord = await this.wordFormReader.getOriginalWord(
+        wordDO.word
+      );
+      wordVOList.push({
         id: wordDO.id,
         word: wordDO.word,
-        originalWord: wordDO.originalWord,
+        originalWord: originalWord.isPresent() ? originalWord.get() : "",
         contextList: WordContextService.getContextList(
           wordDO.word,
-          wordDO.positions,
+          wordDO.positions.split(",").map(parseInt),
           bookDO.contents,
           contextStep,
           contextLimit
         ),
         status: wordDO.status,
-      };
-    });
+      });
+    }
+    return wordVOList;
   }
 
   async updateWord(wordQuery: WordQuery): Promise<void> {
