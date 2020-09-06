@@ -3,7 +3,7 @@ import { Word } from "./domain/Word";
 export class WordExtractor implements IterableIterator<Word> {
   private _contents: string;
   private _currentPos = -1;
-  private static splitters = "↵\"',:.[]/#* \t()-_{};~$1234567890";
+  private static splitters = "\n↵\"',:.[]/#* \t()-_{};~$1234567890";
   private _currentWord = "";
 
   constructor(contents: string) {
@@ -44,10 +44,10 @@ export class WordExtractor implements IterableIterator<Word> {
     }
   }
 
-  private getWord(_currentWord: string, _currentPos: number): Word {
+  private getWord(currentWord: string, currentPos: number): Word {
     return new Word(
-      this._currentWord.trim().toLowerCase(),
-      this._currentPos - this._currentWord.length
+      currentWord.trim().toLowerCase(),
+      currentPos - currentWord.length
     );
   }
 }

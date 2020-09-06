@@ -5,6 +5,8 @@ import { container } from "./config/inversify.config";
 import { EPubBookReader } from "./EPubBookReader";
 import { EBookReadAgent } from "./EBookReadAgent";
 import { TYPES } from "./config/types";
+import { PlainTextBookReader } from "./PlainTextBookReader";
+import * as fs from "fs-extra";
 
 let win: BrowserWindow | null;
 
@@ -71,6 +73,10 @@ async function init() {
   // }
 
   EBookReadAgent.register("epub", EPubBookReader);
+  EBookReadAgent.register("txt", PlainTextBookReader);
+
+  // const result = await EBookReadAgent.readAllWords("/home/searene/tmp/test.txt");
+  // console.log(result);
 }
 
 init();

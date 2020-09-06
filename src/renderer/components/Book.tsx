@@ -132,7 +132,7 @@ export class Book extends React.Component<BookProps, BookStates> {
                               ].long.htmlContents
                             : "",
                         }}
-                      ></Modal.Content>
+                      />
                       <Modal.Actions>
                         <Button
                           onClick={() =>
@@ -204,7 +204,7 @@ export class Book extends React.Component<BookProps, BookStates> {
       pageNo,
       1,
       {
-        short: 50,
+        short: 100,
         long: 500,
       },
       5

@@ -32,7 +32,7 @@ export class AddBookModal extends React.Component<
     this.state = {
       // TODO this is only for test, remove it after testing
       bookFilePath:
-        "/home/searene/WebstormProjects/my-vocabulary/test/resources/GeographyofBliss_oneChapter.epub",
+        "/home/searene/Documents/books/Ten Drugs How Plants, Powders, and Pills Have Shaped the History of Medicine/Ten Drugs  How Plants, Powders, and Pills Have Shaped the History of Medicine.epub",
       loading: false,
     };
   }

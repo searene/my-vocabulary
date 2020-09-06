@@ -250,7 +250,6 @@ export class SqliteDatabaseService implements DatabaseService {
   }
 
   private async run(sql: string, params?: any): Promise<RunResult> {
-    console.log(sql, params);
     return new Promise<RunResult>((resolve, reject) => {
       this.db.run(sql, params, function(err) {
         if (err != null) {
@@ -263,7 +262,6 @@ export class SqliteDatabaseService implements DatabaseService {
   }
 
   private async all(sql: string, params?: any): Promise<any> {
-    console.log(sql, params);
     return new Promise<any>((resolve, reject) => {
       this.db.all(sql, params, (err, rows) => {
         if (err != null) {
