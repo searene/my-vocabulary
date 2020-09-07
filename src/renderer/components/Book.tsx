@@ -261,6 +261,7 @@ export class Book extends React.Component<BookProps, BookStates> {
     if (this.needRefresh(wordVO, wordCount)) {
       this.setState({ initiated: true, bookName, wordVO, wordCount });
     }
+    this.bindShortcuts();
   };
 
   private getPageNo(): number {
@@ -298,4 +299,14 @@ export class Book extends React.Component<BookProps, BookStates> {
       longWordContextModalIndex: Optional.of(contextIndex),
     });
   };
+
+  private bindShortcuts() {
+    document.addEventListener("keyup", async e => {
+      if (e.key === "k") {
+        await this.handleKnowAndNext();
+      } else if (e.key === "n") {
+        await this.handleNext();
+      }
+    });
+  }
 }
