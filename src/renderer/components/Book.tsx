@@ -22,12 +22,39 @@ interface MatchParams {
 interface BookProps extends RouteComponentProps<MatchParams> {}
 
 interface BookStates {
+  /**
+   * Is the initialization completed.
+   */
   initiated: boolean;
+
+  /**
+   * The name of the current book.
+   */
   bookName: string;
+
+  /**
+   * Which kinds of word does the user want to see, unknown or known?
+   */
   wordStatus: WordStatus;
+
+  /**
+   * The page number, starting from 1.
+   */
   pageNo: Map<WordStatus, number>;
+
+  /**
+   * The current word.
+   */
   wordVO: Optional<WordVO>;
+
+  /**
+   * The count of known words, unknown words, etc.
+   */
   wordCount: WordCount;
+
+  /**
+   * The index of the clicked context, used to show the long context modal.
+   */
   longWordContextModalIndex: Optional<number>;
 }
 
@@ -156,16 +183,22 @@ export class Book extends React.Component<BookProps, BookStates> {
             <Grid.Row>
               <Grid.Column width={16} textAlign={"right"}>
                 <Button
+                  disabled={this.state.pageNo.get(this.state.wordStatus) === 1}
+                  onClick={this.handlePrevious}
+                >
+                  Previous (p)
+                </Button>
+                <Button
                   disabled={this.state.wordVO.isEmpty()}
                   onClick={this.handleKnowAndNext}
                 >
-                  Know and Next
+                  Know and Next (k)
                 </Button>
                 <Button
                   disabled={this.state.wordVO.isEmpty()}
                   onClick={this.handleNext}
                 >
-                  Next
+                  Next (n)
                 </Button>
               </Grid.Column>
             </Grid.Row>
@@ -243,10 +276,8 @@ export class Book extends React.Component<BookProps, BookStates> {
       parseInt(this.props.match.params.bookId),
       this.getPageNo() + 1
     );
-    console.log(this.state.pageNo);
     const newPageNo = new Map<WordStatus, number>(this.state.pageNo);
     newPageNo.set(this.state.wordStatus, this.getPageNo() + 1);
-    console.log(newPageNo);
     this.setState({
       wordVO,
       pageNo: newPageNo,
@@ -293,20 +324,28 @@ export class Book extends React.Component<BookProps, BookStates> {
     );
   }
 
-  private handleContextClick = (contextIndex: number) => {
-    console.log("here");
-    this.setState({
-      longWordContextModalIndex: Optional.of(contextIndex),
-    });
-  };
-
   private bindShortcuts() {
     document.addEventListener("keyup", async e => {
       if (e.key === "k") {
         await this.handleKnowAndNext();
       } else if (e.key === "n") {
         await this.handleNext();
+      } else if (e.key === "p") {
+        await this.handlePrevious();
       }
     });
   }
+
+  private handlePrevious = async (): Promise<void> => {
+    const wordVO = await this.getCurrentWord(
+      parseInt(this.props.match.params.bookId),
+      this.getPageNo() - 1
+    );
+    const newPageNo = new Map<WordStatus, number>(this.state.pageNo);
+    newPageNo.set(this.state.wordStatus, this.getPageNo() - 1);
+    this.setState({
+      wordVO,
+      pageNo: newPageNo,
+    });
+  };
 }
