@@ -12,6 +12,11 @@ export interface DatabaseService {
    */
   writeBookContents(bookName: string, bookContents: string): Promise<number>;
 
+  /**
+   * Remove a book along with its words
+   */
+  removeBook(bookId: number): Promise<void>;
+
   writeWords(
     bookId: number,
     wordAndPosList: Map<string, number[]>

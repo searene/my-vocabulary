@@ -14,6 +14,7 @@ import { BookDO } from "../domain/BookDO";
 import { WordFormReader } from "../WordFormReader";
 import { WordCount } from "../domain/WordCount";
 import { WordStatus } from "../enum/WordStatus";
+import { WatchDog } from "../WatchDog";
 
 const sqlite3 = sqliteImport.verbose();
 
@@ -196,6 +197,17 @@ export class SqliteDatabaseService implements DatabaseService {
     return runResult.changes;
   }
 
+  async removeBook(bookId: number): Promise<void> {
+    await this.init();
+    const deleteBookResult = await this.run(
+      `DELETE FROM books WHERE id = ${bookId}`
+    );
+    const deleteWordResult = await this.run(
+      `DELETE FROM words WHERE book_id = ${bookId}`
+    );
+    return Promise.resolve();
+  }
+
   private async getInsertWordsSqlList(
     bookId: number,
     wordAndPosListMap: Map<string, number[]>
@@ -250,11 +262,13 @@ export class SqliteDatabaseService implements DatabaseService {
   }
 
   private async run(sql: string, params?: any): Promise<RunResult> {
+    const watchDog = new WatchDog(sql + ", params: " + params);
     return new Promise<RunResult>((resolve, reject) => {
       this.db.run(sql, params, function(err) {
         if (err != null) {
           reject(err);
         } else {
+          watchDog.outputMeasurement();
           resolve(this);
         }
       });
@@ -262,11 +276,13 @@ export class SqliteDatabaseService implements DatabaseService {
   }
 
   private async all(sql: string, params?: any): Promise<any> {
+    const watchDog = new WatchDog(sql + ", params: " + params);
     return new Promise<any>((resolve, reject) => {
       this.db.all(sql, params, (err, rows) => {
         if (err != null) {
           reject(err);
         } else {
+          watchDog.outputMeasurement();
           resolve(rows);
         }
       });

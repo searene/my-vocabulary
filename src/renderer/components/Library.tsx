@@ -7,6 +7,7 @@ import {
   Icon,
   Grid,
   Button,
+  Modal,
 } from "semantic-ui-react";
 import { AddBookModal } from "./AddBookModal";
 import { BookVO } from "../../main/domain/BookVO";
@@ -19,6 +20,7 @@ interface LibraryStates {
   books: BookVO[];
   initiated: boolean;
   showAddBookModal: boolean;
+  showRemoveBookModal: boolean;
 }
 
 export class Library extends React.Component<LibraryProps, LibraryStates> {
@@ -28,6 +30,7 @@ export class Library extends React.Component<LibraryProps, LibraryStates> {
       books: [],
       initiated: false,
       showAddBookModal: false,
+      showRemoveBookModal: false,
     };
   }
 
@@ -70,13 +73,53 @@ export class Library extends React.Component<LibraryProps, LibraryStates> {
           </Table.Header>
           <Table.Body>
             {this.state.books.map(book => (
-              <Table.Row
-                key={book.id}
-                onClick={() => this.handleClickOnBook(book)}
-                className={"hover-link"}
-              >
-                <Table.Cell>{book.name}</Table.Cell>
+              <Table.Row key={book.id}>
+                <Table.Cell
+                  onClick={() => this.handleClickOnBook(book)}
+                  className={"hover-link"}
+                >
+                  {book.name}
+                </Table.Cell>
                 <Table.Cell>{book.totalWordCount}</Table.Cell>
+                <Modal
+                  closeIcon
+                  open={this.state.showRemoveBookModal}
+                  trigger={
+                    <Table.Cell>
+                      <Button
+                        color={"red"}
+                        onClick={() =>
+                          this.setState({ showRemoveBookModal: true })
+                        }
+                      >
+                        Remove
+                      </Button>
+                    </Table.Cell>
+                  }
+                  onClose={() => this.setState({ showRemoveBookModal: false })}
+                  onOpen={() => this.setState({ showRemoveBookModal: true })}
+                >
+                  <Header content="Confirm" />
+                  <Modal.Content>
+                    <p>Do you really want to delete this book: {book.name}?</p>
+                  </Modal.Content>
+                  <Modal.Actions>
+                    <Button
+                      color="red"
+                      onClick={() =>
+                        this.setState({ showRemoveBookModal: false })
+                      }
+                    >
+                      <Icon name="remove" /> No
+                    </Button>
+                    <Button
+                      color="green"
+                      onClick={() => this.handleRemoveBook(book.id)}
+                    >
+                      <Icon name="checkmark" /> Yes
+                    </Button>
+                  </Modal.Actions>
+                </Modal>
               </Table.Row>
             ))}
           </Table.Body>
@@ -110,5 +153,14 @@ export class Library extends React.Component<LibraryProps, LibraryStates> {
 
   private handleClickOnBook = (book: BookVO) => {
     this.props.history.push("/book/" + book.id);
+  };
+
+  private handleRemoveBook = async (bookId: number) => {
+    await serviceProvider.bookService.removeBook(bookId);
+    const newBooks = this.state.books.filter(book => book.id != bookId);
+    this.setState({
+      showRemoveBookModal: false,
+      books: newBooks,
+    });
   };
 }

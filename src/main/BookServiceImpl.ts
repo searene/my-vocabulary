@@ -7,6 +7,7 @@ import { inject, injectable } from "inversify";
 import { BookStatus } from "./enum/BookStatus";
 import { BookService } from "./BookService";
 import { BookDO } from "./domain/BookDO";
+import * as path from "path";
 
 @injectable()
 export class BookServiceImpl implements BookService {
@@ -29,7 +30,7 @@ export class BookServiceImpl implements BookService {
       TYPES.DatabaseService
     );
     const bookId = await databaseService.writeBookContents(
-      "Ten Drugs",
+      path.parse(filePath).name,
       contents.get()
     );
     await databaseService.writeWords(bookId, words);
@@ -58,6 +59,10 @@ export class BookServiceImpl implements BookService {
       id: bookId,
     });
     return bookDOArray.map(bookDO => BookServiceImpl.toBookVO(bookDO))[0];
+  }
+
+  async removeBook(bookId: number): Promise<void> {
+    await this.databaseService.removeBook(bookId);
   }
 
   static toBookVO(bookDO: BookDO): BookVO {

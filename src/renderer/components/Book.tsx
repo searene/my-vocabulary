@@ -80,6 +80,7 @@ export class Book extends React.Component<BookProps, BookStates> {
 
   async componentDidMount() {
     await this.refresh();
+    this.bindShortcuts();
   }
 
   async componentDidUpdate() {
@@ -292,7 +293,6 @@ export class Book extends React.Component<BookProps, BookStates> {
     if (this.needRefresh(wordVO, wordCount)) {
       this.setState({ initiated: true, bookName, wordVO, wordCount });
     }
-    this.bindShortcuts();
   };
 
   private getPageNo(): number {

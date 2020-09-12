@@ -50,6 +50,9 @@ if (process.env.RENDERER_ENV === "electron") {
           totalWordCount: 1125479,
         });
       },
+      async removeBook(): Promise<void> {
+        return Promise.resolve();
+      },
     },
 
     wordService: {
