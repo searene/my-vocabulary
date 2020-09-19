@@ -5,6 +5,7 @@ import {
   DropdownItemProps,
   DropdownProps,
   Grid,
+  Input,
   Modal,
 } from "semantic-ui-react";
 import { WordStatus } from "../../main/enum/WordStatus";
@@ -14,6 +15,7 @@ import { WordVO } from "../../main/database/WordVO";
 import { Link } from "react-router-dom";
 import { Optional } from "typescript-optional";
 import { WordCount } from "../../main/domain/WordCount";
+import { SearchWordInput } from "./SearchWordInput";
 
 interface MatchParams {
   bookId: string;
@@ -56,6 +58,8 @@ interface BookStates {
    * The index of the clicked context, used to show the long context modal.
    */
   longWordContextModalIndex: Optional<number>;
+
+  needRefresh: boolean;
 }
 
 export class Book extends React.Component<BookProps, BookStates> {
@@ -75,6 +79,7 @@ export class Book extends React.Component<BookProps, BookStates> {
       wordVO: Optional.empty(),
       wordCount: { unknown: 0, known: 0 },
       longWordContextModalIndex: Optional.empty(),
+      needRefresh: true,
     };
   }
 
@@ -98,6 +103,9 @@ export class Book extends React.Component<BookProps, BookStates> {
             <Link to={"/"}>Back to Library</Link>
           </Grid.Column>
           <Grid.Column width={4}>Book: {this.state.bookName}</Grid.Column>
+          <Grid.Column width={4}>
+            <SearchWordInput onSearch={word => this.handleSearch(word)} />
+          </Grid.Column>
           <Grid.Column width={4}>
             <Dropdown
               fluid
@@ -228,12 +236,36 @@ export class Book extends React.Component<BookProps, BookStates> {
     return bookVO.name;
   }
 
+  private async handleSearch(word: string): Promise<void> {
+    const bookId = parseInt(this.props.match.params.bookId);
+    const wordVOArray = await serviceProvider.wordService.getWords(
+      bookId,
+      word,
+      this.state.wordStatus,
+      1,
+      1,
+      {
+        short: 100,
+        long: 500,
+      },
+      5
+    );
+    if (wordVOArray.length === 0) {
+      // FIXED later
+      console.log("Nothing is found.");
+    }
+    this.setState({
+      wordVO: Optional.of(wordVOArray[0]),
+    });
+  }
+
   private async getCurrentWord(
     bookId: number,
     pageNo: number
   ): Promise<Optional<WordVO>> {
     const wordVOArray = await serviceProvider.wordService.getWords(
       bookId,
+      undefined,
       this.state.wordStatus,
       pageNo,
       1,
@@ -268,6 +300,7 @@ export class Book extends React.Component<BookProps, BookStates> {
       this.getPageNo()
     );
     this.setState({
+      needRefresh: true,
       wordVO,
     });
   };
@@ -280,6 +313,7 @@ export class Book extends React.Component<BookProps, BookStates> {
     const newPageNo = new Map<WordStatus, number>(this.state.pageNo);
     newPageNo.set(this.state.wordStatus, this.getPageNo() + 1);
     this.setState({
+      needRefresh: true,
       wordVO,
       pageNo: newPageNo,
     });
@@ -290,17 +324,19 @@ export class Book extends React.Component<BookProps, BookStates> {
     const bookName = await Book.getBookName(bookId);
     const wordVO = await this.getCurrentWord(bookId, this.getPageNo());
     const wordCount = await serviceProvider.wordService.getWordCount(bookId);
-    if (this.needRefresh(wordVO, wordCount)) {
-      this.setState({ initiated: true, bookName, wordVO, wordCount });
+    if (this.state.needRefresh) {
+      this.setState({
+        initiated: true,
+        bookName,
+        wordVO,
+        wordCount,
+        needRefresh: false,
+      });
     }
   };
 
   private getPageNo(): number {
     return this.state.pageNo.get(this.state.wordStatus) as number;
-  }
-
-  private needRefresh(wordVO: Optional<WordVO>, wordCount: WordCount) {
-    return this.isWordVOChanged(wordVO) || this.isWordCountChanged(wordCount);
   }
 
   /**
@@ -344,6 +380,7 @@ export class Book extends React.Component<BookProps, BookStates> {
     const newPageNo = new Map<WordStatus, number>(this.state.pageNo);
     newPageNo.set(this.state.wordStatus, this.getPageNo() - 1);
     this.setState({
+      needRefresh: true,
       wordVO,
       pageNo: newPageNo,
     });

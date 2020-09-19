@@ -1,3 +1,2 @@
-1. Case insensitive
-2. Undo
-3. In Book: ENGLISH SPEECH _ STEVE JOBS - Stanford Commencement (English Subtitles)-1i9kcBHX2Nw, Unknown words is 1 but no more unknown words.
+- Undo
+- In Book: ENGLISH SPEECH _ STEVE JOBS - Stanford Commencement (English Subtitles)-1i9kcBHX2Nw, Unknown words is 1 but no more unknown words.

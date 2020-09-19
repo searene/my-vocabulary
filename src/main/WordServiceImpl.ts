@@ -9,6 +9,7 @@ import { WordQuery } from "./domain/WordQuery";
 import { WordCount } from "./domain/WordCount";
 import { WordContextService } from "./WordContextService";
 import { WordContextStep } from "./domain/WordContextStep";
+import { Optional } from "typescript-optional";
 
 @injectable()
 export class WordServiceImpl implements WordService {
@@ -18,6 +19,7 @@ export class WordServiceImpl implements WordService {
 
   async getWords(
     bookId: number,
+    word: string | undefined,
     wordStatus: WordStatus,
     pageNo: number,
     pageSize: number,
@@ -32,12 +34,14 @@ export class WordServiceImpl implements WordService {
       throw new Error("The size of bookDOList must be 1");
     }
     const bookDO = bookDOList[0];
-    const wordDOList = await this.databaseService.queryWords({
+    let wordQuery: WordQuery = {
       bookId: bookId,
       status: wordStatus,
       pageNo: pageNo,
+      word: word,
       pageSize: pageSize,
-    });
+    };
+    const wordDOList = await this.databaseService.queryWords(wordQuery);
     return wordDOList.map(wordDO => {
       return {
         id: wordDO.id,

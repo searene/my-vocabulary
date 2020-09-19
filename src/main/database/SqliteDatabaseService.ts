@@ -69,6 +69,7 @@ export class SqliteDatabaseService implements DatabaseService {
 
   async queryWords(wordQuery: WordQuery): Promise<WordDO[]> {
     await this.init();
+    console.dir(wordQuery, { depth: null });
     let sql = `SELECT id, book_id, word, positions, status FROM words WHERE 1 = 1`;
 
     // build where
@@ -87,6 +88,8 @@ export class SqliteDatabaseService implements DatabaseService {
       params["$word"] = wordQuery.word;
       params["$status"] = WordStatus.Known;
     }
+    console.log("blah");
+    console.log(wordQuery);
     if (wordQuery.word != undefined) {
       where += " AND word = $word";
       params["$word"] = wordQuery.word;
@@ -100,7 +103,11 @@ export class SqliteDatabaseService implements DatabaseService {
       sql += limitExpression.get();
     }
 
+    console.log("check sql");
+    console.log(sql);
+    console.dir(params, { depth: null });
     const rows = await this.all(sql, params);
+    console.dir(rows, { depth: null });
     const wordDOList: WordDO[] = [];
     for (const row of rows) {
       wordDOList.push({
@@ -161,7 +168,7 @@ export class SqliteDatabaseService implements DatabaseService {
   async getWordCount(bookId: number): Promise<WordCount> {
     await this.init();
     const rows = await this.all(`SELECT status, COUNT(*) AS cnt
-    FROM words GROUP BY status`);
+    FROM words WHERE book_id = ${bookId} GROUP BY status`);
     const wordCount: WordCount = {
       unknown: 0,
       known: 0,
@@ -262,7 +269,7 @@ export class SqliteDatabaseService implements DatabaseService {
   }
 
   private async run(sql: string, params?: any): Promise<RunResult> {
-    const watchDog = new WatchDog(sql + ", params: " + params);
+    const watchDog = new WatchDog(sql + ", params: " + JSON.stringify(params));
     return new Promise<RunResult>((resolve, reject) => {
       this.db.run(sql, params, function(err) {
         if (err != null) {
@@ -292,7 +299,9 @@ export class SqliteDatabaseService implements DatabaseService {
   private static getLimitExpression(baseQuery: BaseQuery): Optional<string> {
     if (baseQuery.pageNo != undefined && baseQuery.pageSize != undefined) {
       return Optional.of(
-        ` LIMIT ${baseQuery.pageSize * baseQuery.pageNo}, ${baseQuery.pageSize}`
+        ` LIMIT ${baseQuery.pageSize * baseQuery.pageNo - 1}, ${
+          baseQuery.pageSize
+        }`
       );
     }
     return Optional.empty();

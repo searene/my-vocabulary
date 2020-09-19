@@ -3,10 +3,12 @@ import { WordStatus } from "./enum/WordStatus";
 import { WordQuery } from "./domain/WordQuery";
 import { WordCount } from "./domain/WordCount";
 import { WordContextStep } from "./domain/WordContextStep";
+import { Optional } from "typescript-optional";
 
 export interface WordService {
   getWords(
     bookId: number,
+    word: string | undefined,
     wordStatus: WordStatus,
     pageNo: number,
     pageSize: number,
