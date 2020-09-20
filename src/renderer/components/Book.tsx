@@ -16,6 +16,7 @@ import { Link } from "react-router-dom";
 import { Optional } from "typescript-optional";
 import { WordCount } from "../../main/domain/WordCount";
 import { SearchWordInput } from "./SearchWordInput";
+import history from "../route/History";
 
 interface MatchParams {
   bookId: string;
@@ -124,68 +125,64 @@ export class Book extends React.Component<BookProps, BookStates> {
         {this.state.wordVO.isEmpty() ? (
           <div>No more words.</div>
         ) : (
-          <Grid.Row>
-            <Grid>
-              <Grid.Row>Word: {this.state.wordVO.get().word}</Grid.Row>
-              <Grid.Row>
-                Original Word: {this.state.wordVO.get().originalWord}
-              </Grid.Row>
-              <Grid.Row>
-                Status: {WordStatus[this.state.wordVO.get().status]}
-              </Grid.Row>
-              <Grid.Row>
-                <Grid>
-                  <Grid.Row>Context:</Grid.Row>
-                  {this.state.wordVO.get().contextList.map((context, i) => (
-                    <Modal
-                      key={i}
-                      trigger={
-                        <Grid.Row
-                          className={"hover-link"}
-                          dangerouslySetInnerHTML={{
-                            __html: context.short.htmlContents,
-                          }}
-                        />
-                      }
-                      onClose={() =>
+          <>
+            <Grid.Row>Word: {this.state.wordVO.get().word}</Grid.Row>
+            <Grid.Row>
+              Original Word: {this.state.wordVO.get().originalWord}
+            </Grid.Row>
+            <Grid.Row>
+              Status: {WordStatus[this.state.wordVO.get().status]}
+            </Grid.Row>
+            <Grid.Row>
+              <Grid.Row>Context:</Grid.Row>
+              {this.state.wordVO.get().contextList.map((context, i) => (
+                <Modal
+                  key={i}
+                  trigger={
+                    <Grid.Row
+                      className={"hover-link"}
+                      dangerouslySetInnerHTML={{
+                        __html: context.short.htmlContents,
+                      }}
+                    />
+                  }
+                  onClose={() =>
+                    this.setState({
+                      longWordContextModalIndex: Optional.empty(),
+                    })
+                  }
+                  onOpen={() =>
+                    this.setState({
+                      longWordContextModalIndex: Optional.of(i),
+                    })
+                  }
+                  open={this.state.longWordContextModalIndex.isPresent()}
+                >
+                  <Modal.Header>Context</Modal.Header>
+                  <Modal.Content
+                    dangerouslySetInnerHTML={{
+                      __html: this.state.longWordContextModalIndex.isPresent()
+                        ? this.state.wordVO.get().contextList[
+                            this.state.longWordContextModalIndex.get()
+                          ].long.htmlContents
+                        : "",
+                    }}
+                  />
+                  <Modal.Actions>
+                    <Button
+                      onClick={() =>
                         this.setState({
                           longWordContextModalIndex: Optional.empty(),
                         })
                       }
-                      onOpen={() =>
-                        this.setState({
-                          longWordContextModalIndex: Optional.of(i),
-                        })
-                      }
-                      open={this.state.longWordContextModalIndex.isPresent()}
                     >
-                      <Modal.Header>Context</Modal.Header>
-                      <Modal.Content
-                        dangerouslySetInnerHTML={{
-                          __html: this.state.longWordContextModalIndex.isPresent()
-                            ? this.state.wordVO.get().contextList[
-                                this.state.longWordContextModalIndex.get()
-                              ].long.htmlContents
-                            : "",
-                        }}
-                      />
-                      <Modal.Actions>
-                        <Button
-                          onClick={() =>
-                            this.setState({
-                              longWordContextModalIndex: Optional.empty(),
-                            })
-                          }
-                        >
-                          Close
-                        </Button>
-                      </Modal.Actions>
-                    </Modal>
-                  ))}
-                </Grid>
-              </Grid.Row>
-            </Grid>
-          </Grid.Row>
+                      Close
+                    </Button>
+                  </Modal.Actions>
+                </Modal>
+              ))}
+            </Grid.Row>
+          </>
         )}
         <Grid.Row>
           <Grid>
@@ -209,6 +206,7 @@ export class Book extends React.Component<BookProps, BookStates> {
                 >
                   Next (n)
                 </Button>
+                <Button onClick={this.handleAdd}>Add (a)</Button>
               </Grid.Column>
             </Grid.Row>
           </Grid>
@@ -318,6 +316,11 @@ export class Book extends React.Component<BookProps, BookStates> {
       wordVO,
       pageNo: newPageNo,
     });
+  };
+
+  private handleAdd = async (): Promise<void> => {
+    const bookId = parseInt(this.props.match.params.bookId);
+    history.push("/add/" + bookId);
   };
 
   private refresh = async (): Promise<void> => {

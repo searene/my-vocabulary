@@ -12,6 +12,7 @@ import { RouteComponentProps } from "react-router";
 import { Optional } from "typescript-optional";
 import serviceProvider from "../ServiceProvider";
 import history from "../route/History";
+import { Add } from "./Add";
 
 interface MenuProps {}
 
@@ -81,6 +82,7 @@ export class Menu extends React.Component<MenuProps, MenuStates> {
               <Switch>
                 <Route path={"/"} component={Library} exact />
                 <Route path={"/book/:bookId"} component={Book} />
+                <Route path={"/add/:bookId"} component={Add} />
               </Switch>
             </HashRouter>
           </Segment>
@@ -100,11 +102,15 @@ export class Menu extends React.Component<MenuProps, MenuStates> {
     if (data.name === "Library") {
       history.push("/");
     } else if (data.name === "Book") {
-      if (this.state.bookId.isPresent()) {
-        history.push("/book/" + this.state.bookId.get());
-      } else {
-        history.push("/book");
-      }
+      history.push(
+        "/book" +
+          (this.state.bookId.isPresent() ? "/" + this.state.bookId.get() : "")
+      );
+    } else if (data.name === "Add") {
+      history.push(
+        "/add" +
+          (this.state.bookId.isPresent() ? "/" + this.state.bookId.get() : "")
+      );
     }
   };
 }
