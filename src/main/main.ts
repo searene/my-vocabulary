@@ -6,8 +6,9 @@ import { EPubBookReader } from "./EPubBookReader";
 import { EBookReadAgent } from "./EBookReadAgent";
 import { TYPES } from "./config/types";
 import { PlainTextBookReader } from "./PlainTextBookReader";
-import * as fs from "fs-extra";
-import { DatabaseService } from "./database/DatabaseService";
+import * as unhandled from "electron-unhandled";
+
+unhandled();
 
 let win: BrowserWindow | null;
 
@@ -26,7 +27,8 @@ const createWindow = async () => {
     await installExtensions();
   }
 
-  win = new BrowserWindow({ width: 800, height: 600 });
+  win = new BrowserWindow();
+  win.maximize();
 
   if (process.env.NODE_ENV !== "production") {
     process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = "1"; // eslint-disable-line require-atomic-updates
@@ -84,17 +86,3 @@ init();
 
 exports.bookService = container.get(TYPES.BookService);
 exports.wordService = container.get(TYPES.WordService);
-
-import * as sqliteImport from "sqlite3";
-const sqlite3 = sqliteImport.verbose();
-const db = new sqlite3.Database("/home/searene/.my-vocabulary/vocabulary.db");
-// db.all("SELECT id FROM words WHERE word = $word", {$word: "grew"}, (err, rows) => {
-//   console.log(rows);
-// });
-db.all(
-  "SELECT id FROM words WHERE book_id = 8 AND status = 0 AND word = $word LIMIT 0,1",
-  { $word: "grew" },
-  (err, rows) => {
-    console.log(rows);
-  }
-);

@@ -4,15 +4,13 @@ import { Container } from "semantic-ui-react";
 import { Library } from "./Library";
 import { HashRouter, Route, Switch } from "react-router-dom";
 import { Book } from "./Book";
+import { Menu } from "./Menu";
+import { createHashHistory } from "history";
+import { createHash } from "crypto";
 
 const Application = () => (
   <Container style={{ marginTop: "50px" }}>
-    <HashRouter>
-      <Switch>
-        <Route path={"/"} component={Library} exact />
-        <Route path={"/book/:bookId"} component={Book} />
-      </Switch>
-    </HashRouter>
+    <Menu />
   </Container>
 );
 

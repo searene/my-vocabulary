@@ -4,6 +4,7 @@ import { Utils } from "./utils/Utils";
 import { WordService } from "../main/WordService";
 import { WordStatus } from "../main/enum/WordStatus";
 import { WordVO } from "../main/database/WordVO";
+import { Optional } from "typescript-optional";
 
 interface ServiceProvider {
   bookService: BookService;
@@ -29,6 +30,14 @@ if (process.env.RENDERER_ENV === "electron") {
           name: "A New Book",
           totalWordCount: 123409128,
         };
+      },
+      async getFirstBook(): Promise<Optional<BookVO>> {
+        const bookVO = {
+          id: 1,
+          name: "Test Book",
+          totalWordCount: 1125479,
+        };
+        return Promise.resolve(Optional.of(bookVO));
       },
       async getBooks(): Promise<BookVO[]> {
         const bookVO1 = {

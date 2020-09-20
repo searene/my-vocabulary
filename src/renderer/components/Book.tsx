@@ -286,6 +286,7 @@ export class Book extends React.Component<BookProps, BookStates> {
     data: DropdownProps
   ): void => {
     this.setState({
+      needRefresh: true,
       wordStatus: data.value as number,
     });
   };

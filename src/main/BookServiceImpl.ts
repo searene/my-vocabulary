@@ -8,6 +8,7 @@ import { BookStatus } from "./enum/BookStatus";
 import { BookService } from "./BookService";
 import { BookDO } from "./domain/BookDO";
 import * as path from "path";
+import { Optional } from "typescript-optional";
 
 @injectable()
 export class BookServiceImpl implements BookService {
@@ -63,6 +64,18 @@ export class BookServiceImpl implements BookService {
 
   async removeBook(bookId: number): Promise<void> {
     await this.databaseService.removeBook(bookId);
+  }
+
+  async getFirstBook(): Promise<Optional<BookVO>> {
+    const bookDOList = await this.databaseService.queryBooks({
+      pageNo: 1,
+      pageSize: 1,
+    });
+    if (bookDOList.length === 0) {
+      return Optional.empty();
+    } else {
+      return Optional.of(BookServiceImpl.toBookVO(bookDOList[0]));
+    }
   }
 
   static toBookVO(bookDO: BookDO): BookVO {

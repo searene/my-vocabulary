@@ -5,6 +5,10 @@ import Application from "./components/Application";
 import "semantic-ui-css/semantic.min.css";
 import "./style/style.less";
 
+if (process.env.RENDERER_ENV === "electron") {
+  require("electron-unhandled")();
+}
+
 // Create main element
 const mainElement = document.createElement("div");
 document.body.appendChild(mainElement);

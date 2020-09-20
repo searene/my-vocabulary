@@ -1,0 +1,101 @@
+@startuml My Vocabulary
+package domain {
+    package learn {
+        class CardType {
+            - id: Long
+        }
+        class FieldType {
+            - id: Long
+            - cardTypeId: Long
+            - name: String
+        }
+        class Card {
+            - id: Long
+            - bookId: Long
+            - cardTypeId: Long
+            + save()
+        }
+        class Field {
+            - id: Long
+            - cardId: Long
+            - contents: String
+        }
+        class Review {
+            - id: Long
+            - reviewTime: LocalDateTime
+            - cardId: Long
+            - level: Level
+        }
+        interface Scheduler {
+            + getScheduledReview(List<Review>): Review
+        }
+        class DefaultScheduler implements Scheduler {
+        }
+        enum Level {
+            EASY
+            GOOD
+            HARD
+            FORGOTTEN
+        }
+    }
+}
+
+package Infrastructure {
+  package dao {
+      interface BaseDAO<D, Q> {
+          + save(D)
+          + update(D)
+          + query(Q)
+          + delete(Q)
+      }
+      interface CardDAO extends BaseDAO {
+      }
+      interface FieldDAO extends BaseDAO {
+      }
+      interface ReviewDAO extends BaseDAO {
+      }
+      interface CardTypeDAO extends BaseDAO {
+      }
+      interface FieldTypeDAO extends BaseDAO {
+      }
+      interface ConfigDAO extends BaseDAO {
+      }
+      class SqliteCardDAO implements CardDAO
+      class SqliteFieldDAO implements FieldDAO
+      class SqliteReviewDAO implements ReviewDAO
+      class SqliteCardTypeDAO implements CardTypeDAO
+      class SqliteFieldTypeDAO implements FieldTypeDAO
+      class SqliteConfigDAO implements ConfigDAO
+  }
+  package do {
+      class CardDO {
+          - id: Long
+          - bookId: Long
+          - cardTypeId: Long
+      }
+      class FieldDO {
+          - id: Long
+          - cardId: Long
+          - contents: String
+      }
+      class ReviewDO {
+          - id: Long
+          - cardId: Long
+          - reviewTime: String
+          - level: Level
+          - isDone: Boolean
+      }
+      class CardTypeDO {
+          - id: Long
+      }
+      class FieldTypeDO {
+          - id: Long
+          - cardTypeId: Long
+          - name: String
+      }
+      class ConfigDO {
+          - defaultCardTypeId: Long
+      }
+  }
+}
+@enduml

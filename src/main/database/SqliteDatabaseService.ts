@@ -88,8 +88,6 @@ export class SqliteDatabaseService implements DatabaseService {
       params["$word"] = wordQuery.word;
       params["$status"] = WordStatus.Known;
     }
-    console.log("blah");
-    console.log(wordQuery);
     if (wordQuery.word != undefined) {
       where += " AND word = $word";
       params["$word"] = wordQuery.word;
@@ -103,9 +101,6 @@ export class SqliteDatabaseService implements DatabaseService {
       sql += limitExpression.get();
     }
 
-    console.log("check sql");
-    console.log(sql);
-    console.dir(params, { depth: null });
     const rows = await this.all(sql, params);
     console.dir(rows, { depth: null });
     const wordDOList: WordDO[] = [];

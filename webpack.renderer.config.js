@@ -9,7 +9,7 @@ const baseConfig = require('./webpack.base.config');
 module.exports = merge.smart(baseConfig, {
     target: process.env.RENDERER_ENV === "web" ? 'web' : 'electron-renderer',
     entry: {
-        app: ['@babel/polyfill','./src/renderer/app.tsx']
+        app: ['@babel/polyfill','./src/renderer/App.tsx']
     },
     module: {
         rules: [
