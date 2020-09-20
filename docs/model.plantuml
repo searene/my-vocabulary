@@ -1,41 +1,56 @@
 @startuml My Vocabulary
+
 package domain {
-    package learn {
+    package card {
         class CardType {
-            - id: Long
+            - id: number
         }
         class FieldType {
-            - id: Long
-            - cardTypeId: Long
+            - id: number
             - name: String
         }
+        CardType "1" o-- "*" FieldType
         class Card {
-            - id: Long
-            - bookId: Long
-            - cardTypeId: Long
-            + save()
+            - id: number
+            - bookId: number
+            + {static} createEmptyCardUsingDefaultCardType(number bookId): Card
+            + save(): Card
+            + addReview(Review): Review
         }
+        note right of Card::createEmptyCardUsingDefaultCardType
+        Card.id and Field.id is null because we don't save
+        the newly created instance to database.
+        end note
+        note left of Card::save
+        Save the Card to database
+        and generate Card.id and Field.id
+        end note
+        Card "*" *-- "1" CardType
         class Field {
-            - id: Long
-            - cardId: Long
+            - id: number
             - contents: String
+            + update()
         }
+        Card "1" o-- "*" Field
+        Field "1" o-- "1" FieldType
         class Review {
-            - id: Long
-            - reviewTime: LocalDateTime
-            - cardId: Long
-            - level: Level
+            - id: number
+            - reviewTime: DateTime
         }
-        interface Scheduler {
-            + getScheduledReview(List<Review>): Review
-        }
-        class DefaultScheduler implements Scheduler {
-        }
+        Card "1" o-- "*" Review
         enum Level {
             EASY
             GOOD
             HARD
             FORGOTTEN
+        }
+        Review "1" *-- "1" Level
+    }
+    package schedule {
+        interface Scheduler {
+            + getScheduledReview(Card): Map<Level, Review>
+        }
+        class DefaultScheduler implements Scheduler {
         }
     }
 }
@@ -68,33 +83,32 @@ package Infrastructure {
       class SqliteConfigDAO implements ConfigDAO
   }
   package do {
-      class CardDO {
-          - id: Long
-          - bookId: Long
-          - cardTypeId: Long
+      class BaseDO {
+          - id: number
+          - createTime: Date
       }
-      class FieldDO {
-          - id: Long
-          - cardId: Long
+      class CardDO extends BaseDO {
+          - bookId: number
+          - cardTypeId: number
+      }
+      class FieldDO extends BaseDO {
+          - cardId: number
           - contents: String
       }
-      class ReviewDO {
-          - id: Long
-          - cardId: Long
+      class ReviewDO extends BaseDO {
+          - cardId: number
           - reviewTime: String
           - level: Level
           - isDone: Boolean
       }
-      class CardTypeDO {
-          - id: Long
+      class CardTypeDO extends BaseDO {
       }
-      class FieldTypeDO {
-          - id: Long
-          - cardTypeId: Long
+      class FieldTypeDO extends BaseDO {
+          - cardTypeId: number
           - name: String
       }
       class ConfigDO {
-          - defaultCardTypeId: Long
+          - defaultCardTypeId: number
       }
   }
 }
