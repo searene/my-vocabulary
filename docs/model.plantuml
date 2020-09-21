@@ -2,42 +2,48 @@
 
 package domain {
     package card {
+        class CardInstance {
+            - id: number
+            + {static} getNextDueCardInstance(bookId): Optional<CardInstance>
+            + {static} getTotalDueCardInstanceCount(bookId): number
+            + addReview(Review): Review
+        }
+        CardInstance "*" *-- "1" Card
+        CardInstance "*" *-- "1" Composition
         class CardType {
             - id: number
         }
         class FieldType {
             - id: number
-            - name: String
+            - name: string
         }
         CardType "1" o-- "*" FieldType
+        class Composition {
+            - id: number
+            - frontFieldList: Field[]
+            - backFieldList: Field[]
+        }
+        Composition o-- Field
+        CardType "1" o-- "*" Composition
         class Card {
             - id: number
             - bookId: number
-            + {static} createEmptyCardUsingDefaultCardType(number bookId): Card
+            + {static} createEmptyCard(bookId): Card
             + save(): Card
-            + addReview(Review): Review
         }
-        note right of Card::createEmptyCardUsingDefaultCardType
-        Card.id and Field.id is null because we don't save
-        the newly created instance to database.
-        end note
-        note left of Card::save
-        Save the Card to database
-        and generate Card.id and Field.id
-        end note
         Card "*" *-- "1" CardType
         class Field {
             - id: number
-            - contents: String
+            - contents: string
             + update()
         }
         Card "1" o-- "*" Field
-        Field "1" o-- "1" FieldType
+        Field "*" o-- "1" FieldType
         class Review {
             - id: number
             - reviewTime: DateTime
         }
-        Card "1" o-- "*" Review
+        CardInstance "1" o-- "*" Review
         enum Level {
             EASY
             GOOD
@@ -63,29 +69,32 @@ package Infrastructure {
           + query(Q)
           + delete(Q)
       }
-      interface CardDAO extends BaseDAO {
-      }
-      interface FieldDAO extends BaseDAO {
-      }
-      interface ReviewDAO extends BaseDAO {
-      }
-      interface CardTypeDAO extends BaseDAO {
-      }
-      interface FieldTypeDAO extends BaseDAO {
-      }
-      interface ConfigDAO extends BaseDAO {
-      }
+      interface CardDAO extends BaseDAO
+      interface FieldDAO extends BaseDAO
+      interface ReviewDAO extends BaseDAO
+      interface CardTypeDAO extends BaseDAO
+      interface FieldTypeDAO extends BaseDAO
+      interface CompositionDAO extends BaseDAO
+      interface ConfigDAO extends BaseDAO
+      interface CardInstanceDAO extends BaseDAO
+
       class SqliteCardDAO implements CardDAO
       class SqliteFieldDAO implements FieldDAO
       class SqliteReviewDAO implements ReviewDAO
       class SqliteCardTypeDAO implements CardTypeDAO
       class SqliteFieldTypeDAO implements FieldTypeDAO
+      class SqliteCompositionDAO implements CompositionDAO
       class SqliteConfigDAO implements ConfigDAO
+      class SqliteCardInstanceDAO implements CardInstanceDAO
   }
   package do {
       class BaseDO {
           - id: number
           - createTime: Date
+      }
+      class CardInstanceDO extends BaseDO {
+          - cardId: number
+          - compositionId: number
       }
       class CardDO extends BaseDO {
           - bookId: number
@@ -93,11 +102,11 @@ package Infrastructure {
       }
       class FieldDO extends BaseDO {
           - cardId: number
-          - contents: String
+          - contents: string
       }
       class ReviewDO extends BaseDO {
           - cardId: number
-          - reviewTime: String
+          - reviewTime: string
           - level: Level
           - isDone: Boolean
       }
@@ -105,7 +114,11 @@ package Infrastructure {
       }
       class FieldTypeDO extends BaseDO {
           - cardTypeId: number
-          - name: String
+          - name: string
+      }
+      class CompositionDO extends BaseDO {
+          - frontFieldIdList: string
+          - backFieldIdList: string
       }
       class ConfigDO {
           - defaultCardTypeId: number
