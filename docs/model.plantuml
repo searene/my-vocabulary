@@ -6,12 +6,12 @@ package domain {
             - id: number
             + {static} getNextDueCardInstance(bookId): Optional<CardInstance>
             + {static} getTotalDueCardInstanceCount(bookId): number
-            + addReview(Review): Review
         }
         CardInstance "*" *-- "1" Card
         CardInstance "*" *-- "1" Composition
         class CardType {
             - id: number
+            - name: string
         }
         class FieldType {
             - id: number
@@ -42,8 +42,9 @@ package domain {
         class Review {
             - id: number
             - reviewTime: DateTime
+            + save()
         }
-        CardInstance "1" o-- "*" Review
+        CardInstance "1" --o "*" Review
         enum Level {
             EASY
             GOOD
@@ -54,7 +55,7 @@ package domain {
     }
     package schedule {
         interface Scheduler {
-            + getScheduledReview(Card): Map<Level, Review>
+            + getNextReview(CardInstance): Map<Level, Review>
         }
         class DefaultScheduler implements Scheduler {
         }
@@ -105,12 +106,13 @@ package Infrastructure {
           - contents: string
       }
       class ReviewDO extends BaseDO {
-          - cardId: number
+          - cardInstanceId: number
           - reviewTime: string
           - level: Level
           - isDone: Boolean
       }
       class CardTypeDO extends BaseDO {
+          - name: string
       }
       class FieldTypeDO extends BaseDO {
           - cardTypeId: number
