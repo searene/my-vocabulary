@@ -9,6 +9,8 @@ import { TYPES } from "./types";
 import { BookServiceImpl } from "../BookServiceImpl";
 import { BookService } from "../BookService";
 import { WordService } from "../WordService";
+import { RepositoryFactory } from "../infrastructure/repository/RepositoryFactory";
+import { TypeOrmRepositoryFactory } from "../infrastructure/repository/typeOrm/TypeOrmRepositoryFactory";
 
 export const container = new Container();
 
@@ -19,3 +21,6 @@ container
   .to(SqliteDatabaseService);
 container.bind(ConfigReader).to(ConfigReader);
 container.bind<BookService>(TYPES.BookService).to(BookServiceImpl);
+container
+  .bind<RepositoryFactory>(TYPES.RepositoryFactory)
+  .to(TypeOrmRepositoryFactory);

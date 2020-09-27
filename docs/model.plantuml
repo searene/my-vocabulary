@@ -1,10 +1,18 @@
 @startuml My Vocabulary
 
 package domain {
+    top to bottom direction
+    package freshDict {
+        class ConvertDictResourceService implements IBeforeSaveCardHook
+    }
     package card {
+        interface IBeforeSaveCardHook {
+            + process(Card): void
+        }
+        Card --> BeforeSaveCardHook::process
         class CardInstance {
             - id: number
-            + {static} getNextDueCardInstance(bookId): Optional<CardInstance>
+            + {static} getNextDueCardInstance(bookId): CardInstance | undefined
             + {static} getTotalDueCardInstanceCount(bookId): number
         }
         CardInstance "*" *-- "1" Card
@@ -16,14 +24,17 @@ package domain {
         class FieldType {
             - id: number
             - name: string
+            - category: string
         }
-        CardType "1" o-- "*" FieldType
+        note right of FieldType::category
+        Including google-image/word
+        end note
         class Composition {
             - id: number
-            - frontFieldList: Field[]
-            - backFieldList: Field[]
+            - frontFields: Field[]
+            - backFields: Field[]
         }
-        Composition o-- Field
+        Composition "1" o-- "*" Field
         CardType "1" o-- "*" Composition
         class Card {
             - id: number
@@ -41,7 +52,7 @@ package domain {
         Field "*" o-- "1" FieldType
         class Review {
             - id: number
-            - reviewTime: DateTime
+            - reviewTime: Date
             + save()
         }
         CardInstance "1" --o "*" Review
@@ -63,66 +74,54 @@ package domain {
 }
 
 package Infrastructure {
-  package dao {
-      interface BaseDAO<D, Q> {
-          + save(D)
-          + update(D)
-          + query(Q)
-          + delete(Q)
+  package repository {
+      interface Repository<Entity> {
+          + save(Entity[]): Entity[]
       }
-      interface CardDAO extends BaseDAO
-      interface FieldDAO extends BaseDAO
-      interface ReviewDAO extends BaseDAO
-      interface CardTypeDAO extends BaseDAO
-      interface FieldTypeDAO extends BaseDAO
-      interface CompositionDAO extends BaseDAO
-      interface ConfigDAO extends BaseDAO
-      interface CardInstanceDAO extends BaseDAO
-
-      class SqliteCardDAO implements CardDAO
-      class SqliteFieldDAO implements FieldDAO
-      class SqliteReviewDAO implements ReviewDAO
-      class SqliteCardTypeDAO implements CardTypeDAO
-      class SqliteFieldTypeDAO implements FieldTypeDAO
-      class SqliteCompositionDAO implements CompositionDAO
-      class SqliteConfigDAO implements ConfigDAO
-      class SqliteCardInstanceDAO implements CardInstanceDAO
+      interface RepositoryFactory {
+          + getRepository<Entity>(ObjectType<Entity>): Repository<Entity>
+      }
+      package typeOrm {
+          class TypeOrmRepository<Entity> implements Repository
+          class TypeOrmRepositoryFactory implements RepositoryFactory
+      }
+      RepositoryFactory -left-> Repository
   }
-  package do {
-      class BaseDO {
+  package entity {
+      class BaseEntity {
           - id: number
-          - createTime: Date
       }
-      class CardInstanceDO extends BaseDO {
+      class CardInstanceEntity extends BaseEntity {
           - cardId: number
           - compositionId: number
       }
-      class CardDO extends BaseDO {
+      class CardEntity extends BaseEntity {
           - bookId: number
           - cardTypeId: number
       }
-      class FieldDO extends BaseDO {
+      class FieldEntity extends BaseEntity {
           - cardId: number
           - contents: string
       }
-      class ReviewDO extends BaseDO {
+      class ReviewEntity extends BaseEntity {
           - cardInstanceId: number
           - reviewTime: string
           - level: Level
           - isDone: Boolean
       }
-      class CardTypeDO extends BaseDO {
+      class CardTypeEntity extends BaseEntity {
           - name: string
       }
-      class FieldTypeDO extends BaseDO {
+      class FieldTypeEntity extends BaseEntity {
           - cardTypeId: number
           - name: string
+          - category: string
       }
-      class CompositionDO extends BaseDO {
+      class CompositionEntity extends BaseEntity {
           - frontFieldIdList: string
           - backFieldIdList: string
       }
-      class ConfigDO {
+      class ConfigEntity extends BaseEntity {
           - defaultCardTypeId: number
       }
   }
