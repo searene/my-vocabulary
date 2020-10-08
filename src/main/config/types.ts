@@ -3,4 +3,6 @@ export const TYPES = {
   BookService: Symbol.for("BookService"),
   WordService: Symbol.for("WordService"),
   RepositoryFactory: Symbol.for("RepositoryFactory"),
+  ConfigRepository: Symbol.for("ConfigRepository"),
+  CardTypeRepository: Symbol.for("CardTypeRepository"),
 };
