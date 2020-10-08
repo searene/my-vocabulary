@@ -1,10 +1,22 @@
 class CardType {
   constructor(
     // CardType id
-    private readonly id: number,
+    private readonly _id: number,
     // CardType name
-    private readonly name: string,
+    private readonly _name: string,
 
-    private compositions: Composition[]
+    private readonly _compositionArray: Composition[]
   ) {}
+
+  get id(): number {
+    return this._id;
+  }
+
+  get name(): string {
+    return this._name;
+  }
+
+  get compositionArray(): Composition[] {
+    return this.compositionArray;
+  }
 }
