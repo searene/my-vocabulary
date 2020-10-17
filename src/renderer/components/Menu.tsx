@@ -12,7 +12,7 @@ import { RouteComponentProps } from "react-router";
 import { Optional } from "typescript-optional";
 import serviceProvider from "../ServiceProvider";
 import history from "../route/History";
-import { Add } from "./Add";
+import { Add } from "./add/Add";
 
 interface MenuProps {}
 

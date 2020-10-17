@@ -5,14 +5,15 @@ import { CardEntity } from "../../infrastructure/entity/CardEntity";
 import { repositoryFactory } from "../../config/bind";
 import { ConfigEntity } from "../../infrastructure/entity/ConfigEntity";
 import { Entity } from "typeorm";
+import { CardType } from "./CardType";
 
 export class Card {
   private id: number | undefined;
 
   private constructor(
-    private bookId: number,
-    private cardType: CardType,
-    private fields: Field[]
+    private _bookId: number,
+    private _cardType: CardType,
+    private _fields: Field[]
   ) {}
 
   /**
@@ -39,5 +40,15 @@ export class Card {
     const cardRepository = await repositoryFactory.getRepository(CardEntity);
     const cardEntity = new CardEntity();
     await cardRepository.save([this]);
+  }
+
+  public get cardType(): CardType {
+    return this._cardType;
+  }
+  public get bookId(): number {
+    return this._bookId;
+  }
+  public get fields(): Field[] {
+    return this._fields;
   }
 }
