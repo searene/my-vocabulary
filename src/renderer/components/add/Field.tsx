@@ -4,7 +4,8 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 
 interface FieldProps {
-  field: Field;
+  fieldTypeId: number;
+  fieldName: string;
 }
 export const Field = (props: FieldProps) => {
   const [contents, setContents] = useState("");
@@ -13,7 +14,7 @@ export const Field = (props: FieldProps) => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     dispatch(
       changeFieldContents({
-        fieldTypeId: props.field.fieldType.id,
+        fieldTypeId: props.fieldTypeId,
         contents: e.target.value,
       })
     );
@@ -21,7 +22,7 @@ export const Field = (props: FieldProps) => {
 
   return (
     <div>
-      <span>{props.field.fieldType.name}: </span>
+      <span>{props.fieldName}: </span>
       <input value={contents} onChange={handleChange} />
     </div>
   );

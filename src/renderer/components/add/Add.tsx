@@ -3,7 +3,7 @@ import { Button, Grid } from "semantic-ui-react";
 import { RouteComponentProps } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { useState, useEffect } from "react";
-import { createEmptyCard, saveCard, selectCard } from "./addSlice";
+import { createCard, saveCard, selectCardVO } from "./addSlice";
 import { Field } from "./Field";
 import { BookName } from "../bookName/BookName";
 
@@ -14,31 +14,30 @@ interface MatchParams {
 interface AddProps extends RouteComponentProps<MatchParams> {}
 
 export function Add(props: AddProps) {
-  const card = useSelector(selectCard);
+  const cardVO = useSelector(selectCardVO);
   const dispatch = useDispatch();
   const [initiated, setInitiated] = useState(false);
   const bookId = parseInt(props.match.params.bookId);
 
-  const fieldComponents =
-    card == undefined ? (
-      <></>
-    ) : (
-      card.fields.map(field => (
-        <Grid.Row>
-          <Field key={field.fieldType.id} field={field} />
-        </Grid.Row>
-      ))
-    );
+  const fieldComponents = cardVO?.fieldVOs.map(fieldVO => (
+    <Grid.Row>
+      <Field
+        key={fieldVO.fieldTypeId}
+        fieldTypeId={fieldVO.fieldTypeId}
+        fieldName={fieldVO.fieldName}
+      />
+    </Grid.Row>
+  ));
 
   useEffect(() => {
     if (!initiated) {
-      dispatch(createEmptyCard({ bookId }));
+      dispatch(createCard({ bookId }));
     }
     setInitiated(true);
   }, [initiated, dispatch]);
 
   const save = () => {
-    dispatch(saveCard());
+    dispatch(saveCard({ bookId }));
   };
 
   return initiated ? (

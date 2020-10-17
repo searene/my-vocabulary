@@ -1,3 +1,4 @@
+import { CardFacade } from "./../main/facade/CardFacade";
 import { BookService } from "../main/BookService";
 import { BookVO } from "../main/domain/BookVO";
 import { Utils } from "./utils/Utils";
@@ -9,6 +10,7 @@ import { Optional } from "typescript-optional";
 interface ServiceProvider {
   bookService: BookService;
   wordService: WordService;
+  cardFacade: CardFacade;
 }
 
 let serviceProvider: ServiceProvider;
@@ -18,6 +20,7 @@ if (process.env.RENDERER_ENV === "electron") {
   serviceProvider = {
     bookService: mainJs.bookService,
     wordService: mainJs.wordService,
+    cardFacade: mainJs.cardFacade,
   };
 } else {
   serviceProvider = {
@@ -106,6 +109,7 @@ if (process.env.RENDERER_ENV === "electron") {
         });
       },
     },
+    cardFacade: {},
   };
 }
 export default serviceProvider;

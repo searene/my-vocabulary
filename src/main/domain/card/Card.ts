@@ -1,10 +1,6 @@
-import { RepositoryFactory } from "../../infrastructure/repository/RepositoryFactory";
-import { TypeOrmRepository } from "../../infrastructure/repository/typeOrm/TypeOrmRepository";
-import { TypeOrmRepositoryFactory } from "../../infrastructure/repository/typeOrm/TypeOrmRepositoryFactory";
 import { CardEntity } from "../../infrastructure/entity/CardEntity";
 import { repositoryFactory } from "../../config/bind";
 import { ConfigEntity } from "../../infrastructure/entity/ConfigEntity";
-import { Entity } from "typeorm";
 import { CardType } from "./CardType";
 
 export class Card {
