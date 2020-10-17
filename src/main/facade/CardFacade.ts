@@ -18,5 +18,9 @@ export type SaveCardParam = {
 export interface CardFacade {
   createCard(bookId: number): Promise<CardVO>;
 
-  saveCard(saveCardParam: SaveCardParam): Promise<void>;
+  /**
+   * Save the card to database
+   * @returns cardId
+   */
+  saveCard(saveCardParam: SaveCardParam): Promise<number>;
 }

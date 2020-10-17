@@ -1,3 +1,5 @@
+import { Card } from "./../domain/card/Card";
+import { CardFacade } from "./../facade/CardFacade";
 import "reflect-metadata";
 import { Container } from "inversify";
 import { WordFormReader } from "../WordFormReader";
@@ -11,6 +13,7 @@ import { BookService } from "../BookService";
 import { WordService } from "../WordService";
 import { ConfigRepository } from "../infrastructure/repository/ConfigRepository";
 import { KnexConfigRepository } from "../infrastructure/repository/knex/KnexConfigRepository";
+import { CardFacadeImpl } from "../facade/CardFacadeImpl";
 
 export const container = new Container();
 
@@ -21,6 +24,7 @@ container
   .to(SqliteDatabaseService);
 container.bind(ConfigReader).to(ConfigReader);
 container.bind<BookService>(TYPES.BookService).to(BookServiceImpl);
+container.bind<CardFacade>(TYPES.CardFacade).to(CardFacadeImpl);
 container
   .bind<ConfigRepository>(TYPES.ConfigRepository)
   .to(KnexConfigRepository);

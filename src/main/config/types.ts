@@ -1,3 +1,4 @@
+import { CardFacade } from "./../facade/CardFacade";
 export const TYPES = {
   DatabaseService: Symbol.for("DatabaseService"),
   BookService: Symbol.for("BookService"),
@@ -5,4 +6,5 @@ export const TYPES = {
   RepositoryFactory: Symbol.for("RepositoryFactory"),
   ConfigRepository: Symbol.for("ConfigRepository"),
   CardTypeRepository: Symbol.for("CardTypeRepository"),
+  CardFacade: Symbol.for("CardFacadeA"),
 };

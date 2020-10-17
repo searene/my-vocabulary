@@ -1,7 +1,7 @@
 class Field {
   constructor(
     private readonly _id: number,
-    private readonly _contents: string,
+    private _contents: string,
     private readonly _fieldType: FieldType
   ) {}
 
@@ -10,6 +10,9 @@ class Field {
   }
   public get contents(): string {
     return this._contents;
+  }
+  public set contents(value: string) {
+    this._contents = value;
   }
   public get id(): number {
     return this._id;

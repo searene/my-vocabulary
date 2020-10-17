@@ -4,9 +4,9 @@ import { ConfigEntity } from "../../infrastructure/entity/ConfigEntity";
 import { CardType } from "./CardType";
 
 export class Card {
-  private id: number | undefined;
+  private _id: number | undefined;
 
-  private constructor(
+  public constructor(
     private _bookId: number,
     private _cardType: CardType,
     private _fields: Field[]
@@ -38,6 +38,12 @@ export class Card {
     await cardRepository.save([this]);
   }
 
+  public get id(): number | undefined {
+    return this._id;
+  }
+  public set id(value: number | undefined) {
+    this._id = value;
+  }
   public get cardType(): CardType {
     return this._cardType;
   }
