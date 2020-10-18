@@ -1,5 +1,6 @@
 import { BaseDO } from "./BaseDO";
 
-export class CardDO extends BaseDO {
-  cardTypeId: number | undefined;
-}
+export type CardDO = BaseDO & {
+  cardTypeId?: number;
+  bookId?: number;
+};

@@ -73,13 +73,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com:Robinfr/electron-react-typescript.git"
+    "url": "git+ssh://git@github.com:searene/my-vocabulary.git"
   },
   "author": {
-    "name": "Your name",
-    "email": "Your email"
+    "name": "Joey",
+    "email": "mycityofsky@gmail.com"
   },
-  "license": "SEE LICENSE",
+  "license": "UNLICENSED",
   "bugs": {
     "url": "https://github.com/Robinfr/electron-react-typescript/issues"
   },

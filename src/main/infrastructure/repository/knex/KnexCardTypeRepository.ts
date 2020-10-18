@@ -8,6 +8,12 @@ const knex = KnexFactory.knex;
 
 @injectable()
 export class KnexCardTypeRepository implements CardTypeRepository {
+  batchInsert(dataObjects: CardTypeDO[]): Promise<number[]> {
+    throw new Error("Method not implemented.");
+  }
+  batchQueryByIds(id: number[]): Promise<CardTypeDO[]> {
+    throw new Error("Method not implemented.");
+  }
   async insert(cardTypeDO: CardTypeDO): Promise<number> {
     const insertResult = await knex("card_type")
       .insert({

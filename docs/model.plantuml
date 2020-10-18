@@ -26,6 +26,7 @@ package domain {
             - name: string
             - category: string
         }
+        FieldType "*" *-- "1" CardType
         note right of FieldType::category
         Including google-image/word
         end note

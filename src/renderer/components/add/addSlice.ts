@@ -16,13 +16,11 @@ const initialState: AddState = {
 export type CreateCardParam = {
   bookId: number;
 };
-export const createCard = createAsyncThunk<
-  CardVO,
-  CreateCardParam,
-  { state: State }
->("add/createCard", async ({ bookId }, { getState }) => {
-  return await serviceProvider.cardFacade.createCard(bookId);
+
+export const getFieldTypes = createAsyncThunk("add/createCard", async () => {
+  return await serviceProvider.cardFacade.getFieldTypes();
 });
+
 export const saveCard = createAsyncThunk<
   void,
   { bookId: number },
@@ -33,7 +31,7 @@ export const saveCard = createAsyncThunk<
     throw new Error("cardVO is undefined.");
   }
   const fieldContents = selectFieldContents(getState());
-  await serviceProvider.cardFacade.saveCard({
+  await serviceProvider.cardFacade.createCard({
     bookId,
     cardTypeId: cardVO.cardTypeVO.id,
     fieldContents,
@@ -49,9 +47,9 @@ const addSlice = createSlice({
     },
   },
   extraReducers: builder => {
-    builder.addCase(createCard.fulfilled, (state, action) => {
-      for (const fieldVO of action.payload.fieldVOs) {
-        state.fieldContents[fieldVO.fieldTypeId] = "";
+    builder.addCase(getFieldTypes.fulfilled, (state, action) => {
+      for (const fieldVO of action.payload) {
+        state.fieldContents[fieldVO.id] = "";
       }
     });
   },

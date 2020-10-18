@@ -14,6 +14,10 @@ import { WordService } from "../WordService";
 import { ConfigRepository } from "../infrastructure/repository/ConfigRepository";
 import { KnexConfigRepository } from "../infrastructure/repository/knex/KnexConfigRepository";
 import { CardFacadeImpl } from "../facade/CardFacadeImpl";
+import { CardTypeRepository } from "../infrastructure/repository/CardTypeRepository";
+import { KnexCardTypeRepository } from "../infrastructure/repository/knex/KnexCardTypeRepository";
+import { KnexCardRepository } from "../infrastructure/repository/knex/KnexCardRepository";
+import { CardRepository } from "../infrastructure/repository/CardRepository";
 
 export const container = new Container();
 
@@ -28,3 +32,10 @@ container.bind<CardFacade>(TYPES.CardFacade).to(CardFacadeImpl);
 container
   .bind<ConfigRepository>(TYPES.ConfigRepository)
   .to(KnexConfigRepository);
+container
+  .bind<CardTypeRepository>(TYPES.CardTypeRepository)
+  .to(KnexCardTypeRepository);
+container
+  .bind<FieldTypeRepository>(TYPES.FieldTypeRepository)
+  .to(KnexFieldTypeRepository);
+container.bind<CardRepository>(TYPES.CardRepository).to(KnexCardRepository);

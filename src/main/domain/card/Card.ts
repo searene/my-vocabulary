@@ -1,56 +1,63 @@
+import { CardTypeQuery } from "./../../infrastructure/query/CardTypeQuery";
+import { CardTypeRepository } from "./../../infrastructure/repository/CardTypeRepository";
+import { ConfigRepository } from "./../../infrastructure/repository/ConfigRepository";
+import "reflect-metadata";
 import { CardEntity } from "../../infrastructure/entity/CardEntity";
 import { repositoryFactory } from "../../config/bind";
 import { ConfigEntity } from "../../infrastructure/entity/ConfigEntity";
 import { CardType } from "./CardType";
+import { container } from "../../config/inversify.config";
+import { TYPES } from "../../config/types";
+import { ConfigQuery } from "../../infrastructure/query/ConfigQuery";
+import { CardRepository } from "../../infrastructure/repository/CardRepository";
+import { CardDO } from "../../infrastructure/do/CardDO";
+import { assert } from "../../utils/Assert";
+import { CardQuery } from "../../infrastructure/query/CardQuery";
+import { Field } from "./Field";
 
 export class Card {
-  private _id: number | undefined;
+  private static _cardRepository: CardRepository = container.get(
+    TYPES.CardRepository
+  );
 
   public constructor(
-    private _bookId: number,
-    private _cardType: CardType,
-    private _fields: Field[]
+    private readonly _id: number,
+    private readonly _bookId: number,
+    private readonly _cardTypeId: number
   ) {}
 
   /**
-   * Create an empty Card instance, this card hasn't been saved into database
-   * yet, and Card::id is undefined
+   * @param fieldContents fieldTypeId -> field contents
    */
-  static async createEmptyCard(bookId: number): Promise<Card> {
-    const configRepository = await repositoryFactory.getRepository(
-      ConfigEntity
+  static async createCard(bookId: number, cardTypeId?: number): Promise<Card> {
+    const insertedCardDO = await Card._cardRepository.insert({
+      cardTypeId,
+      bookId,
+    });
+    return Card.fromCardDO(insertedCardDO);
+  }
+
+  static async getById(id: number): Promise<Card> {
+    const cardDOs = await Card._cardRepository.query({ id });
+    assert(cardDOs.length === 1, "cardDOs.length should be 1");
+    return Card.fromCardDO(cardDOs[0]);
+  }
+
+  static fromCardDO(cardDO: CardDO): Card {
+    return new Card(
+      cardDO.id as number,
+      cardDO.bookId as number,
+      cardDO.cardTypeId as number
     );
-    const configEntity = await configRepository.findOne();
-    if (configEntity === undefined) {
-      console.error("configEntity is undefined");
-      throw new Error("configEntity is undefined");
-    }
-    return new Card(bookId, configEntity.defaultCardType as CardType, []);
   }
 
-  /**
-   * Save the current Card into db, and id of the returned Card instance will
-   * be filled. This method will not modify the current Card instance.
-   */
-  async save(): Promise<Card> {
-    const cardRepository = await repositoryFactory.getRepository(CardEntity);
-    const cardEntity = new CardEntity();
-    await cardRepository.save([this]);
-  }
-
-  public get id(): number | undefined {
+  public get id(): number {
     return this._id;
   }
-  public set id(value: number | undefined) {
-    this._id = value;
-  }
-  public get cardType(): CardType {
-    return this._cardType;
+  public get cardTypeId(): number {
+    return this._cardTypeId;
   }
   public get bookId(): number {
     return this._bookId;
-  }
-  public get fields(): Field[] {
-    return this._fields;
   }
 }

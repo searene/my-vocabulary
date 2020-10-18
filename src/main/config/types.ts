@@ -6,5 +6,8 @@ export const TYPES = {
   RepositoryFactory: Symbol.for("RepositoryFactory"),
   ConfigRepository: Symbol.for("ConfigRepository"),
   CardTypeRepository: Symbol.for("CardTypeRepository"),
+  CardRepository: Symbol.for("CardRepository"),
+  FieldTypeRepository: Symbol.for("FieldTypeRepository"),
+  FieldRepository: Symbol.for("FieldRepository"),
   CardFacade: Symbol.for("CardFacadeA"),
 };

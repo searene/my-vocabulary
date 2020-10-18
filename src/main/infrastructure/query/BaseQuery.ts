@@ -1,3 +1,3 @@
-export class BaseQuery {
-  id: number | undefined;
-}
+export type BaseQuery = {
+  id?: number;
+};

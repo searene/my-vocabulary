@@ -8,6 +8,12 @@ const knex = KnexFactory.knex;
 
 @injectable()
 export class KnexConfigRepository implements ConfigRepository {
+  batchInsert(dataObjects: ConfigDO[]): Promise<number[]> {
+    throw new Error("Method not implemented.");
+  }
+  batchQueryByIds(id: number[]): Promise<ConfigDO[]> {
+    throw new Error("Method not implemented.");
+  }
   async insert(configDO: ConfigDO): Promise<number> {
     const insertResult = await knex("config")
       .insert({

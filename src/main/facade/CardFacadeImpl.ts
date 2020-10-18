@@ -1,38 +1,34 @@
+import { ConfigQuery } from "./../infrastructure/query/ConfigQuery";
+import { ConfigRepository } from "./../infrastructure/repository/ConfigRepository";
 import { Card } from "./../domain/card/Card";
-import { injectable } from "inversify";
-import { CardFacade, CardVO, SaveCardParam } from "./CardFacade";
+import { inject, injectable } from "inversify";
+import { CardFacade, CardVO, FieldTypeVO, CreateCardParam } from "./CardFacade";
+import { assert } from "../utils/Assert";
+import { TYPES } from "../config/types";
+import { FieldType } from "../domain/card/FieldType";
+import { FieldTypeRepository } from "../infrastructure/repository/FieldTypeRepository";
+import { Field } from "../domain/card/Field";
 
 @injectable()
 export class CardFacadeImpl implements CardFacade {
-  async createCard(bookId: number): Promise<CardVO> {
-    const card = await Card.createEmptyCard(bookId);
-    return this.toCardVO(card);
+  constructor(
+    @inject(TYPES.ConfigRepository) private _configRepository: ConfigRepository,
+    @inject(TYPES.FieldTypeRepository)
+    private _fieldTypeRepository: FieldTypeRepository
+  ) {}
+
+  async getFieldTypes(cardTypeId?: number): Promise<FieldTypeVO[]> {
+    const fieldTypes = await FieldType.getFieldTypes(cardTypeId);
+    return fieldTypes.map(fieldType => {
+      return {
+        id: fieldType.id,
+        name: fieldType.name,
+      };
+    });
   }
 
-  async saveCard(saveCardParam: SaveCardParam): Promise<number> {
-    const card = await Card.createEmptyCard(saveCardParam.bookId);
-    for (const field of card.fields) {
-      field.contents = saveCardParam.fieldContents[field.fieldType.id];
-    }
-    const savedCard = await card.save();
-    if (savedCard.id === undefined) {
-      throw new Error("savedCard.id is undefined.");
-    }
-    return savedCard.id;
-  }
-
-  private toCardVO(card: Card): CardVO {
-    return {
-      cardTypeVO: {
-        id: card.cardType.id,
-        name: card.cardType.name,
-      },
-      fieldVOs: card.fields.map(field => {
-        return {
-          fieldTypeId: field.fieldType.id,
-          fieldName: field.fieldType.name,
-        };
-      }),
-    };
+  async createCard(createCardParam: CreateCardParam): Promise<number> {
+    const card = await Card.createCard(createCardParam.bookId);
+    return card.id;
   }
 }

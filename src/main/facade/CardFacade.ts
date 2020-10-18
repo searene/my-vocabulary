@@ -10,17 +10,30 @@ export type CardVO = {
   cardTypeVO: CardTypeVO;
   fieldVOs: FieldVO[];
 };
-export type SaveCardParam = {
+export type CreateCardParam = {
   bookId: number;
-  cardTypeId: number;
+
+  /**
+   * The cardType to be used, if no cardType was given, the default cardType would be used.
+   */
+  cardTypeId?: number;
+
   fieldContents: Record<number, string>; // fieldTypeId -> fieldContents
 };
+export type FieldTypeVO = {
+  id: number;
+  name: string;
+};
 export interface CardFacade {
-  createCard(bookId: number): Promise<CardVO>;
+  /**
+   * Get field types of the given cardType, if no cardType was given,
+   * the default cardType would be used.
+   */
+  getFieldTypes(cardTypeId?: number): Promise<FieldTypeVO[]>;
 
   /**
    * Save the card to database
    * @returns cardId
    */
-  saveCard(saveCardParam: SaveCardParam): Promise<number>;
+  createCard(createCardParam: CreateCardParam): Promise<number>;
 }

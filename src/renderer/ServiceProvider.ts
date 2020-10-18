@@ -1,4 +1,8 @@
-import { CardFacade } from "./../main/facade/CardFacade";
+import {
+  CardFacade,
+  CreateCardParam,
+  FieldTypeVO,
+} from "./../main/facade/CardFacade";
 import { BookService } from "../main/BookService";
 import { BookVO } from "../main/domain/BookVO";
 import { Utils } from "./utils/Utils";
@@ -109,7 +113,14 @@ if (process.env.RENDERER_ENV === "electron") {
         });
       },
     },
-    cardFacade: {},
+    cardFacade: {
+      getFieldTypes(cardTypeId?: number): Promise<FieldTypeVO[]> {
+        throw new Error("To be implemented.");
+      },
+      createCard(createCardParam: CreateCardParam): Promise<number> {
+        throw new Error("To be implemented.");
+      },
+    },
   };
 }
 export default serviceProvider;

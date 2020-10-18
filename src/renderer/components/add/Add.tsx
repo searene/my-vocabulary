@@ -3,7 +3,7 @@ import { Button, Grid } from "semantic-ui-react";
 import { RouteComponentProps } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { useState, useEffect } from "react";
-import { createCard, saveCard, selectCardVO } from "./addSlice";
+import { getFieldTypes, saveCard, selectCardVO } from "./addSlice";
 import { Field } from "./Field";
 import { BookName } from "../bookName/BookName";
 
@@ -31,7 +31,7 @@ export function Add(props: AddProps) {
 
   useEffect(() => {
     if (!initiated) {
-      dispatch(createCard({ bookId }));
+      dispatch(getFieldTypes());
     }
     setInitiated(true);
   }, [initiated, dispatch]);

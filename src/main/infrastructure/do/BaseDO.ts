@@ -1,3 +1,3 @@
-export class BaseDO {
-  id: number | undefined;
-}
+export type BaseDO = {
+  id?: number;
+};
