@@ -1,11 +1,11 @@
 import { inject } from "inversify";
-import { TYPES } from "../../config/types";
+import { types } from "../../config/types";
 import { ConfigQuery } from "../../infrastructure/query/ConfigQuery";
 import { ConfigRepository } from "../../infrastructure/repository/ConfigRepository";
 import { assert } from "../../utils/Assert";
 
 export class CardType {
-  @inject(TYPES.ConfigRepository)
+  @inject(types.ConfigRepository)
   private static _configRepository: ConfigRepository;
 
   constructor(

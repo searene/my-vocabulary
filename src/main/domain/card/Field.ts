@@ -1,11 +1,11 @@
 import { container } from "../../config/inversify.config";
-import { TYPES } from "../../config/types";
+import { types } from "../../config/types";
 import { FieldDO } from "../../infrastructure/do/FieldDO";
 import { FieldRepository } from "../../infrastructure/repository/FieldRepository";
 
 export class Field {
   private static _fieldRepository: FieldRepository = container.get(
-    TYPES.FieldRepository
+    types.FieldRepository
   );
 
   constructor(

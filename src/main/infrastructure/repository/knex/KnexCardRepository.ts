@@ -6,19 +6,19 @@ import { CardQuery } from "../../query/CardQuery";
 const knex = KnexFactory.knex;
 
 export class KnexCardRepository implements CardRepository {
-  batchInsert(dataObjects: CardDO[]): Promise<number[]> {
+  async batchInsert(dataObjects: CardDO[]): Promise<CardDO[]> {
     throw new Error("Method not implemented.");
   }
 
-  query(query: CardQuery): Promise<CardDO[]> {
+  async query(query: CardQuery): Promise<CardDO[]> {
     throw new Error("Method not implemented.");
   }
 
-  batchQueryByIds(id: number[]): Promise<CardDO[]> {
+  async batchQueryByIds(id: number[]): Promise<CardDO[]> {
     throw new Error("Method not implemented.");
   }
 
-  async insert(cardDO: CardDO): Promise<number> {
+  async insert(cardDO: CardDO): Promise<CardDO> {
     const insertResult = await knex("card")
       .insert({
         cardTypeId: cardDO.cardTypeId,

@@ -4,7 +4,7 @@ import { Card } from "./../domain/card/Card";
 import { inject, injectable } from "inversify";
 import { CardFacade, CardVO, FieldTypeVO, CreateCardParam } from "./CardFacade";
 import { assert } from "../utils/Assert";
-import { TYPES } from "../config/types";
+import { types } from "../config/types";
 import { FieldType } from "../domain/card/FieldType";
 import { FieldTypeRepository } from "../infrastructure/repository/FieldTypeRepository";
 import { Field } from "../domain/card/Field";
@@ -12,8 +12,8 @@ import { Field } from "../domain/card/Field";
 @injectable()
 export class CardFacadeImpl implements CardFacade {
   constructor(
-    @inject(TYPES.ConfigRepository) private _configRepository: ConfigRepository,
-    @inject(TYPES.FieldTypeRepository)
+    @inject(types.ConfigRepository) private _configRepository: ConfigRepository,
+    @inject(types.FieldTypeRepository)
     private _fieldTypeRepository: FieldTypeRepository
   ) {}
 

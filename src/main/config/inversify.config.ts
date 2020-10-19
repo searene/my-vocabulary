@@ -7,7 +7,7 @@ import { SqliteDatabaseService } from "../database/SqliteDatabaseService";
 import { DatabaseService } from "../database/DatabaseService";
 import { ConfigReader } from "../ConfigReader";
 import { WordServiceImpl } from "../WordServiceImpl";
-import { TYPES } from "./types";
+import { types } from "./types";
 import { BookServiceImpl } from "../BookServiceImpl";
 import { BookService } from "../BookService";
 import { WordService } from "../WordService";
@@ -18,24 +18,26 @@ import { CardTypeRepository } from "../infrastructure/repository/CardTypeReposit
 import { KnexCardTypeRepository } from "../infrastructure/repository/knex/KnexCardTypeRepository";
 import { KnexCardRepository } from "../infrastructure/repository/knex/KnexCardRepository";
 import { CardRepository } from "../infrastructure/repository/CardRepository";
+import { KnexFieldTypeRepository } from "../infrastructure/repository/knex/KnexFieldTypeRepository";
+import { FieldTypeRepository } from "../infrastructure/repository/FieldTypeRepository";
 
 export const container = new Container();
 
-container.bind<WordService>(TYPES.WordService).to(WordServiceImpl);
+container.bind<WordService>(types.WordService).to(WordServiceImpl);
 container.bind(WordFormReader).to(WordFormReader);
 container
-  .bind<DatabaseService>(TYPES.DatabaseService)
+  .bind<DatabaseService>(types.DatabaseService)
   .to(SqliteDatabaseService);
 container.bind(ConfigReader).to(ConfigReader);
-container.bind<BookService>(TYPES.BookService).to(BookServiceImpl);
-container.bind<CardFacade>(TYPES.CardFacade).to(CardFacadeImpl);
+container.bind<BookService>(types.BookService).to(BookServiceImpl);
+container.bind<CardFacade>(types.CardFacade).to(CardFacadeImpl);
 container
-  .bind<ConfigRepository>(TYPES.ConfigRepository)
+  .bind<ConfigRepository>(types.ConfigRepository)
   .to(KnexConfigRepository);
 container
-  .bind<CardTypeRepository>(TYPES.CardTypeRepository)
+  .bind<CardTypeRepository>(types.CardTypeRepository)
   .to(KnexCardTypeRepository);
 container
-  .bind<FieldTypeRepository>(TYPES.FieldTypeRepository)
+  .bind<FieldTypeRepository>(types.FieldTypeRepository)
   .to(KnexFieldTypeRepository);
-container.bind<CardRepository>(TYPES.CardRepository).to(KnexCardRepository);
+container.bind<CardRepository>(types.CardRepository).to(KnexCardRepository);

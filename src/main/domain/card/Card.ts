@@ -1,23 +1,13 @@
-import { CardTypeQuery } from "./../../infrastructure/query/CardTypeQuery";
-import { CardTypeRepository } from "./../../infrastructure/repository/CardTypeRepository";
-import { ConfigRepository } from "./../../infrastructure/repository/ConfigRepository";
 import "reflect-metadata";
-import { CardEntity } from "../../infrastructure/entity/CardEntity";
-import { repositoryFactory } from "../../config/bind";
-import { ConfigEntity } from "../../infrastructure/entity/ConfigEntity";
-import { CardType } from "./CardType";
 import { container } from "../../config/inversify.config";
-import { TYPES } from "../../config/types";
-import { ConfigQuery } from "../../infrastructure/query/ConfigQuery";
+import { types } from "../../config/types";
 import { CardRepository } from "../../infrastructure/repository/CardRepository";
 import { CardDO } from "../../infrastructure/do/CardDO";
 import { assert } from "../../utils/Assert";
-import { CardQuery } from "../../infrastructure/query/CardQuery";
-import { Field } from "./Field";
 
 export class Card {
   private static _cardRepository: CardRepository = container.get(
-    TYPES.CardRepository
+    types.CardRepository
   );
 
   public constructor(

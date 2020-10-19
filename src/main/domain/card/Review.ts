@@ -5,5 +5,7 @@ class Review {
     private level: Level
   ) {}
 
-  save(): Promise<void> {}
+  async save(): Promise<void> {
+    throw new Error("Method not implemented.");
+  }
 }

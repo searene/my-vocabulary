@@ -1,7 +1,7 @@
 import { EBookReadAgent } from "./EBookReadAgent";
 import { container } from "./config/inversify.config";
 import { DatabaseService } from "./database/DatabaseService";
-import { TYPES } from "./config/types";
+import { types } from "./config/types";
 import { BookVO } from "./domain/BookVO";
 import { inject, injectable } from "inversify";
 import { BookStatus } from "./enum/BookStatus";
@@ -13,7 +13,7 @@ import { Optional } from "typescript-optional";
 @injectable()
 export class BookServiceImpl implements BookService {
   constructor(
-    @inject(TYPES.DatabaseService) private databaseService: DatabaseService
+    @inject(types.DatabaseService) private databaseService: DatabaseService
   ) {}
 
   /**
@@ -28,7 +28,7 @@ export class BookServiceImpl implements BookService {
     const words = await EBookReadAgent.readAllWords(filePath);
 
     const databaseService = container.get<DatabaseService>(
-      TYPES.DatabaseService
+      types.DatabaseService
     );
     const bookId = await databaseService.writeBookContents(
       path.parse(filePath).name,

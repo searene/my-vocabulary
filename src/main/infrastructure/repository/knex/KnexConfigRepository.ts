@@ -8,13 +8,13 @@ const knex = KnexFactory.knex;
 
 @injectable()
 export class KnexConfigRepository implements ConfigRepository {
-  batchInsert(dataObjects: ConfigDO[]): Promise<number[]> {
+  batchInsert(dataObjects: ConfigDO[]): Promise<ConfigDO[]> {
     throw new Error("Method not implemented.");
   }
   batchQueryByIds(id: number[]): Promise<ConfigDO[]> {
     throw new Error("Method not implemented.");
   }
-  async insert(configDO: ConfigDO): Promise<number> {
+  async insert(configDO: ConfigDO): Promise<ConfigDO> {
     const insertResult = await knex("config")
       .insert({
         default_card_type_id: configDO.defaultCardTypeId,
@@ -30,10 +30,9 @@ export class KnexConfigRepository implements ConfigRepository {
     const selectResult = await knex
       .select("id", "default_card_type_id")
       .from("config");
-    return selectResult.map(data => {
-      const configDO = new ConfigDO();
-      configDO.defaultCardTypeId = data.get("default_card_type_id");
-      return configDO;
-    });
+    return selectResult.map(data => ({
+      id: data["id"],
+      defaultCardTypeId: data["default_card_type_id"],
+    }));
   }
 }

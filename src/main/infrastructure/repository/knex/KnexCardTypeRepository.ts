@@ -8,13 +8,13 @@ const knex = KnexFactory.knex;
 
 @injectable()
 export class KnexCardTypeRepository implements CardTypeRepository {
-  batchInsert(dataObjects: CardTypeDO[]): Promise<number[]> {
+  async batchInsert(dataObjects: CardTypeDO[]): Promise<CardTypeDO[]> {
     throw new Error("Method not implemented.");
   }
-  batchQueryByIds(id: number[]): Promise<CardTypeDO[]> {
+  async batchQueryByIds(id: number[]): Promise<CardTypeDO[]> {
     throw new Error("Method not implemented.");
   }
-  async insert(cardTypeDO: CardTypeDO): Promise<number> {
+  async insert(cardTypeDO: CardTypeDO): Promise<CardTypeDO> {
     const insertResult = await knex("card_type")
       .insert({
         name: cardTypeDO.name,
@@ -28,11 +28,9 @@ export class KnexCardTypeRepository implements CardTypeRepository {
 
   async query(query: CardTypeQuery): Promise<CardTypeDO[]> {
     const selectResult = await knex.select("id", "name").from("card_type");
-    return selectResult.map(data => {
-      const cardTypeDO = new CardTypeDO();
-      cardTypeDO.id = data.get("id");
-      cardTypeDO.name = data.get("name");
-      return cardTypeDO;
-    });
+    return selectResult.map(data => ({
+      id: data["id"],
+      name: data["name"],
+    }));
   }
 }

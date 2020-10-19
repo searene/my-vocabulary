@@ -4,7 +4,7 @@ import * as url from "url";
 import { container } from "./config/inversify.config";
 import { EPubBookReader } from "./EPubBookReader";
 import { EBookReadAgent } from "./EBookReadAgent";
-import { TYPES } from "./config/types";
+import { types } from "./config/types";
 import { PlainTextBookReader } from "./PlainTextBookReader";
 import * as unhandled from "electron-unhandled";
 
@@ -84,5 +84,5 @@ async function init() {
 
 init();
 
-exports.bookService = container.get(TYPES.BookService);
-exports.wordService = container.get(TYPES.WordService);
+exports.bookService = container.get(types.BookService);
+exports.wordService = container.get(types.WordService);

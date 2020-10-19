@@ -3,7 +3,7 @@ import { inject, injectable } from "inversify";
 import { DatabaseService } from "./database/DatabaseService";
 import { WordStatus } from "./enum/WordStatus";
 import { BookStatus } from "./enum/BookStatus";
-import { TYPES } from "./config/types";
+import { types } from "./config/types";
 import { WordService } from "./WordService";
 import { WordQuery } from "./domain/WordQuery";
 import { WordCount } from "./domain/WordCount";
@@ -14,7 +14,7 @@ import { Optional } from "typescript-optional";
 @injectable()
 export class WordServiceImpl implements WordService {
   constructor(
-    @inject(TYPES.DatabaseService) private databaseService: DatabaseService
+    @inject(types.DatabaseService) private databaseService: DatabaseService
   ) {}
 
   async getWords(

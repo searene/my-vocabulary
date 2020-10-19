@@ -1,12 +1,12 @@
 import { inject } from "inversify";
-import { TYPES } from "../../config/types";
+import { types } from "../../config/types";
 import { FieldTypeCategory } from "../../infrastructure/common/FieldTypeCategory";
 import { FieldTypeDO } from "../../infrastructure/do/FieldTypeDO";
 import { FieldTypeRepository } from "../../infrastructure/repository/FieldTypeRepository";
 import { CardType } from "./CardType";
 
 export class FieldType {
-  @inject(TYPES.FieldTypeRepository)
+  @inject(types.FieldTypeRepository)
   private static _fieldTypeRepository: FieldTypeRepository;
 
   constructor(
