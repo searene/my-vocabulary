@@ -1,6 +1,5 @@
-import { Card } from "./../domain/card/Card";
-import { CardFacade } from "./../facade/CardFacade";
 import "reflect-metadata";
+import { CardFacade } from "./../facade/CardFacade";
 import { Container } from "inversify";
 import { WordFormReader } from "../WordFormReader";
 import { SqliteDatabaseService } from "../database/SqliteDatabaseService";
