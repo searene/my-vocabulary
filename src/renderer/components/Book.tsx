@@ -290,6 +290,10 @@ export class Book extends React.Component<BookProps, BookStates> {
   };
 
   private handleKnowAndNext = async (): Promise<void> => {
+    // const knowAndNextCommand = new KnowAndNextCommand(this.state.wordVO.get().id);
+    // const newCommands = commands.slice().push(knowAndNextCommand);
+    // this.setState({commands: newCommands});
+
     await serviceProvider.wordService.updateWord({
       id: this.state.wordVO.get().id,
       status: WordStatus.Known,
