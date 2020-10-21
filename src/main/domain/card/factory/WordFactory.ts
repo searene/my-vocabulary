@@ -41,7 +41,8 @@ export class WordFactory {
       originalWord: originalWord.orElse(""),
       positions: positions.join(","),
     });
-    return this.fromWordDO(wordDO);
+    const result = this.fromWordDO(wordDO);
+    return result;
   }
 
   fromWordDO(wordDO: WordDO): Word {

@@ -1,8 +1,13 @@
+import { injectable } from "inversify";
 import { FieldTypeDO } from "../../do/FieldTypeDO";
 import { FieldTypeQuery } from "../../query/FieldTypeQuery";
 import { FieldTypeRepository } from "../FieldTypeRepository";
 
+@injectable()
 export class KnexFieldTypeRepository implements FieldTypeRepository {
+  createTableIfNotExists(): Promise<void> {
+    throw new Error("Method not implemented.");
+  }
   async insert(dataObject: FieldTypeDO): Promise<FieldTypeDO> {
     throw new Error("Method not implemented.");
   }

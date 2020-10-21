@@ -8,6 +8,9 @@ const knex = KnexFactory.knex;
 
 @injectable()
 export class KnexConfigRepository implements ConfigRepository {
+  createTableIfNotExists(): Promise<void> {
+    throw new Error("Method not implemented.");
+  }
   batchInsert(dataObjects: ConfigDO[]): Promise<ConfigDO[]> {
     throw new Error("Method not implemented.");
   }

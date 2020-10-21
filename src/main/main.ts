@@ -11,6 +11,16 @@ import { WordRepository } from "./infrastructure/repository/WordRepository";
 
 unhandled();
 
+async function initialization(): Promise<void> {
+  EBookReadAgent.register("epub", EPubBookReader);
+  EBookReadAgent.register("txt", PlainTextBookReader);
+
+  await container
+    .get<WordRepository>(types.WordRepository)
+    .createTableIfNotExists();
+  await container.get<WordRepository>(types.WordRepository).updateWordStatus();
+}
+
 let win: BrowserWindow | null;
 
 const installExtensions = async () => {
@@ -27,6 +37,8 @@ const createWindow = async () => {
   if (process.env.NODE_ENV !== "production") {
     await installExtensions();
   }
+
+  await initialization();
 
   win = new BrowserWindow();
   win.maximize();
@@ -70,28 +82,6 @@ app.on("activate", () => {
   }
 });
 
-async function init() {
-  // only for test
-  // if (fs.existsSync("/home/searene/.my-vocabulary")) {
-  //   fs.removeSync("/home/searene/.my-vocabulary");
-  // }
-
-  EBookReadAgent.register("epub", EPubBookReader);
-  EBookReadAgent.register("txt", PlainTextBookReader);
-
-  // const result = await EBookReadAgent.readAllWords("/home/searene/tmp/test.txt");
-  // console.log(result);
-}
-
-init();
-
 exports.bookService = container.get(types.BookService);
 exports.wordService = container.get(types.WordService);
-
-(async function() {
-  const wordRepository: WordRepository = container.get(types.WordRepository);
-  const wordDOs = await wordRepository.query({
-    word: "author",
-  });
-  console.log(wordDOs);
-})();
+exports.cardFacade = container.get(types.CardFacade);

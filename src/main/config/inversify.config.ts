@@ -22,7 +22,9 @@ import { FieldTypeRepository } from "../infrastructure/repository/FieldTypeRepos
 import { WordRepository } from "../infrastructure/repository/WordRepository";
 import { KnexWordRepository } from "../infrastructure/repository/knex/KnexWordRepository";
 
-export const container = new Container();
+export const container = new Container({
+  defaultScope: "Singleton",
+});
 
 container.bind<WordService>(types.WordService).to(WordServiceImpl);
 container.bind(WordFormReader).to(WordFormReader);

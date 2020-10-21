@@ -4,6 +4,7 @@ import { Optional } from "typescript-optional";
 import { WordFormLine } from "./domain/WordFormLine";
 import { inject, injectable } from "inversify";
 import { ConfigReader } from "./ConfigReader";
+import { WatchDog } from "./WatchDog";
 
 @injectable()
 export class WordFormReader {

@@ -2,10 +2,15 @@ import { CardRepository } from "../CardRepository";
 import { CardDO } from "../../do/CardDO";
 import * as KnexFactory from "./KnexFactory";
 import { CardQuery } from "../../query/CardQuery";
+import { injectable } from "inversify";
 
 const knex = KnexFactory.knex;
 
+@injectable()
 export class KnexCardRepository implements CardRepository {
+  createTableIfNotExists(): Promise<void> {
+    throw new Error("Method not implemented.");
+  }
   async batchInsert(dataObjects: CardDO[]): Promise<CardDO[]> {
     throw new Error("Method not implemented.");
   }

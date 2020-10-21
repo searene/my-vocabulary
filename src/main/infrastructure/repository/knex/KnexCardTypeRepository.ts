@@ -33,4 +33,8 @@ export class KnexCardTypeRepository implements CardTypeRepository {
       name: data["name"],
     }));
   }
+
+  async createTableIfNotExists(): Promise<void> {
+    throw new Error("Method not implemented.");
+  }
 }
