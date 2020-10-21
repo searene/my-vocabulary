@@ -155,6 +155,7 @@
     "immutable": "^4.0.0-rc.12",
     "inversify": "^5.0.1",
     "knex": "^0.21.6",
+    "knex-stringcase": "^1.4.3",
     "less-loader": "^6.2.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",

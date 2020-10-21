@@ -9,6 +9,7 @@ import { BookService } from "./BookService";
 import { BookDO } from "./domain/BookDO";
 import * as path from "path";
 import { Optional } from "typescript-optional";
+import { WordFactory } from "./domain/card/factory/WordFactory";
 
 @injectable()
 export class BookServiceImpl implements BookService {
@@ -25,7 +26,7 @@ export class BookServiceImpl implements BookService {
     if (!contents.isPresent()) {
       throw new Error("plainContents not available");
     }
-    const words = await EBookReadAgent.readAllWords(filePath);
+    const wordToPositionsMap = await EBookReadAgent.readAllWords(filePath);
 
     const databaseService = container.get<DatabaseService>(
       types.DatabaseService
@@ -34,7 +35,10 @@ export class BookServiceImpl implements BookService {
       path.parse(filePath).name,
       contents.get()
     );
-    await databaseService.writeWords(bookId, words);
+    for (const [word, positions] of wordToPositionsMap) {
+      await WordFactory.get().createWord(bookId, word, positions);
+    }
+    // await databaseService.writeWords(bookId, words);
     const bookDOList = await databaseService.queryBooks({
       id: bookId,
     });

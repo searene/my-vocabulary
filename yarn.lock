@@ -7341,6 +7341,13 @@ kleur@^3.0.3:
   resolved "https://registry.npm.taobao.org/kleur/download/kleur-3.0.3.tgz?cache=0&sync_timestamp=1593039723169&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fkleur%2Fdownload%2Fkleur-3.0.3.tgz#a79c9ecc86ee1ce3fa6206d1216c501f147fc07e"
   integrity sha1-p5yezIbuHOP6YgbRIWxQHxR/wH4=
 
+knex-stringcase@^1.4.3:
+  version "1.4.3"
+  resolved "https://registry.npm.taobao.org/knex-stringcase/download/knex-stringcase-1.4.3.tgz#c9ba6ce3d3fe5cff04f86c72725dfd867816cd1b"
+  integrity sha1-ybps49P+XP8E+Gxycl39hngWzRs=
+  dependencies:
+    stringcase "^4.3.1"
+
 knex@^0.21.6:
   version "0.21.6"
   resolved "https://registry.npm.taobao.org/knex/download/knex-0.21.6.tgz#3e80ae38199c41e2dfe7d1d1a38470b1de1c93e7"
@@ -10888,6 +10895,11 @@ string_decoder@~1.1.1:
   integrity sha1-nPFhG6YmhdcDCunkujQUnDrwP8g=
   dependencies:
     safe-buffer "~5.1.0"
+
+stringcase@^4.3.1:
+  version "4.3.1"
+  resolved "https://registry.npm.taobao.org/stringcase/download/stringcase-4.3.1.tgz#54279c9dd7379ff50f4e47d50d036b2ac888d34b"
+  integrity sha1-VCecndc3n/UPTkfVDQNrKsiI00s=
 
 stringify-object@^3.3.0:
   version "3.3.0"

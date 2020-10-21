@@ -19,6 +19,8 @@ import { KnexCardRepository } from "../infrastructure/repository/knex/KnexCardRe
 import { CardRepository } from "../infrastructure/repository/CardRepository";
 import { KnexFieldTypeRepository } from "../infrastructure/repository/knex/KnexFieldTypeRepository";
 import { FieldTypeRepository } from "../infrastructure/repository/FieldTypeRepository";
+import { WordRepository } from "../infrastructure/repository/WordRepository";
+import { KnexWordRepository } from "../infrastructure/repository/knex/KnexWordRepository";
 
 export const container = new Container();
 
@@ -40,3 +42,4 @@ container
   .bind<FieldTypeRepository>(types.FieldTypeRepository)
   .to(KnexFieldTypeRepository);
 container.bind<CardRepository>(types.CardRepository).to(KnexCardRepository);
+container.bind<WordRepository>(types.WordRepository).to(KnexWordRepository);

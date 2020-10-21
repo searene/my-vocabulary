@@ -7,6 +7,7 @@ import { EBookReadAgent } from "./EBookReadAgent";
 import { types } from "./config/types";
 import { PlainTextBookReader } from "./PlainTextBookReader";
 import * as unhandled from "electron-unhandled";
+import { WordRepository } from "./infrastructure/repository/WordRepository";
 
 unhandled();
 
@@ -86,3 +87,11 @@ init();
 
 exports.bookService = container.get(types.BookService);
 exports.wordService = container.get(types.WordService);
+
+(async function() {
+  const wordRepository: WordRepository = container.get(types.WordRepository);
+  const wordDOs = await wordRepository.query({
+    word: "author",
+  });
+  console.log(wordDOs);
+})();
