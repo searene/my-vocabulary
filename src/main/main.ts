@@ -7,18 +7,12 @@ import { EBookReadAgent } from "./EBookReadAgent";
 import { types } from "./config/types";
 import { PlainTextBookReader } from "./PlainTextBookReader";
 import * as unhandled from "electron-unhandled";
-import { WordRepository } from "./infrastructure/repository/WordRepository";
 
 unhandled();
 
 async function initialization(): Promise<void> {
   EBookReadAgent.register("epub", EPubBookReader);
   EBookReadAgent.register("txt", PlainTextBookReader);
-
-  await container
-    .get<WordRepository>(types.WordRepository)
-    .createTableIfNotExists();
-  await container.get<WordRepository>(types.WordRepository).updateWordStatus();
 }
 
 let win: BrowserWindow | null;

@@ -8,6 +8,9 @@ const knex = KnexFactory.knex;
 
 @injectable()
 export class KnexCardRepository implements CardRepository {
+  updateById(id: number, dataObject: CardDO): Promise<CardDO> {
+    throw new Error("Method not implemented.");
+  }
   createTableIfNotExists(): Promise<void> {
     throw new Error("Method not implemented.");
   }

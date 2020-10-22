@@ -17,7 +17,7 @@ import { CardTypeRepository } from "../infrastructure/repository/CardTypeReposit
 import { KnexCardTypeRepository } from "../infrastructure/repository/knex/KnexCardTypeRepository";
 import { KnexCardRepository } from "../infrastructure/repository/knex/KnexCardRepository";
 import { CardRepository } from "../infrastructure/repository/CardRepository";
-import { KnexFieldTypeRepository } from "../infrastructure/repository/knex/KnexFieldTypeRepository";
+import { KnexFieldTypeRepository } from "../infrastructure/repository/knex/KnexFieldTypeRepository.1";
 import { FieldTypeRepository } from "../infrastructure/repository/FieldTypeRepository";
 import { WordRepository } from "../infrastructure/repository/WordRepository";
 import { KnexWordRepository } from "../infrastructure/repository/knex/KnexWordRepository";
@@ -45,3 +45,18 @@ container
   .to(KnexFieldTypeRepository);
 container.bind<CardRepository>(types.CardRepository).to(KnexCardRepository);
 container.bind<WordRepository>(types.WordRepository).to(KnexWordRepository);
+
+export type WordRepositoryProvider = () => Promise<WordRepository>;
+
+container
+  .bind<WordRepositoryProvider>(types.WordRepositoryProvider)
+  .toProvider<WordRepository>(context => {
+    return async () => {
+      const wordRepository = context.container.get<WordRepository>(
+        types.WordRepository
+      );
+      await wordRepository.createTableIfNotExists();
+      await wordRepository.updateWordStatus();
+      return wordRepository;
+    };
+  });

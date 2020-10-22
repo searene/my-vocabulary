@@ -1,14 +1,18 @@
-import { container } from "../../../config/inversify.config";
+import {
+  container,
+  WordRepositoryProvider,
+} from "../../../config/inversify.config";
 import { types } from "../../../config/types";
 import { WordStatus } from "../../../enum/WordStatus";
 import { WordDO } from "../../../infrastructure/do/WordDO";
-import { WordRepository } from "../../../infrastructure/repository/WordRepository";
 import { WordFormReader } from "../../../WordFormReader";
 import { Word } from "../../word/Word";
 
 export class WordFactory {
   private _wordFormReader: WordFormReader = container.get(WordFormReader);
-  private _wordRepository: WordRepository = container.get(types.WordRepository);
+  private _wordRepositoryProvider: WordRepositoryProvider = container.get(
+    types.WordRepositoryProvider
+  );
 
   private static _instance?: WordFactory;
 
@@ -26,7 +30,8 @@ export class WordFactory {
     word: string,
     positions: number[]
   ): Promise<Word> {
-    const wordDOs = await this._wordRepository.query({
+    const wordRepository = await this._wordRepositoryProvider();
+    const wordDOs = await wordRepository.query({
       word: word,
       status: WordStatus.Known,
       limit: 1,
@@ -34,7 +39,7 @@ export class WordFactory {
     const statusOfNewWord =
       wordDOs.length > 0 ? WordStatus.Known : WordStatus.Unknown;
     const originalWord = await this._wordFormReader.getOriginalWord(word);
-    const wordDO = await this._wordRepository.insert({
+    const wordDO = await wordRepository.insert({
       bookId: bookId,
       word: word,
       status: statusOfNewWord,

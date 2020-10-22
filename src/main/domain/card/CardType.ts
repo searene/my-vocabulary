@@ -1,19 +1,53 @@
-import { inject } from "inversify";
+import { container } from "../../config/inversify.config";
 import { types } from "../../config/types";
-import { ConfigQuery } from "../../infrastructure/query/ConfigQuery";
+import { CardTypeRepository } from "../../infrastructure/repository/CardTypeRepository";
 import { ConfigRepository } from "../../infrastructure/repository/ConfigRepository";
 import { assert } from "../../utils/Assert";
 
 export class CardType {
-  @inject(types.ConfigRepository)
-  private static _configRepository: ConfigRepository;
+  private static _initiated = false;
 
-  constructor(
+  private constructor(
     // CardType id
     private readonly _id: number,
     // CardType name
     private readonly _name: string
   ) {}
+
+  static async build(id: number, name: string): Promise<CardType> {
+    if (!this._initiated) {
+      await this.insertDefaultCardTypeIfNotExist();
+      this._initiated = true;
+    }
+    return new CardType(id, name);
+  }
+
+  static async insertDefaultCardTypeIfNotExist(): Promise<void> {
+    const configRepository: ConfigRepository = container.get(
+      types.ConfigRepository
+    );
+    const cardTypeRepository: CardTypeRepository = container.get(
+      types.CardTypeRepository
+    );
+    const configDOs = await configRepository.query({});
+    assert(
+      configDOs.length <= 1,
+      "configDOs.length should be less than or equal to 1"
+    );
+    if (configDOs.length === 0) {
+      const defaultCardType = await cardTypeRepository.insert({
+        name: "default",
+      });
+      await configRepository.insert({ defaultCardTypeId: defaultCardType.id });
+    } else if (configDOs[0].defaultCardTypeId === undefined) {
+      const defaultCardType = await cardTypeRepository.insert({
+        name: "default",
+      });
+      await configRepository.updateById(configDOs[0].id as number, {
+        defaultCardTypeId: defaultCardType.id,
+      });
+    }
+  }
 
   get id(): number {
     return this._id;
@@ -21,13 +55,5 @@ export class CardType {
 
   get name(): string {
     return this._name;
-  }
-
-  static async getDefaultCardTypeId(): Promise<number> {
-    const configDOs = await this._configRepository.query({});
-    assert(configDOs.length !== 1, "configDOs.length should be 1");
-    const defaultCardTypeId = configDOs[0].defaultCardTypeId;
-    assert(defaultCardTypeId !== undefined, "defaultCardTypeId is undefined.");
-    return defaultCardTypeId;
   }
 }

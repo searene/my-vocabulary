@@ -8,6 +8,12 @@ const knex = KnexFactory.knex;
 
 @injectable()
 export class KnexConfigRepository implements ConfigRepository {
+  async updateById(id: number, configDO: ConfigDO): Promise<ConfigDO> {
+    return await knex("config")
+      .where({ id })
+      .update(configDO)
+      .select("*");
+  }
   createTableIfNotExists(): Promise<void> {
     throw new Error("Method not implemented.");
   }
