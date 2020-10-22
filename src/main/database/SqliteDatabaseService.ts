@@ -24,7 +24,7 @@ export class SqliteDatabaseService implements DatabaseService {
   private initiated = false;
 
   constructor(@inject(WordFormReader) private wordFormReader: WordFormReader) {
-    const dir = join(os.homedir(), ".my-vocabulary");
+    const dir = join(os.homedir(), ".my-vocabulary-dev");
     if (!existsSync(dir)) {
       mkdirSync(dir);
     }
