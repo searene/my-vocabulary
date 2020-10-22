@@ -94,7 +94,6 @@ export class Library extends React.Component<LibraryProps, LibraryStates> {
                       >
                         Remove
                       </Button>
-                      <Button>Review</Button>
                     </Table.Cell>
                   }
                   onClose={() => this.setState({ showRemoveBookModal: false })}
@@ -121,6 +120,9 @@ export class Library extends React.Component<LibraryProps, LibraryStates> {
                     </Button>
                   </Modal.Actions>
                 </Modal>
+                <Table.Cell>
+                  <Button>Review</Button>
+                </Table.Cell>
               </Table.Row>
             ))}
           </Table.Body>

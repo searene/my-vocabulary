@@ -58,3 +58,4 @@ const addSlice = createSlice({
 export const selectCardVO = (state: State) => state.add.cardVO;
 export const selectFieldContents = (state: State) => state.add.fieldContents;
 export const { changeFieldContents } = addSlice.actions;
+export const addReducer = addSlice.reducer;

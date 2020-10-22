@@ -4,6 +4,8 @@ import { AppContainer } from "react-hot-loader";
 import Application from "./components/Application";
 import "semantic-ui-css/semantic.min.css";
 import "./style/style.less";
+import { Provider } from "react-redux";
+import store from "./redux/store";
 
 if (process.env.RENDERER_ENV === "electron") {
   require("electron-unhandled")();
@@ -17,7 +19,9 @@ document.body.appendChild(mainElement);
 const render = (Component: () => JSX.Element) => {
   ReactDOM.render(
     <AppContainer>
-      <Component />
+      <Provider store={store}>
+        <Component />
+      </Provider>
     </AppContainer>,
     mainElement
   );

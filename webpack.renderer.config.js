@@ -31,7 +31,7 @@ module.exports = merge.smart(baseConfig, {
                     plugins: [
                         ["@babel/plugin-proposal-decorators", { "legacy": true }],
                         ['@babel/plugin-proposal-class-properties', { loose: true }],
-                    ]
+                    ],
                 }
             },
             {
