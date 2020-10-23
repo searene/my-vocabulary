@@ -21,6 +21,8 @@ import { WordRepository } from "../infrastructure/repository/WordRepository";
 import { KnexWordRepository } from "../infrastructure/repository/knex/KnexWordRepository";
 import { KnexConfigRepository } from "../infrastructure/repository/knex/KnexConfigRepository";
 import { KnexFieldTypeRepository } from "../infrastructure/repository/knex/KnexFieldTypeRepository";
+import { CompositionRepository } from "../infrastructure/repository/CompositionRepository";
+import { KnexCompositionRepository } from "../infrastructure/repository/knex/KnexCompositionRepository";
 
 export const container = new Container({
   defaultScope: "Singleton",
@@ -68,4 +70,11 @@ container
   .onActivation(async (_, wordRepository) => {
     await wordRepository.init();
     return wordRepository;
+  });
+container
+  .bind<CompositionRepository>(types.WordRepository)
+  .to(KnexCompositionRepository)
+  .onActivation(async (_, compositionRepository) => {
+    await compositionRepository.init();
+    return compositionRepository;
   });

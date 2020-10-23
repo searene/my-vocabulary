@@ -10,6 +10,7 @@ export const types = {
   FieldTypeRepository: Symbol.for("FieldTypeRepository"),
   FieldRepository: Symbol.for("FieldRepository"),
   WordRepository: Symbol.for("WordRepository"),
+  CompositionRepository: Symbol.for("CompositionRepository"),
   WordRepositoryProvider: Symbol.for("WordRepositoryProvider"),
   CardFacade: Symbol.for("CardFacadeA"),
 };

@@ -3,7 +3,6 @@ import { types } from "../../../config/types";
 import { FieldTypeCategory } from "../../../infrastructure/common/FieldTypeCategory";
 import { FieldTypeDO } from "../../../infrastructure/do/FieldTypeDO";
 import { FieldTypeRepository } from "../../../infrastructure/repository/FieldTypeRepository";
-import { CardType } from "../CardType";
 import { FieldType } from "../FieldType";
 import { CardTypeFactory } from "./CardTypeFactory";
 
@@ -18,9 +17,7 @@ export class FieldTypeFactory {
    * @param cardTypeId if not given, the default cardType would be used.
    */
   async getFieldTypes(cardTypeId?: number): Promise<FieldType[]> {
-    const fieldTypeRepository: FieldTypeRepository = await container.getAsync(
-      types.FieldTypeRepository
-    );
+    const fieldTypeRepository = await this.getFieldTypeRepository();
     if (cardTypeId === undefined) {
       cardTypeId = await this._cardTypeFactory.getDefaultCardTypeId();
     }
@@ -30,11 +27,35 @@ export class FieldTypeFactory {
     return fieldTypeDOs.map(fieldTypeDO => this.fromFieldTypeDO(fieldTypeDO));
   }
 
+  async createDefaultFieldTypes(
+    defaultCardTypeId: number
+  ): Promise<FieldType[]> {
+    const fieldTypeRepository = await this.getFieldTypeRepository();
+    const frontFieldDO = await fieldTypeRepository.insert({
+      name: "front",
+      category: "text",
+      cardTypeId: defaultCardTypeId,
+    });
+    const backFieldDO = await fieldTypeRepository.insert({
+      name: "back",
+      category: "text",
+      cardTypeId: defaultCardTypeId,
+    });
+    return [
+      this.fromFieldTypeDO(frontFieldDO),
+      this.fromFieldTypeDO(backFieldDO),
+    ];
+  }
+
   static get(): FieldTypeFactory {
     if (this._instance === undefined) {
       this._instance = new FieldTypeFactory();
     }
     return this._instance;
+  }
+
+  private async getFieldTypeRepository(): Promise<FieldTypeRepository> {
+    return container.getAsync(types.FieldTypeRepository);
   }
 
   private fromFieldTypeDO(fieldTypeDO: FieldTypeDO): FieldType {
