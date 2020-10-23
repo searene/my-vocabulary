@@ -8,14 +8,23 @@ const knex = KnexFactory.knex;
 
 @injectable()
 export class KnexConfigRepository implements ConfigRepository {
+  async init(): Promise<void> {
+    await this.createTableIfNotExists();
+  }
   async updateById(id: number, configDO: ConfigDO): Promise<ConfigDO> {
     return await knex("config")
       .where({ id })
       .update(configDO)
       .select("*");
   }
-  createTableIfNotExists(): Promise<void> {
-    throw new Error("Method not implemented.");
+  async createTableIfNotExists(): Promise<void> {
+    const tablesExists = await knex.schema.hasTable("configs");
+    if (!tablesExists) {
+      await knex.schema.createTable("configs", table => {
+        table.increments();
+        table.integer("default_card_type_id");
+      });
+    }
   }
   batchInsert(dataObjects: ConfigDO[]): Promise<ConfigDO[]> {
     throw new Error("Method not implemented.");

@@ -69,25 +69,4 @@ export class KnexWordRepository implements WordRepository {
         });
     }
   }
-
-  // private addQueryConditions(wordQuery: WordQuery, queryInterface: QueryInterface) {
-  //     if (wordQuery.id !== undefined) {
-  //         queryInterface.where("id", "=", wordQuery.id);
-  //     }
-  //     if (wordQuery.bookId !== undefined) {
-  //         queryInterface.where("book_id", "=", wordQuery.bookId);
-  //     }
-  //     if (wordQuery.originalWord !== undefined) {
-  //         queryInterface.where("original_word", "=", wordQuery.originalWord);
-  //     }
-  //     if(wordQuery.positions !== undefined) {
-  //         queryInterface.where("positions", "=", wordQuery.positions);
-  //     }
-  //     if (wordQuery.status !== undefined) {
-  //         queryInterface.where("status", "=", wordQuery.status);
-  //     }
-  //     if (wordQuery.word !== undefined) {
-  //         queryInterface.where("word", "=", wordQuery.word);
-  //     }
-  // }
 }

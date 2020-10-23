@@ -7,19 +7,15 @@ import { assert } from "../../../utils/Assert";
 import { container } from "../../../config/inversify.config";
 
 export class CardTypeFactory {
-  private _configRepository: ConfigRepository = container.get(
-    types.ConfigRepository
-  );
-  private _cardTypeRepository: CardTypeRepository = container.get(
-    types.CardTypeRepository
-  );
-
   private static _instance: CardTypeFactory | undefined;
 
   private constructor() {}
 
   async getDefaultCardType(): Promise<CardType> {
-    const configDOList = await this._configRepository.query({});
+    const configRepository: ConfigRepository = await container.getAsync(
+      types.ConfigRepository
+    );
+    const configDOList = await configRepository.query({});
     if (configDOList.length !== 1) {
       throw new Error("configDOList.length should be 1");
     }
@@ -33,7 +29,10 @@ export class CardTypeFactory {
   }
 
   async getById(cardTypeId: number): Promise<CardType | undefined> {
-    const cardTypeDOArray = await this._cardTypeRepository.query({
+    const cardTypeRepository: CardTypeRepository = await container.getAsync(
+      types.CardTypeRepository
+    );
+    const cardTypeDOArray = await cardTypeRepository.query({
       id: cardTypeId,
     });
     if (cardTypeDOArray.length !== 1) {
@@ -44,7 +43,10 @@ export class CardTypeFactory {
   }
 
   async getDefaultCardTypeId(): Promise<number> {
-    const configDOs = await this._configRepository.query({});
+    const configRepository: ConfigRepository = await container.getAsync(
+      types.ConfigRepository
+    );
+    const configDOs = await configRepository.query({});
     assert(configDOs.length !== 1, "configDOs.length should be 1");
     const defaultCardTypeId = configDOs[0].defaultCardTypeId;
     assert(defaultCardTypeId !== undefined, "defaultCardTypeId is undefined.");

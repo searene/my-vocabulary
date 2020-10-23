@@ -8,7 +8,10 @@ const knex = KnexFactory.knex;
 
 @injectable()
 export class KnexCardTypeRepository implements CardTypeRepository {
-  updateById(id: number, dataObject: CardTypeDO): Promise<CardTypeDO> {
+  async init(): Promise<void> {
+    await this.createTableIfNotExists();
+  }
+  async updateById(id: number, dataObject: CardTypeDO): Promise<CardTypeDO> {
     throw new Error("Method not implemented.");
   }
   async batchInsert(dataObjects: CardTypeDO[]): Promise<CardTypeDO[]> {
@@ -18,7 +21,7 @@ export class KnexCardTypeRepository implements CardTypeRepository {
     throw new Error("Method not implemented.");
   }
   async insert(cardTypeDO: CardTypeDO): Promise<CardTypeDO> {
-    const insertResult = await knex("card_type")
+    const insertResult = await knex("card_types")
       .insert({
         name: cardTypeDO.name,
       })
@@ -30,7 +33,7 @@ export class KnexCardTypeRepository implements CardTypeRepository {
   }
 
   async query(query: CardTypeQuery): Promise<CardTypeDO[]> {
-    const selectResult = await knex.select("id", "name").from("card_type");
+    const selectResult = await knex.select("id", "name").from("card_types");
     return selectResult.map(data => ({
       id: data["id"],
       name: data["name"],
@@ -38,6 +41,12 @@ export class KnexCardTypeRepository implements CardTypeRepository {
   }
 
   async createTableIfNotExists(): Promise<void> {
-    throw new Error("Method not implemented.");
+    const tablesExists = await knex.schema.hasTable("card_types");
+    if (!tablesExists) {
+      await knex.schema.createTable("card_types", table => {
+        table.increments();
+        table.string("name");
+      });
+    }
   }
 }

@@ -7,13 +7,14 @@ import { assert } from "../../../utils/Assert";
 import { Card } from "../Card";
 
 export class CardFactory {
-  private _cardRepository: CardRepository = container.get(types.CardRepository);
-
   /**
    * @param fieldContents fieldTypeId -> field contents
    */
   async createCard(bookId: number, cardTypeId?: number): Promise<Card> {
-    const insertedCardDO = await this._cardRepository.insert({
+    const cardRepository: CardRepository = await container.getAsync(
+      types.CardRepository
+    );
+    const insertedCardDO = await cardRepository.insert({
       cardTypeId,
       bookId,
     });
@@ -21,7 +22,10 @@ export class CardFactory {
   }
 
   async getById(id: number): Promise<Card> {
-    const cardDOs = await this._cardRepository.query({ id });
+    const cardRepository: CardRepository = await container.getAsync(
+      types.CardRepository
+    );
+    const cardDOs = await cardRepository.query({ id });
     assert(cardDOs.length === 1, "cardDOs.length should be 1");
     return this.fromCardDO(cardDOs[0]);
   }

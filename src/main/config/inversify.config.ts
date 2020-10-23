@@ -11,16 +11,16 @@ import { BookServiceImpl } from "../BookServiceImpl";
 import { BookService } from "../BookService";
 import { WordService } from "../WordService";
 import { ConfigRepository } from "../infrastructure/repository/ConfigRepository";
-import { KnexConfigRepository } from "../infrastructure/repository/knex/KnexConfigRepository";
 import { CardFacadeImpl } from "../facade/CardFacadeImpl";
 import { CardTypeRepository } from "../infrastructure/repository/CardTypeRepository";
 import { KnexCardTypeRepository } from "../infrastructure/repository/knex/KnexCardTypeRepository";
 import { KnexCardRepository } from "../infrastructure/repository/knex/KnexCardRepository";
 import { CardRepository } from "../infrastructure/repository/CardRepository";
-import { KnexFieldTypeRepository } from "../infrastructure/repository/knex/KnexFieldTypeRepository.1";
 import { FieldTypeRepository } from "../infrastructure/repository/FieldTypeRepository";
 import { WordRepository } from "../infrastructure/repository/WordRepository";
 import { KnexWordRepository } from "../infrastructure/repository/knex/KnexWordRepository";
+import { KnexConfigRepository } from "../infrastructure/repository/knex/KnexConfigRepository";
+import { KnexFieldTypeRepository } from "../infrastructure/repository/knex/KnexFieldTypeRepository";
 
 export const container = new Container({
   defaultScope: "Singleton",
@@ -36,18 +36,36 @@ container.bind<BookService>(types.BookService).to(BookServiceImpl);
 container.bind<CardFacade>(types.CardFacade).to(CardFacadeImpl);
 container
   .bind<ConfigRepository>(types.ConfigRepository)
-  .to(KnexConfigRepository);
+  .to(KnexConfigRepository)
+  .onActivation(async (_, configRepository) => {
+    await configRepository.init();
+    return configRepository;
+  });
 container
   .bind<CardTypeRepository>(types.CardTypeRepository)
-  .to(KnexCardTypeRepository);
+  .to(KnexCardTypeRepository)
+  .onActivation(async (_, cardRepository) => {
+    await cardRepository.init();
+    return cardRepository;
+  });
 container
   .bind<FieldTypeRepository>(types.FieldTypeRepository)
-  .to(KnexFieldTypeRepository);
-container.bind<CardRepository>(types.CardRepository).to(KnexCardRepository);
+  .to(KnexFieldTypeRepository)
+  .onActivation(async (_, fieldTypeRepository) => {
+    await fieldTypeRepository.init();
+    return fieldTypeRepository;
+  });
+container
+  .bind<CardRepository>(types.CardRepository)
+  .to(KnexCardRepository)
+  .onActivation(async (_, cardRepository) => {
+    await cardRepository.init();
+    return cardRepository;
+  });
 container
   .bind<WordRepository>(types.WordRepository)
   .to(KnexWordRepository)
-  .onActivation(async (context, WordRepository) => {
-    await WordRepository.init();
-    return WordRepository;
+  .onActivation(async (_, wordRepository) => {
+    await wordRepository.init();
+    return wordRepository;
   });
