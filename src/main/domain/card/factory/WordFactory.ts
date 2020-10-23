@@ -1,18 +1,13 @@
-import {
-  container,
-  WordRepositoryProvider,
-} from "../../../config/inversify.config";
+import { container } from "../../../config/inversify.config";
 import { types } from "../../../config/types";
 import { WordStatus } from "../../../enum/WordStatus";
 import { WordDO } from "../../../infrastructure/do/WordDO";
+import { WordRepository } from "../../../infrastructure/repository/WordRepository";
 import { WordFormReader } from "../../../WordFormReader";
 import { Word } from "../../word/Word";
 
 export class WordFactory {
   private _wordFormReader: WordFormReader = container.get(WordFormReader);
-  private _wordRepositoryProvider: WordRepositoryProvider = container.get(
-    types.WordRepositoryProvider
-  );
 
   private static _instance?: WordFactory;
 
@@ -30,7 +25,9 @@ export class WordFactory {
     word: string,
     positions: number[]
   ): Promise<Word> {
-    const wordRepository = await this._wordRepositoryProvider();
+    const wordRepository: WordRepository = await container.getAsync(
+      types.WordRepository
+    );
     const wordDOs = await wordRepository.query({
       word: word,
       status: WordStatus.Known,

@@ -4,4 +4,5 @@ import { BaseRepository } from "./BaseRepository";
 
 export interface WordRepository extends BaseRepository<WordQuery, WordDO> {
   updateWordStatus(): Promise<void>;
+  init(): Promise<void>;
 }

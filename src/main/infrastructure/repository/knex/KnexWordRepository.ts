@@ -7,6 +7,9 @@ import { knex } from "./KnexFactory";
 
 @injectable()
 export class KnexWordRepository implements WordRepository {
+  async init(): Promise<void> {
+    await this.createTableIfNotExists();
+  }
   updateById(id: number, dataObject: WordDO): Promise<WordDO> {
     throw new Error("Method not implemented.");
   }

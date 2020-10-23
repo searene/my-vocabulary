@@ -44,19 +44,10 @@ container
   .bind<FieldTypeRepository>(types.FieldTypeRepository)
   .to(KnexFieldTypeRepository);
 container.bind<CardRepository>(types.CardRepository).to(KnexCardRepository);
-container.bind<WordRepository>(types.WordRepository).to(KnexWordRepository);
-
-export type WordRepositoryProvider = () => Promise<WordRepository>;
-
 container
-  .bind<WordRepositoryProvider>(types.WordRepositoryProvider)
-  .toProvider<WordRepository>(context => {
-    return async () => {
-      const wordRepository = context.container.get<WordRepository>(
-        types.WordRepository
-      );
-      await wordRepository.createTableIfNotExists();
-      await wordRepository.updateWordStatus();
-      return wordRepository;
-    };
+  .bind<WordRepository>(types.WordRepository)
+  .to(KnexWordRepository)
+  .onActivation(async (context, WordRepository) => {
+    await WordRepository.init();
+    return WordRepository;
   });
