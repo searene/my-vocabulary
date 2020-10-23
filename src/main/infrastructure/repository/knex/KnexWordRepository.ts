@@ -1,5 +1,4 @@
-import { injectable } from "inversify";
-import { QueryInterface } from "knex";
+import { injectable } from "@parisholley/inversify-async";
 import { WatchDog } from "../../../WatchDog";
 import { WordDO } from "../../do/WordDO";
 import { WordQuery } from "../../query/WordQuery";

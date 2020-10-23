@@ -2,7 +2,7 @@ import { ConfigRepository } from "../ConfigRepository";
 import * as KnexFactory from "./KnexFactory";
 import { ConfigDO } from "../../do/ConfigDO";
 import { ConfigQuery } from "../../query/ConfigQuery";
-import { injectable } from "inversify";
+import { injectable } from "@parisholley/inversify-async";
 
 const knex = KnexFactory.knex;
 

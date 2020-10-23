@@ -146,6 +146,7 @@
   },
   "dependencies": {
     "@babel/plugin-proposal-decorators": "^7.10.4",
+    "@parisholley/inversify-async": "^1.1.7",
     "@reduxjs/toolkit": "^1.4.0",
     "@types/html-to-text": "^5.1.1",
     "@types/react-router-dom": "^5.1.5",
@@ -154,7 +155,6 @@
     "epub": "^1.2.1",
     "html-to-text": "^5.1.1",
     "immutable": "^4.0.0-rc.12",
-    "inversify": "^5.0.1",
     "knex": "^0.21.6",
     "knex-stringcase": "^1.4.3",
     "less-loader": "^6.2.0",

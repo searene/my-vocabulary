@@ -1,7 +1,7 @@
 import * as fs from "fs-extra";
 import { join } from "path";
 import { Optional } from "typescript-optional";
-import { injectable } from "inversify";
+import { injectable } from "@parisholley/inversify-async";
 
 @injectable()
 export class ConfigReader {

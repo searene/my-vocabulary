@@ -3,7 +3,7 @@ import { container } from "./config/inversify.config";
 import { DatabaseService } from "./database/DatabaseService";
 import { types } from "./config/types";
 import { BookVO } from "./domain/BookVO";
-import { inject, injectable } from "inversify";
+import { inject, injectable } from "@parisholley/inversify-async";
 import { BookStatus } from "./enum/BookStatus";
 import { BookService } from "./BookService";
 import { BookDO } from "./domain/BookDO";

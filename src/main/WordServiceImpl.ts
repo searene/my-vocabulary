@@ -1,5 +1,5 @@
 import { WordVO } from "./database/WordVO";
-import { inject, injectable } from "inversify";
+import { inject, injectable } from "@parisholley/inversify-async";
 import { DatabaseService } from "./database/DatabaseService";
 import { WordStatus } from "./enum/WordStatus";
 import { BookStatus } from "./enum/BookStatus";

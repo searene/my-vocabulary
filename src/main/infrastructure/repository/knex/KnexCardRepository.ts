@@ -2,7 +2,7 @@ import { CardRepository } from "../CardRepository";
 import { CardDO } from "../../do/CardDO";
 import * as KnexFactory from "./KnexFactory";
 import { CardQuery } from "../../query/CardQuery";
-import { injectable } from "inversify";
+import { injectable } from "@parisholley/inversify-async";
 
 const knex = KnexFactory.knex;
 

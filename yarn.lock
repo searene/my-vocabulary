@@ -1256,6 +1256,11 @@
     "@types/istanbul-reports" "^1.1.1"
     "@types/yargs" "^13.0.0"
 
+"@parisholley/inversify-async@^1.1.7":
+  version "1.1.7"
+  resolved "https://registry.npm.taobao.org/@parisholley/inversify-async/download/@parisholley/inversify-async-1.1.7.tgz#f7a3e50bc7ff5d9851c55351e968217206a3ad83"
+  integrity sha1-96PlC8f/XZhRxVNR6WghcgajrYM=
+
 "@reduxjs/toolkit@^1.4.0":
   version "1.4.0"
   resolved "https://registry.npm.taobao.org/@reduxjs/toolkit/download/@reduxjs/toolkit-1.4.0.tgz#ee2e2384cc3d1d76780d844b9c2da3580d32710d"
@@ -6297,11 +6302,6 @@ invariant@^2.2.2, invariant@^2.2.4:
   integrity sha1-YQ88ksk1nOHbYW5TgAjSP/NRWOY=
   dependencies:
     loose-envify "^1.0.0"
-
-inversify@^5.0.1:
-  version "5.0.1"
-  resolved "https://registry.npm.taobao.org/inversify/download/inversify-5.0.1.tgz#500d709b1434896ce5a0d58915c4a4210e34fb6e"
-  integrity sha1-UA1wmxQ0iWzloNWJFcSkIQ40+24=
 
 ip-regex@^2.1.0:
   version "2.1.0"

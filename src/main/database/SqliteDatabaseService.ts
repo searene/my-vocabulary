@@ -4,7 +4,7 @@ import { Database, RunResult } from "sqlite3";
 import * as os from "os";
 import { join } from "path";
 import { existsSync, mkdirSync } from "fs";
-import { inject, injectable } from "inversify";
+import { inject, injectable } from "@parisholley/inversify-async";
 import { WordQuery } from "../domain/WordQuery";
 import { WordDO } from "../domain/WordDO";
 import { BaseQuery } from "../domain/BaseQuery";

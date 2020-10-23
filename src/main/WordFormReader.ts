@@ -2,7 +2,7 @@ import * as fs from "fs";
 import { Interface, createInterface } from "readline";
 import { Optional } from "typescript-optional";
 import { WordFormLine } from "./domain/WordFormLine";
-import { inject, injectable } from "inversify";
+import { inject, injectable } from "@parisholley/inversify-async";
 import { ConfigReader } from "./ConfigReader";
 import { WatchDog } from "./WatchDog";
 

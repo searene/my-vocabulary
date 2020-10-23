@@ -1,4 +1,4 @@
-import { injectable } from "inversify";
+import { injectable } from "@parisholley/inversify-async";
 import { CardFacade, FieldTypeVO, CreateCardParam } from "./CardFacade";
 import { FieldType } from "../domain/card/FieldType";
 import { CardFactory } from "../domain/card/factory/CardFactory";

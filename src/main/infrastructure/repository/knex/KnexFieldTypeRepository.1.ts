@@ -1,4 +1,4 @@
-import { injectable } from "inversify";
+import { injectable } from "@parisholley/inversify-async";
 import { FieldTypeDO } from "../../do/FieldTypeDO";
 import { FieldTypeQuery } from "../../query/FieldTypeQuery";
 import { FieldTypeRepository } from "../FieldTypeRepository";

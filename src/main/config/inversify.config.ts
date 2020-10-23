@@ -1,6 +1,6 @@
 import "reflect-metadata";
 import { CardFacade } from "./../facade/CardFacade";
-import { Container } from "inversify";
+import { Container } from "@parisholley/inversify-async";
 import { WordFormReader } from "../WordFormReader";
 import { SqliteDatabaseService } from "../database/SqliteDatabaseService";
 import { DatabaseService } from "../database/DatabaseService";
