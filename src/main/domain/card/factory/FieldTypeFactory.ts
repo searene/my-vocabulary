@@ -27,19 +27,19 @@ export class FieldTypeFactory {
     return fieldTypeDOs.map(fieldTypeDO => this.fromFieldTypeDO(fieldTypeDO));
   }
 
-  async createDefaultFieldTypes(
-    defaultCardTypeId: number
+  async createInitialFieldTypes(
+    initialCardTypeId: number
   ): Promise<FieldType[]> {
     const fieldTypeRepository = await this.getFieldTypeRepository();
     const frontFieldDO = await fieldTypeRepository.insert({
       name: "front",
       category: "text",
-      cardTypeId: defaultCardTypeId,
+      cardTypeId: initialCardTypeId,
     });
     const backFieldDO = await fieldTypeRepository.insert({
       name: "back",
       category: "text",
-      cardTypeId: defaultCardTypeId,
+      cardTypeId: initialCardTypeId,
     });
     return [
       this.fromFieldTypeDO(frontFieldDO),

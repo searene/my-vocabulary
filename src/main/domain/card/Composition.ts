@@ -14,7 +14,7 @@ export class Composition {
     front: string,
     back: string
   ) {
-    return new Composition(id, cardTypeId, front, back);
+    return new Composition(id, name, cardTypeId, front, back);
   }
 
   public get id(): number {

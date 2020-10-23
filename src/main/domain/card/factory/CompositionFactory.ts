@@ -6,13 +6,13 @@ import { Composition } from "../Composition";
 import { FieldType } from "../FieldType";
 
 export class CompositionFactory {
-  async createDefaultComposition(
+  async createInitialComposition(
     frontFieldType: FieldType,
     backFieldType: FieldType
   ): Promise<Composition> {
     const compositionRepository = await this.getCompositionRepository();
     const compositionDO = await compositionRepository.insert({
-      name: "default",
+      name: "normal",
       front: `${frontFieldType.id}`,
       back: `${backFieldType.id}`,
       cardTypeId: frontFieldType.cardTypeId,
