@@ -19,7 +19,7 @@ export class FieldTypeFactory {
   async getFieldTypes(cardTypeId?: number): Promise<FieldType[]> {
     const fieldTypeRepository = await this.getFieldTypeRepository();
     if (cardTypeId === undefined) {
-      cardTypeId = await this._cardTypeFactory.getDefaultCardTypeId();
+      cardTypeId = (await this._cardTypeFactory.getDefaultCardType()).id;
     }
     const fieldTypeDOs = await fieldTypeRepository.query({
       cardTypeId,
@@ -31,6 +31,13 @@ export class FieldTypeFactory {
     initialCardTypeId: number
   ): Promise<FieldType[]> {
     const fieldTypeRepository = await this.getFieldTypeRepository();
+    const fieldTypeDOs = await fieldTypeRepository.query({
+      cardTypeId: initialCardTypeId,
+    });
+    if (fieldTypeDOs.length > 0) {
+      // The initial field types already exist
+      return fieldTypeDOs.map(fieldTypeDO => this.fromFieldTypeDO(fieldTypeDO));
+    }
     const frontFieldDO = await fieldTypeRepository.insert({
       name: "front",
       category: "text",
@@ -62,6 +69,7 @@ export class FieldTypeFactory {
     return new FieldType(
       fieldTypeDO.id as number,
       fieldTypeDO.name as string,
+      fieldTypeDO.cardTypeId as number,
       fieldTypeDO.category as FieldTypeCategory
     );
   }

@@ -1,5 +1,6 @@
 import { BaseQuery } from "../query/BaseQuery";
 import { BaseDO } from "../do/BaseDO";
+import { Options } from "../query/Options";
 
 export interface BaseRepository<Q extends BaseQuery, D extends BaseDO> {
   init(): Promise<void>;
@@ -8,9 +9,9 @@ export interface BaseRepository<Q extends BaseQuery, D extends BaseDO> {
 
   batchInsert(dataObjects: D[]): Promise<D[]>;
 
-  query(query: Q): Promise<D[]>;
+  query(query: Q, options?: Options): Promise<D[]>;
 
-  batchQueryByIds(id: number[]): Promise<D[]>;
+  batchQueryByIds(id: number[], options?: Options): Promise<D[]>;
 
   createTableIfNotExists(): Promise<void>;
 

@@ -28,11 +28,13 @@ export class WordFactory {
     const wordRepository: WordRepository = await container.getAsync(
       types.WordRepository
     );
-    const wordDOs = await wordRepository.query({
-      word: word,
-      status: WordStatus.Known,
-      limit: 1,
-    });
+    const wordDOs = await wordRepository.query(
+      {
+        word: word,
+        status: WordStatus.Known,
+      },
+      { limit: 1 }
+    );
     const statusOfNewWord =
       wordDOs.length > 0 ? WordStatus.Known : WordStatus.Unknown;
     const originalWord = await this._wordFormReader.getOriginalWord(word);

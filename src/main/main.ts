@@ -7,12 +7,36 @@ import { EBookReadAgent } from "./EBookReadAgent";
 import { types } from "./config/types";
 import { PlainTextBookReader } from "./PlainTextBookReader";
 import * as unhandled from "electron-unhandled";
+import { FieldTypeFactory } from "./domain/card/factory/FieldTypeFactory";
+import { ConfigRepository } from "./infrastructure/repository/ConfigRepository";
+import { CardTypeFactory } from "./domain/card/factory/CardTypeFactory";
+import { CompositionFactory } from "./domain/card/factory/CompositionFactory";
 
 unhandled();
 
 async function initialization(): Promise<void> {
   EBookReadAgent.register("epub", EPubBookReader);
   EBookReadAgent.register("txt", PlainTextBookReader);
+
+  const configRepository = await container.getAsync<ConfigRepository>(
+    types.ConfigRepository
+  );
+  if ((await configRepository.query({})).length === 0) {
+    // defaultCardTypeId hasn't been inserted, we need to create and init it.
+
+    // initialCardType is the defaultCardTypeId at start
+    const initialCardTypeId = (
+      await CardTypeFactory.get().createInitialCardType()
+    ).id;
+    const [
+      frontFieldType,
+      backFieldType,
+    ] = await FieldTypeFactory.get().createInitialFieldTypes(initialCardTypeId);
+    await (await CompositionFactory.get()).createInitialComposition(
+      frontFieldType,
+      backFieldType
+    );
+  }
 }
 
 let win: BrowserWindow | null;

@@ -6,11 +6,21 @@ import { Composition } from "../Composition";
 import { FieldType } from "../FieldType";
 
 export class CompositionFactory {
+  private static _instance: CompositionFactory | undefined;
+
+  private constructor() {}
+
   async createInitialComposition(
     frontFieldType: FieldType,
     backFieldType: FieldType
   ): Promise<Composition> {
     const compositionRepository = await this.getCompositionRepository();
+    const compositions = await compositionRepository.query({
+      cardTypeId: frontFieldType.cardTypeId,
+    });
+    if (compositions.length > 1) {
+      return this.fromCompositionDO(compositions[0]);
+    }
     const compositionDO = await compositionRepository.insert({
       name: "normal",
       front: `${frontFieldType.id}`,
@@ -32,5 +42,12 @@ export class CompositionFactory {
 
   private async getCompositionRepository(): Promise<CompositionRepository> {
     return await container.getAsync(types.CompositionRepository);
+  }
+
+  static async get() {
+    if (this._instance === undefined) {
+      this._instance = new CompositionFactory();
+    }
+    return this._instance;
   }
 }

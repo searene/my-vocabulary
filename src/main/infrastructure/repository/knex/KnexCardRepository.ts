@@ -3,6 +3,7 @@ import { CardDO } from "../../do/CardDO";
 import * as KnexFactory from "./KnexFactory";
 import { CardQuery } from "../../query/CardQuery";
 import { injectable } from "@parisholley/inversify-async";
+import { Options } from "../../query/Options";
 
 const knex = KnexFactory.knex;
 
@@ -28,8 +29,20 @@ export class KnexCardRepository implements CardRepository {
     throw new Error("Method not implemented.");
   }
 
-  async query(query: CardQuery): Promise<CardDO[]> {
-    throw new Error("Method not implemented.");
+  async query(query: CardQuery, options?: Options): Promise<CardDO[]> {
+    const queryInterface = knex.from("cards").select(Object.keys(query));
+    if (options !== undefined) {
+      if (options.offset !== undefined) {
+        queryInterface.offset(options.offset);
+      }
+      if (options.limit !== undefined) {
+        queryInterface.limit(options.limit);
+      }
+    }
+    queryInterface.where(query);
+    // this.addQueryConditions(wordQuery, queryInterface);
+    const rows = await queryInterface;
+    return rows as CardDO[];
   }
 
   async batchQueryByIds(id: number[]): Promise<CardDO[]> {
@@ -37,15 +50,10 @@ export class KnexCardRepository implements CardRepository {
   }
 
   async insert(cardDO: CardDO): Promise<CardDO> {
-    const insertResult = await knex("cards")
-      .insert({
-        cardTypeId: cardDO.cardTypeId,
-        bookId: cardDO.bookId,
-      })
-      .returning("id");
-    if (insertResult.length !== 1) {
+    const insertedIds = await knex("cards").insert(cardDO);
+    if (insertedIds.length !== 1) {
       throw new Error("insertResult's length should be 1");
     }
-    return insertResult[0];
+    return (await this.query({ id: insertedIds[0] }))[0];
   }
 }

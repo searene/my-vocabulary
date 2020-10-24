@@ -72,7 +72,7 @@ container
     return wordRepository;
   });
 container
-  .bind<CompositionRepository>(types.WordRepository)
+  .bind<CompositionRepository>(types.CompositionRepository)
   .to(KnexCompositionRepository)
   .onActivation(async (_, compositionRepository) => {
     await compositionRepository.init();

@@ -1,6 +1,7 @@
 import { injectable } from "@parisholley/inversify-async";
 import { WatchDog } from "../../../WatchDog";
 import { WordDO } from "../../do/WordDO";
+import { Options } from "../../query/Options";
 import { WordQuery } from "../../query/WordQuery";
 import { WordRepository } from "../WordRepository";
 import { knex } from "./KnexFactory";
@@ -10,7 +11,7 @@ export class KnexWordRepository implements WordRepository {
   async init(): Promise<void> {
     await this.createTableIfNotExists();
   }
-  updateById(id: number, dataObject: WordDO): Promise<WordDO> {
+  async updateById(id: number, dataObject: WordDO): Promise<WordDO> {
     throw new Error("Method not implemented.");
   }
   async createTableIfNotExists(): Promise<void> {
@@ -27,23 +28,21 @@ export class KnexWordRepository implements WordRepository {
     }
   }
   async insert(wordDO: WordDO): Promise<WordDO> {
-    const watchDog = new WatchDog("insert");
     wordDO.id = await knex("words").insert(wordDO);
-    watchDog.outputMeasurement();
     return wordDO;
   }
   async batchInsert(wordDOs: WordDO[]): Promise<WordDO[]> {
     throw new Error("Method not implemented.");
   }
-  async query(wordQuery: WordQuery): Promise<WordDO[]> {
-    const queryInterface = knex.from("words").select("*");
-    if (wordQuery.offset !== undefined) {
-      queryInterface.offset(wordQuery.offset);
-      delete wordQuery.offset;
-    }
-    if (wordQuery.limit !== undefined) {
-      queryInterface.limit(wordQuery.limit);
-      delete wordQuery.limit;
+  async query(wordQuery: WordQuery, options?: Options): Promise<WordDO[]> {
+    const queryInterface = knex.from("words").select(Object.keys(wordQuery));
+    if (options !== undefined) {
+      if (options.offset !== undefined) {
+        queryInterface.offset(options.offset);
+      }
+      if (options.limit !== undefined) {
+        queryInterface.limit(options.limit);
+      }
     }
     queryInterface.where(wordQuery);
     // this.addQueryConditions(wordQuery, queryInterface);

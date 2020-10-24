@@ -3,7 +3,6 @@ import { types } from "../../../config/types";
 import { CardTypeRepository } from "../../../infrastructure/repository/CardTypeRepository";
 import { CardTypeDO } from "../../../infrastructure/do/CardTypeDO";
 import { CardType } from "../CardType";
-import { assert } from "../../../utils/Assert";
 import { container } from "../../../config/inversify.config";
 
 export class CardTypeFactory {
@@ -39,18 +38,22 @@ export class CardTypeFactory {
       throw new Error("cardTypes.length should be 1.");
     }
     const cardTypeDO = cardTypeDOArray[0];
-    return await this.from(cardTypeDO);
+    return this.fromCardTypeDO(cardTypeDO);
   }
 
-  async getDefaultCardTypeId(): Promise<number> {
-    const configRepository: ConfigRepository = await container.getAsync(
-      types.ConfigRepository
-    );
-    const configDOs = await configRepository.query({});
-    assert(configDOs.length !== 1, "configDOs.length should be 1");
-    const defaultCardTypeId = configDOs[0].defaultCardTypeId;
-    assert(defaultCardTypeId !== undefined, "defaultCardTypeId is undefined.");
-    return defaultCardTypeId;
+  async createInitialCardType(): Promise<CardType> {
+    const configRepository = await this.getConfigRepository();
+    const defaultCardTypeId = await configRepository.getDefaultCardTypeId();
+    const cardTypeRepository = await this.getCardTypeRepository();
+    if (defaultCardTypeId !== undefined) {
+      cardTypeRepository.query({
+        id: defaultCardTypeId,
+      });
+    }
+    const cardTypeDO = await cardTypeRepository.insert({
+      name: "normal",
+    });
+    return this.fromCardTypeDO(cardTypeDO);
   }
 
   static get() {
@@ -59,10 +62,16 @@ export class CardTypeFactory {
     }
     return this._instance;
   }
-  private async from(cardTypeDO: CardTypeDO): Promise<CardType> {
-    return await CardType.build(
-      cardTypeDO.id as number,
-      cardTypeDO.name as string
-    );
+
+  private async getConfigRepository(): Promise<ConfigRepository> {
+    return await container.getAsync(types.ConfigRepository);
+  }
+
+  private async getCardTypeRepository(): Promise<CardTypeRepository> {
+    return await container.getAsync(types.CardTypeRepository);
+  }
+
+  private fromCardTypeDO(cardTypeDO: CardTypeDO): CardType {
+    return CardType.get(cardTypeDO.id as number, cardTypeDO.name as string);
   }
 }

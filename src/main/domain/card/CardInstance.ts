@@ -3,7 +3,7 @@ import { Card } from "./Card";
 class CardInstance {
   constructor(
     private readonly _id: number,
-    private readonly _compositionId: Composition
+    private readonly _compositionId: number
   ) {}
 
   static getNextDueCardInstance(
