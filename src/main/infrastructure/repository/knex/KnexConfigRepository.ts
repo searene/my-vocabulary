@@ -45,11 +45,7 @@ export class KnexConfigRepository implements ConfigRepository {
     throw new Error("Method not implemented.");
   }
   async insert(configDO: ConfigDO): Promise<ConfigDO> {
-    const insertedIds = await knex("configs").insert(configDO);
-    if (insertedIds.length !== 1) {
-      throw new Error("insertResult's length should be 1");
-    }
-    return (await this.query({ id: insertedIds[0] }))[0];
+    return RepositoryUtils.insert(KnexConfigRepository._CONFIGS, configDO);
   }
 
   async query(query: ConfigQuery, options?: Options): Promise<ConfigDO[]> {

@@ -25,13 +25,10 @@ export class KnexCardTypeRepository implements CardTypeRepository {
     throw new Error("Method not implemented.");
   }
   async insert(cardTypeDO: CardTypeDO): Promise<CardTypeDO> {
-    const insertIds = await knex("card_types").insert({
-      name: cardTypeDO.name,
-    });
-    if (insertIds.length !== 1) {
-      throw new Error("insertResult's length should be 1");
-    }
-    return (await this.query({ id: insertIds[0] }))[0];
+    return RepositoryUtils.insert(
+      KnexCardTypeRepository._CARD_TYPES,
+      cardTypeDO
+    );
   }
 
   async query(query: CardTypeQuery, options?: Options): Promise<CardTypeDO[]> {

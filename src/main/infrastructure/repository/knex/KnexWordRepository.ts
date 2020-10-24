@@ -31,8 +31,7 @@ export class KnexWordRepository implements WordRepository {
     }
   }
   async insert(wordDO: WordDO): Promise<WordDO> {
-    wordDO.id = await knex("words").insert(wordDO);
-    return wordDO;
+    return RepositoryUtils.insert(KnexWordRepository._WORDS, wordDO);
   }
   async batchInsert(wordDOs: WordDO[]): Promise<WordDO[]> {
     throw new Error("Method not implemented.");

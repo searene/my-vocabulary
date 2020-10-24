@@ -1,4 +1,5 @@
 import { injectable } from "@parisholley/inversify-async";
+import { combineReducers } from "redux";
 import { CompositionDO } from "../../do/CompositionDO";
 import { CompositionQuery } from "../../query/CompositionQuery";
 import { Options } from "../../query/Options";
@@ -14,11 +15,10 @@ export class KnexCompositionRepository implements CompositionRepository {
     await this.createTableIfNotExists();
   }
   async insert(CompositionDO: CompositionDO): Promise<CompositionDO> {
-    const insertedIds = await knex("compositions").insert(CompositionDO);
-    if (insertedIds.length !== 1) {
-      throw new Error("insertResult's length should be 1");
-    }
-    return (await this.query({ id: insertedIds[0] }))[0];
+    return RepositoryUtils.insert(
+      KnexCompositionRepository._COMPOSITIONS,
+      CompositionDO
+    );
   }
   async batchInsert(dataObjects: CompositionDO[]): Promise<CompositionDO[]> {
     throw new Error("Method not implemented.");

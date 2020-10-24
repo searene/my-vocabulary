@@ -5,6 +5,7 @@ import { CardQuery } from "../../query/CardQuery";
 import { injectable } from "@parisholley/inversify-async";
 import { Options } from "../../query/Options";
 import { RepositoryUtils } from "../RepositoryUtils";
+import { KnexCardTypeRepository } from "./KnexCardTypeRepository";
 
 const knex = KnexFactory.knex;
 
@@ -41,10 +42,6 @@ export class KnexCardRepository implements CardRepository {
   }
 
   async insert(cardDO: CardDO): Promise<CardDO> {
-    const insertedIds = await knex("cards").insert(cardDO);
-    if (insertedIds.length !== 1) {
-      throw new Error("insertResult's length should be 1");
-    }
-    return (await this.query({ id: insertedIds[0] }))[0];
+    return RepositoryUtils.insert(KnexCardRepository._CARDS, cardDO);
   }
 }

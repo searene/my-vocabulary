@@ -27,9 +27,11 @@ export class KnexFieldTypeRepository implements FieldTypeRepository {
       });
     }
   }
-  async insert(FieldTypeDO: FieldTypeDO): Promise<FieldTypeDO> {
-    FieldTypeDO.id = await knex("field_types").insert(FieldTypeDO);
-    return FieldTypeDO;
+  async insert(fieldTypeDO: FieldTypeDO): Promise<FieldTypeDO> {
+    return RepositoryUtils.insert(
+      KnexFieldTypeRepository._FIELD_TYPES,
+      fieldTypeDO
+    );
   }
   async batchInsert(dataObjects: FieldTypeDO[]): Promise<FieldTypeDO[]> {
     throw new Error("Method not implemented.");

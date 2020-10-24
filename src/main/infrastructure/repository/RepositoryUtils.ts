@@ -23,4 +23,13 @@ export class RepositoryUtils {
     const rows = await queryInterface;
     return rows as D[];
   }
+
+  static async insert<D extends BaseDO>(
+    tableName: string,
+    dataObject: D
+  ): Promise<D> {
+    const dataObjectWithId = { ...dataObject };
+    dataObjectWithId.id = await knex(tableName).insert(dataObject);
+    return dataObjectWithId;
+  }
 }
