@@ -1,18 +1,19 @@
-import { CardVO } from "./../../../main/facade/CardFacade";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import serviceProvider from "../../ServiceProvider";
-import { WebContents } from "electron";
 
 interface State {
   add: AddState;
 }
+interface FieldVO {
+  id: number;
+  name: string;
+  contents: string;
+}
 interface AddState {
-  cardVO: CardVO | undefined;
-  fieldContents: Record<number, string>; // fieldTypeId -> field contents
+  fieldTypeIdToFieldVOMap: Record<number, FieldVO>; // fieldTypeId -> field contents
 }
 const initialState: AddState = {
-  cardVO: undefined,
-  fieldContents: {},
+  fieldTypeIdToFieldVOMap: {},
 };
 export type CreateCardParam = {
   bookId: number;
@@ -27,14 +28,15 @@ export const saveCard = createAsyncThunk<
   { bookId: number },
   { state: State }
 >("add/saveCard", async ({ bookId }, { getState }) => {
-  const cardVO = selectCardVO(getState());
-  if (cardVO === undefined) {
-    throw new Error("cardVO is undefined.");
+  const fieldTypeIdToFieldVOMap = selectFieldTypeIdToFieldVOMap(getState());
+  const fieldContents: Record<number, string> = {};
+  for (const [fieldTypeId, fieldVO] of Object.entries(
+    fieldTypeIdToFieldVOMap
+  )) {
+    fieldContents[parseInt(fieldTypeId)] = fieldVO.contents;
   }
-  const fieldContents = selectFieldContents(getState());
   await serviceProvider.cardFacade.createCard({
     bookId,
-    cardTypeId: cardVO.cardTypeVO.id,
     fieldContents,
   });
 });
@@ -44,15 +46,23 @@ const addSlice = createSlice({
   reducers: {
     changeFieldContents: (state, action) => {
       const { fieldTypeId, contents } = action.payload;
-      state.fieldContents[fieldTypeId] = contents;
+      state.fieldTypeIdToFieldVOMap[fieldTypeId] = {
+        ...state.fieldTypeIdToFieldVOMap[fieldTypeId],
+        contents,
+      };
     },
   },
   extraReducers: builder => {
     builder.addCase(getFieldTypes.fulfilled, (state, action) => {
       try {
         for (const fieldVO of action.payload) {
-          state.fieldContents[fieldVO.id] = "";
+          state.fieldTypeIdToFieldVOMap[fieldVO.id] = {
+            ...fieldVO,
+            contents: "",
+          };
         }
+        console.log("Jlkafdkaf");
+        console.log(state.fieldTypeIdToFieldVOMap);
       } catch (err) {
         console.error("Error occurred in getFieldTypes.fulfilled.");
         console.error(err);
@@ -65,7 +75,7 @@ const addSlice = createSlice({
   },
 });
 
-export const selectCardVO = (state: State) => state.add.cardVO;
-export const selectFieldContents = (state: State) => state.add.fieldContents;
+export const selectFieldTypeIdToFieldVOMap = (state: State) =>
+  state.add.fieldTypeIdToFieldVOMap;
 export const { changeFieldContents } = addSlice.actions;
 export const addReducer = addSlice.reducer;

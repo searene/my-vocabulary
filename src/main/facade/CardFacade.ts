@@ -1,15 +1,3 @@
-export type FieldVO = {
-  fieldTypeId: number;
-  fieldName: string;
-};
-export type CardTypeVO = {
-  id: number;
-  name: string;
-};
-export type CardVO = {
-  cardTypeVO: CardTypeVO;
-  fieldVOs: FieldVO[];
-};
 export type CreateCardParam = {
   bookId: number;
 

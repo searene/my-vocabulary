@@ -3,7 +3,11 @@ import { Button, Grid } from "semantic-ui-react";
 import { RouteComponentProps } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { useState, useEffect } from "react";
-import { getFieldTypes, saveCard, selectCardVO } from "./addSlice";
+import {
+  getFieldTypes,
+  saveCard,
+  selectFieldTypeIdToFieldVOMap,
+} from "./addSlice";
 import { Field } from "./Field";
 import { BookName } from "../bookName/BookName";
 
@@ -14,20 +18,25 @@ interface MatchParams {
 interface AddProps extends RouteComponentProps<MatchParams> {}
 
 export function Add(props: AddProps) {
-  const cardVO = useSelector(selectCardVO);
+  const fieldTypeIdToFieldVOMap = useSelector(selectFieldTypeIdToFieldVOMap);
   const dispatch = useDispatch();
   const [initiated, setInitiated] = useState(false);
   const bookId = parseInt(props.match.params.bookId);
 
-  const fieldComponents = cardVO?.fieldVOs.map(fieldVO => (
-    <Grid.Row>
-      <Field
-        key={fieldVO.fieldTypeId}
-        fieldTypeId={fieldVO.fieldTypeId}
-        fieldName={fieldVO.fieldName}
-      />
-    </Grid.Row>
-  ));
+  const getFieldComponents = () => {
+    console.log(fieldTypeIdToFieldVOMap);
+    for (const [fieldTypeId, fieldVO] of Object.entries(
+      fieldTypeIdToFieldVOMap
+    )) {
+      <Grid.Row>
+        <Field
+          key={fieldTypeId}
+          fieldTypeId={parseInt(fieldTypeId)}
+          fieldName={fieldVO.name}
+        />
+      </Grid.Row>;
+    }
+  };
 
   useEffect(() => {
     if (!initiated) {
@@ -47,7 +56,7 @@ export function Add(props: AddProps) {
           Book: <BookName bookId={bookId} />
         </Grid.Column>
       </Grid.Row>
-      {fieldComponents}
+      {getFieldComponents()}
       <Grid.Row>
         <Button onClick={save}>Save</Button>
       </Grid.Row>
