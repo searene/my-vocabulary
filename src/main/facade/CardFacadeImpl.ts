@@ -9,9 +9,7 @@ export class CardFacadeImpl implements CardFacade {
   private _fieldTypeFactory = FieldTypeFactory.get();
 
   async getFieldTypes(cardTypeId?: number): Promise<FieldTypeVO[]> {
-    console.log("beforeGetFieldTypes");
     const fieldTypes = await this._fieldTypeFactory.getFieldTypes(cardTypeId);
-    console.log("afterGetFieldTypes");
     return fieldTypes.map(fieldType => {
       return {
         id: fieldType.id,

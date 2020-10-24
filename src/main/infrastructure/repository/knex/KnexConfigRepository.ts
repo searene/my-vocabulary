@@ -5,10 +5,29 @@ import { ConfigQuery } from "../../query/ConfigQuery";
 import { injectable } from "@parisholley/inversify-async";
 import { Options } from "../../query/Options";
 import { RepositoryUtils } from "../RepositoryUtils";
+import { assert } from "../../../utils/Assert";
 
 @injectable()
 export class KnexConfigRepository implements ConfigRepository {
   private static readonly _CONFIGS = "configs";
+
+  async getConfig(): Promise<ConfigDO | undefined> {
+    const configs = await this.query({});
+    assert(
+      configs.length <= 1,
+      "configs.length should be less than or equal to 1."
+    );
+    return configs.length === 1 ? configs[0] : undefined;
+  }
+
+  async setDefaultCardTypeId(defaultCardTypeId: number): Promise<void> {
+    const config = await this.getConfig();
+    if (config === undefined) {
+      await this.insert({ defaultCardTypeId });
+      return;
+    }
+    await this.updateById(config.id as number, { defaultCardTypeId });
+  }
 
   async init(): Promise<void> {
     await this.createTableIfNotExists();

@@ -1,6 +1,7 @@
 import { CardVO } from "./../../../main/facade/CardFacade";
-import { createSlice, createAsyncThunk, Action } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import serviceProvider from "../../ServiceProvider";
+import { WebContents } from "electron";
 
 interface State {
   add: AddState;
@@ -18,11 +19,7 @@ export type CreateCardParam = {
 };
 
 export const getFieldTypes = createAsyncThunk("add/getFieldTypes", async () => {
-  console.log("before");
-  const fieldTypes = await serviceProvider.cardFacade.getFieldTypes();
-  console.log("here!");
-  console.log(fieldTypes);
-  return fieldTypes;
+  return await serviceProvider.cardFacade.getFieldTypes();
 });
 
 export const saveCard = createAsyncThunk<
@@ -52,10 +49,19 @@ const addSlice = createSlice({
   },
   extraReducers: builder => {
     builder.addCase(getFieldTypes.fulfilled, (state, action) => {
-      console.log("fulfilled");
-      for (const fieldVO of action.payload) {
-        state.fieldContents[fieldVO.id] = "";
+      try {
+        for (const fieldVO of action.payload) {
+          state.fieldContents[fieldVO.id] = "";
+        }
+        console.log(state);
+      } catch (err) {
+        console.error("Error occurred in getFieldTypes.fulfilled.");
+        console.error(err);
       }
+    });
+    builder.addCase(getFieldTypes.rejected, (state, action) => {
+      console.error("getFieldTypes.rejected: an error occurred");
+      console.error(action.error);
     });
   },
 });

@@ -46,13 +46,17 @@ export class CardTypeFactory {
     const defaultCardTypeId = await configRepository.getDefaultCardTypeId();
     const cardTypeRepository = await this.getCardTypeRepository();
     if (defaultCardTypeId !== undefined) {
-      cardTypeRepository.query({
-        id: defaultCardTypeId,
-      });
+      const defaultCardTypeDO = (
+        await cardTypeRepository.query({
+          id: defaultCardTypeId,
+        })
+      )[0];
+      return this.fromCardTypeDO(defaultCardTypeDO);
     }
     const cardTypeDO = await cardTypeRepository.insert({
       name: "normal",
     });
+    await configRepository.setDefaultCardTypeId(cardTypeDO.id as number);
     return this.fromCardTypeDO(cardTypeDO);
   }
 
