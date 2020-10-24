@@ -8,11 +8,11 @@ interface State {
 }
 interface AddState {
   cardVO: CardVO | undefined;
-  fieldContents: Record<number, string>;
+  fieldContents: Record<number, string>; // fieldTypeId -> field contents
 }
 const initialState: AddState = {
   cardVO: undefined,
-  fieldContents: [],
+  fieldContents: {},
 };
 export type CreateCardParam = {
   bookId: number;
@@ -53,7 +53,6 @@ const addSlice = createSlice({
         for (const fieldVO of action.payload) {
           state.fieldContents[fieldVO.id] = "";
         }
-        console.log(state);
       } catch (err) {
         console.error("Error occurred in getFieldTypes.fulfilled.");
         console.error(err);
