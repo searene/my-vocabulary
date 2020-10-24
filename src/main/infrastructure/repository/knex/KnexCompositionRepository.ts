@@ -3,10 +3,13 @@ import { CompositionDO } from "../../do/CompositionDO";
 import { CompositionQuery } from "../../query/CompositionQuery";
 import { Options } from "../../query/Options";
 import { CompositionRepository } from "../CompositionRepository";
+import { RepositoryUtils } from "../RepositoryUtils";
 import { knex } from "./KnexFactory";
 
 @injectable()
 export class KnexCompositionRepository implements CompositionRepository {
+  private static readonly _COMPOSITIONS = "compositions";
+
   async init(): Promise<void> {
     await this.createTableIfNotExists();
   }
@@ -24,19 +27,11 @@ export class KnexCompositionRepository implements CompositionRepository {
     query: CompositionQuery,
     options?: Options
   ): Promise<CompositionDO[]> {
-    const queryInterface = knex.from("compositions").select(Object.keys(query));
-    if (options !== undefined) {
-      if (options.offset !== undefined) {
-        queryInterface.offset(options.offset);
-      }
-      if (options.limit !== undefined) {
-        queryInterface.limit(options.limit);
-      }
-    }
-    queryInterface.where(query);
-    // this.addQueryConditions(wordQuery, queryInterface);
-    const rows = await queryInterface;
-    return rows as CompositionDO[];
+    return RepositoryUtils.query(
+      KnexCompositionRepository._COMPOSITIONS,
+      query,
+      options
+    );
   }
   async batchQueryByIds(id: number[]): Promise<CompositionDO[]> {
     throw new Error("Method not implemented.");

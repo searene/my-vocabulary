@@ -4,11 +4,14 @@ import * as KnexFactory from "./KnexFactory";
 import { CardQuery } from "../../query/CardQuery";
 import { injectable } from "@parisholley/inversify-async";
 import { Options } from "../../query/Options";
+import { RepositoryUtils } from "../RepositoryUtils";
 
 const knex = KnexFactory.knex;
 
 @injectable()
 export class KnexCardRepository implements CardRepository {
+  private static readonly _CARDS = "cards";
+
   async init(): Promise<void> {
     await this.createTableIfNotExists();
   }
@@ -30,19 +33,7 @@ export class KnexCardRepository implements CardRepository {
   }
 
   async query(query: CardQuery, options?: Options): Promise<CardDO[]> {
-    const queryInterface = knex.from("cards").select(Object.keys(query));
-    if (options !== undefined) {
-      if (options.offset !== undefined) {
-        queryInterface.offset(options.offset);
-      }
-      if (options.limit !== undefined) {
-        queryInterface.limit(options.limit);
-      }
-    }
-    queryInterface.where(query);
-    // this.addQueryConditions(wordQuery, queryInterface);
-    const rows = await queryInterface;
-    return rows as CardDO[];
+    return RepositoryUtils.query(KnexCardRepository._CARDS, query, options);
   }
 
   async batchQueryByIds(id: number[]): Promise<CardDO[]> {

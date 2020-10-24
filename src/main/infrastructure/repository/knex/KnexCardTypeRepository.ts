@@ -4,11 +4,14 @@ import { CardTypeDO } from "../../do/CardTypeDO";
 import { CardTypeQuery } from "../../query/CardTypeQuery";
 import { injectable } from "@parisholley/inversify-async";
 import { Options } from "../../query/Options";
+import { RepositoryUtils } from "../RepositoryUtils";
 
 const knex = KnexFactory.knex;
 
 @injectable()
 export class KnexCardTypeRepository implements CardTypeRepository {
+  private static readonly _CARD_TYPES = "card_types";
+
   async init(): Promise<void> {
     await this.createTableIfNotExists();
   }
@@ -32,19 +35,11 @@ export class KnexCardTypeRepository implements CardTypeRepository {
   }
 
   async query(query: CardTypeQuery, options?: Options): Promise<CardTypeDO[]> {
-    const queryInterface = knex.from("card_types").select(Object.keys(query));
-    if (options !== undefined) {
-      if (options.offset !== undefined) {
-        queryInterface.offset(options.offset);
-      }
-      if (options.limit !== undefined) {
-        queryInterface.limit(options.limit);
-      }
-    }
-    queryInterface.where(query);
-    // this.addQueryConditions(wordQuery, queryInterface);
-    const rows = await queryInterface;
-    return rows as CardTypeDO[];
+    return RepositoryUtils.query(
+      KnexCardTypeRepository._CARD_TYPES,
+      query,
+      options
+    );
   }
 
   async createTableIfNotExists(): Promise<void> {

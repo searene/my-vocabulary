@@ -3,11 +3,14 @@ import { WatchDog } from "../../../WatchDog";
 import { WordDO } from "../../do/WordDO";
 import { Options } from "../../query/Options";
 import { WordQuery } from "../../query/WordQuery";
+import { RepositoryUtils } from "../RepositoryUtils";
 import { WordRepository } from "../WordRepository";
 import { knex } from "./KnexFactory";
 
 @injectable()
 export class KnexWordRepository implements WordRepository {
+  private static readonly _WORDS = "words";
+
   async init(): Promise<void> {
     await this.createTableIfNotExists();
   }
@@ -34,20 +37,8 @@ export class KnexWordRepository implements WordRepository {
   async batchInsert(wordDOs: WordDO[]): Promise<WordDO[]> {
     throw new Error("Method not implemented.");
   }
-  async query(wordQuery: WordQuery, options?: Options): Promise<WordDO[]> {
-    const queryInterface = knex.from("words").select(Object.keys(wordQuery));
-    if (options !== undefined) {
-      if (options.offset !== undefined) {
-        queryInterface.offset(options.offset);
-      }
-      if (options.limit !== undefined) {
-        queryInterface.limit(options.limit);
-      }
-    }
-    queryInterface.where(wordQuery);
-    // this.addQueryConditions(wordQuery, queryInterface);
-    const rows = await queryInterface;
-    return rows as WordDO[];
+  async query(query: WordQuery, options?: Options): Promise<WordDO[]> {
+    return RepositoryUtils.query(KnexWordRepository._WORDS, query, options);
   }
   async batchQueryByIds(id: number[]): Promise<WordDO[]> {
     throw new Error("Method not implemented.");

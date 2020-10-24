@@ -5,11 +5,15 @@ import { ConfigQuery } from "../../query/ConfigQuery";
 import { injectable } from "@parisholley/inversify-async";
 import { assert } from "../../../utils/Assert";
 import { Options } from "../../query/Options";
+import { RepositoryUtils } from "../RepositoryUtils";
+import { KnexCardRepository } from "./KnexCardRepository";
 
 const knex = KnexFactory.knex;
 
 @injectable()
 export class KnexConfigRepository implements ConfigRepository {
+  private static readonly _CONFIGS = "configs";
+
   async init(): Promise<void> {
     await this.createTableIfNotExists();
   }
@@ -49,18 +53,6 @@ export class KnexConfigRepository implements ConfigRepository {
   }
 
   async query(query: ConfigQuery, options?: Options): Promise<ConfigDO[]> {
-    const queryInterface = knex.from("configs").select(Object.keys(query));
-    if (options !== undefined) {
-      if (options.offset !== undefined) {
-        queryInterface.offset(options.offset);
-      }
-      if (options.limit !== undefined) {
-        queryInterface.limit(options.limit);
-      }
-    }
-    queryInterface.where(query);
-    // this.addQueryConditions(wordQuery, queryInterface);
-    const rows = await queryInterface;
-    return rows as ConfigDO[];
+    return RepositoryUtils.query(KnexConfigRepository._CONFIGS, query, options);
   }
 }

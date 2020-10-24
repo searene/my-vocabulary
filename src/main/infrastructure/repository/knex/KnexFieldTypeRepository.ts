@@ -3,10 +3,13 @@ import { FieldTypeDO } from "../../do/FieldTypeDO";
 import { FieldTypeQuery } from "../../query/FieldTypeQuery";
 import { Options } from "../../query/Options";
 import { FieldTypeRepository } from "../FieldTypeRepository";
+import { RepositoryUtils } from "../RepositoryUtils";
 import { knex } from "./KnexFactory";
 
 @injectable()
 export class KnexFieldTypeRepository implements FieldTypeRepository {
+  private static readonly _FIELD_TYPES = "field_types";
+
   async init(): Promise<void> {
     await this.createTableIfNotExists();
   }
@@ -32,19 +35,11 @@ export class KnexFieldTypeRepository implements FieldTypeRepository {
     throw new Error("Method not implemented.");
   }
   async query(query: FieldTypeQuery, options: Options): Promise<FieldTypeDO[]> {
-    const queryInterface = knex.from("field_types").select(Object.keys(query));
-    if (options !== undefined) {
-      if (options.offset !== undefined) {
-        queryInterface.offset(options.offset);
-      }
-      if (options.limit !== undefined) {
-        queryInterface.limit(options.limit);
-      }
-    }
-    queryInterface.where(query);
-    // this.addQueryConditions(wordQuery, queryInterface);
-    const rows = await queryInterface;
-    return rows as FieldTypeDO[];
+    return RepositoryUtils.query(
+      KnexFieldTypeRepository._FIELD_TYPES,
+      query,
+      options
+    );
   }
   async batchQueryByIds(id: number[]): Promise<FieldTypeDO[]> {
     throw new Error("Method not implemented.");
