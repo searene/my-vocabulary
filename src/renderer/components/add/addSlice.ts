@@ -17,8 +17,12 @@ export type CreateCardParam = {
   bookId: number;
 };
 
-export const getFieldTypes = createAsyncThunk("add/createCard", async () => {
-  return await serviceProvider.cardFacade.getFieldTypes();
+export const getFieldTypes = createAsyncThunk("add/getFieldTypes", async () => {
+  console.log("before");
+  const fieldTypes = await serviceProvider.cardFacade.getFieldTypes();
+  console.log("here!");
+  console.log(fieldTypes);
+  return fieldTypes;
 });
 
 export const saveCard = createAsyncThunk<
@@ -48,6 +52,7 @@ const addSlice = createSlice({
   },
   extraReducers: builder => {
     builder.addCase(getFieldTypes.fulfilled, (state, action) => {
+      console.log("fulfilled");
       for (const fieldVO of action.payload) {
         state.fieldContents[fieldVO.id] = "";
       }

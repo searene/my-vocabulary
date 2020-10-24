@@ -1,14 +1,10 @@
 import { ConfigRepository } from "../ConfigRepository";
-import * as KnexFactory from "./KnexFactory";
+import { knex } from "./KnexFactory";
 import { ConfigDO } from "../../do/ConfigDO";
 import { ConfigQuery } from "../../query/ConfigQuery";
 import { injectable } from "@parisholley/inversify-async";
-import { assert } from "../../../utils/Assert";
 import { Options } from "../../query/Options";
 import { RepositoryUtils } from "../RepositoryUtils";
-import { KnexCardRepository } from "./KnexCardRepository";
-
-const knex = KnexFactory.knex;
 
 @injectable()
 export class KnexConfigRepository implements ConfigRepository {

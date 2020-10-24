@@ -61,7 +61,7 @@ const createWindow = async () => {
   win = new BrowserWindow();
   win.maximize();
 
-  if (process.env.NODE_ENV !== "production") {
+  if (process.env.RENDERER_ENV === "web") {
     process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = "1"; // eslint-disable-line require-atomic-updates
     win.loadURL(`http://localhost:2003`);
   } else {
