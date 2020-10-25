@@ -8,11 +8,11 @@ module.exports = {
     output: {
         path: path.resolve(__dirname, 'dist'),
         filename: '[name].js',
-        publicPath: process.env.RENDERER_ENV === "web" ? "/" : "./",
+        publicPath: "./",
     },
     node: {
         __dirname: false,
-        __filename: false
+        __filename: false,
     },
     resolve: {
         extensions: ['.tsx', '.ts', '.js', '.json']
@@ -23,5 +23,5 @@ module.exports = {
     },
     plugins: [
         new ForkTsCheckerWebpackPlugin(),
-    ]
+    ],
 };

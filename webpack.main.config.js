@@ -37,7 +37,8 @@ module.exports = merge(baseConfig, {
     },
     externals: {
         sqlite3: 'commonjs sqlite3',
-        knex: 'commonjs knex'
+        knex: 'commonjs knex',
+        electron: 'commonjs electron',
     },
     plugins: [
         new webpack.DefinePlugin({

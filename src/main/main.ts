@@ -6,14 +6,11 @@ import { EPubBookReader } from "./EPubBookReader";
 import { EBookReadAgent } from "./EBookReadAgent";
 import { types } from "./config/types";
 import { PlainTextBookReader } from "./PlainTextBookReader";
-import * as unhandled from "electron-unhandled";
 import { FieldTypeFactory } from "./domain/card/factory/FieldTypeFactory";
 import { ConfigRepository } from "./infrastructure/repository/ConfigRepository";
 import { CardTypeFactory } from "./domain/card/factory/CardTypeFactory";
 import { CompositionFactory } from "./domain/card/factory/CompositionFactory";
 import * as os from "os";
-
-unhandled();
 
 async function initialization(): Promise<void> {
   EBookReadAgent.register("epub", EPubBookReader);
@@ -63,25 +60,24 @@ const installExtensions = async () => {
 const createWindow = async () => {
   await initialization();
 
-  win = new BrowserWindow();
+  win = new BrowserWindow({
+    webPreferences: {
+      nodeIntegration: true,
+    },
+  });
   win.maximize();
 
   if (process.env.NODE_ENV !== "production") {
     await installExtensions();
   }
 
-  if (process.env.RENDERER_ENV === "web") {
-    process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = "1"; // eslint-disable-line require-atomic-updates
-    win.loadURL(`http://localhost:2003`);
-  } else {
-    win.loadURL(
-      url.format({
-        pathname: path.join(__dirname, "index.html"),
-        protocol: "file:",
-        slashes: true,
-      })
-    );
-  }
+  win.loadURL(
+    url.format({
+      pathname: path.join(__dirname, "index.html"),
+      protocol: "file:",
+      slashes: true,
+    })
+  );
 
   if (process.env.NODE_ENV !== "production") {
     // Open DevTools, see https://github.com/electron/electron/issues/12438 for why we wait for dom-ready

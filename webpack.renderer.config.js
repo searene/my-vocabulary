@@ -6,9 +6,9 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const baseConfig = require('./webpack.base.config');
 
 module.exports = merge(baseConfig, {
-    target: process.env.RENDERER_ENV === "web" ? 'web' : 'electron-renderer',
+    target: 'electron-renderer',
     entry: {
-        app: ['@babel/polyfill','./src/renderer/App.tsx']
+        app: ['./src/renderer/App.tsx']
     },
     module: {
         rules: [
@@ -79,8 +79,6 @@ module.exports = merge(baseConfig, {
         new HtmlWebpackPlugin(),
         new webpack.DefinePlugin({
             'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
-            'process.env.RENDERER_ENV': JSON.stringify(process.env.RENDERER_ENV),
-            'testVar': JSON.stringify("blah")
         }),
         new MiniCssExtractPlugin({
             // Options similar to the same options in webpackOptions.output
