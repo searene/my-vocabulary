@@ -1,7 +1,10 @@
 const { merge } = require('webpack-merge');
+const NodemonPlugin = require('nodemon-webpack-plugin');
 
 const baseConfig = require('./webpack.main.config');
 
 module.exports = merge(baseConfig, {
-    mode: 'production'
+  plugins: [
+    new NodemonPlugin(),
+  ],
 });

@@ -11,6 +11,7 @@ import { FieldTypeFactory } from "./domain/card/factory/FieldTypeFactory";
 import { ConfigRepository } from "./infrastructure/repository/ConfigRepository";
 import { CardTypeFactory } from "./domain/card/factory/CardTypeFactory";
 import { CompositionFactory } from "./domain/card/factory/CompositionFactory";
+import * as os from "os";
 
 unhandled();
 
@@ -42,24 +43,32 @@ async function initialization(): Promise<void> {
 let win: BrowserWindow | null;
 
 const installExtensions = async () => {
-  const installer = require("electron-devtools-installer");
-  const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
-  const extensions = ["REACT_DEVELOPER_TOOLS", "REDUX_DEVTOOLS"];
-
-  return Promise.all(
-    extensions.map(name => installer.default(installer[name], forceDownload))
-  ).catch(console.log); // eslint-disable-line no-console
+  const ses = win?.webContents.session;
+  // react dev tools
+  ses?.loadExtension(
+    path.join(
+      os.homedir(),
+      ".config/google-chrome/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/4.9.0_0"
+    )
+  );
+  // redux dev tools
+  ses?.loadExtension(
+    path.join(
+      os.homedir(),
+      ".config/google-chrome/Default/Extensions/lmhkpmbekcpmknklioeibfkpmmfibljd/2.17.0_0"
+    )
+  );
 };
 
 const createWindow = async () => {
-  if (process.env.NODE_ENV !== "production") {
-    await installExtensions();
-  }
-
   await initialization();
 
   win = new BrowserWindow();
   win.maximize();
+
+  if (process.env.NODE_ENV !== "production") {
+    await installExtensions();
+  }
 
   if (process.env.RENDERER_ENV === "web") {
     process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = "1"; // eslint-disable-line require-atomic-updates

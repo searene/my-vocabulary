@@ -1,5 +1,6 @@
 'use strict';
 
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const path = require('path');
 
 module.exports = {
@@ -20,4 +21,7 @@ module.exports = {
     devServer: {
         writeToDisk: true
     },
+    plugins: [
+        new ForkTsCheckerWebpackPlugin(),
+    ]
 };
