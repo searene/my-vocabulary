@@ -18,10 +18,6 @@ module.exports = merge(baseConfig, {
                     cacheDirectory: true,
                     babelrc: false,
                     presets: [
-                        [
-                            '@babel/preset-env',
-                            { targets: 'maintained node versions' }
-                        ],
                         ['@babel/preset-typescript',
                             { "onlyRemoveTypeImports": true }
                         ]
@@ -38,7 +34,6 @@ module.exports = merge(baseConfig, {
     externals: {
         sqlite3: 'commonjs sqlite3',
         knex: 'commonjs knex',
-        electron: 'commonjs electron',
     },
     plugins: [
         new webpack.DefinePlugin({

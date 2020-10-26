@@ -30,15 +30,29 @@ module.exports = merge(baseConfig, {
                     plugins: [
                         ["@babel/plugin-proposal-decorators", { "legacy": true }],
                         ['@babel/plugin-proposal-class-properties', { loose: true }],
+                        [
+                            "@babel/plugin-transform-runtime",
+                            {
+                              "regenerator": true,
+                              "corejs": 3
+                            }
+                          ]
                     ],
                 }
             },
             {
-                test: /\.css|\.less$/i,
+                test: /\.less$/i,
                 use: [
                     MiniCssExtractPlugin.loader,
                     'css-loader',
                     'less-loader'
+                ],
+            },
+            {
+                test: /\.css$/i,
+                use: [
+                    MiniCssExtractPlugin.loader,
+                    'css-loader',
                 ],
             },
             {

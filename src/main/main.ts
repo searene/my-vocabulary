@@ -63,6 +63,7 @@ const createWindow = async () => {
   win = new BrowserWindow({
     webPreferences: {
       nodeIntegration: true,
+      enableRemoteModule: true,
     },
   });
   win.maximize();
