@@ -4,12 +4,14 @@ import { RouteComponentProps } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { useState, useEffect } from "react";
 import {
+  FieldVO,
   getFieldTypes,
   saveCard,
   selectFieldTypeIdToFieldVOMap,
 } from "./addSlice";
 import { Field } from "./Field";
 import { BookName } from "../bookName/BookName";
+import { FieldTypeVO } from "../../../main/facade/CardFacade";
 
 interface MatchParams {
   bookId: string;
@@ -23,20 +25,17 @@ export function Add(props: AddProps) {
   const [initiated, setInitiated] = useState(false);
   const bookId = parseInt(props.match.params.bookId);
 
-  const getFieldComponents = () => {
-    console.log(fieldTypeIdToFieldVOMap);
-    for (const [fieldTypeId, fieldVO] of Object.entries(
-      fieldTypeIdToFieldVOMap
-    )) {
-      <Grid.Row>
+  const fieldComponents = Object.entries(fieldTypeIdToFieldVOMap).map(
+    ([fieldTypeId, fieldVO]) => (
+      <Grid.Row id={fieldTypeId}>
         <Field
           key={fieldTypeId}
           fieldTypeId={parseInt(fieldTypeId)}
           fieldName={fieldVO.name}
         />
-      </Grid.Row>;
-    }
-  };
+      </Grid.Row>
+    )
+  );
 
   useEffect(() => {
     if (!initiated) {
@@ -56,7 +55,7 @@ export function Add(props: AddProps) {
           Book: <BookName bookId={bookId} />
         </Grid.Column>
       </Grid.Row>
-      {getFieldComponents()}
+      {fieldComponents}
       <Grid.Row>
         <Button onClick={save}>Save</Button>
       </Grid.Row>

@@ -4,7 +4,7 @@ import serviceProvider from "../../ServiceProvider";
 interface State {
   add: AddState;
 }
-interface FieldVO {
+export interface FieldVO {
   id: number;
   name: string;
   contents: string;
@@ -52,7 +52,7 @@ const addSlice = createSlice({
       };
     },
   },
-  extraReducers: builder => {
+  extraReducers: (builder) => {
     builder.addCase(getFieldTypes.fulfilled, (state, action) => {
       try {
         for (const fieldVO of action.payload) {
@@ -61,8 +61,6 @@ const addSlice = createSlice({
             contents: "",
           };
         }
-        console.log("Jlkafdkaf");
-        console.log(state.fieldTypeIdToFieldVOMap);
       } catch (err) {
         console.error("Error occurred in getFieldTypes.fulfilled.");
         console.error(err);

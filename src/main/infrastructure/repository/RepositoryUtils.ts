@@ -9,7 +9,7 @@ export class RepositoryUtils {
     query: Q,
     options?: Options
   ): Promise<D[]> {
-    const queryInterface = knex.from(tableName).select(Object.keys(query));
+    const queryInterface = knex.from(tableName).select("*");
     if (options !== undefined) {
       if (options.offset !== undefined) {
         queryInterface.offset(options.offset);

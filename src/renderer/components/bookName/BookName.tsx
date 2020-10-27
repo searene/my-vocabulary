@@ -20,5 +20,5 @@ export const BookName = (props: BookNameProps) => {
     fetchBookName();
   }, [props.bookId, dispatch]);
 
-  return <div>{bookName}</div>;
+  return <span>{bookName}</span>;
 };
