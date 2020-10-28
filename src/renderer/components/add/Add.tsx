@@ -25,7 +25,7 @@ export function Add(props: AddProps) {
 
   const fieldComponents = Object.entries(fieldTypeIdToFieldVOMap).map(
     ([fieldTypeId, fieldVO]) => (
-      <Grid.Row id={fieldTypeId}>
+      <Grid.Row key={fieldTypeId}>
         <Field
           key={fieldTypeId}
           fieldTypeId={parseInt(fieldTypeId)}
@@ -48,13 +48,13 @@ export function Add(props: AddProps) {
 
   return initiated ? (
     <Grid divided={"vertically"}>
-      <Grid.Row columns={1} id="book-name-row">
+      <Grid.Row columns={1}>
         <Grid.Column>
           Book: <BookName bookId={bookId} />
         </Grid.Column>
       </Grid.Row>
       {fieldComponents}
-      <Grid.Row id="button-row">
+      <Grid.Row>
         <Button onClick={save}>Save</Button>
       </Grid.Row>
     </Grid>
