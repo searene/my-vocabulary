@@ -4,14 +4,12 @@ import { RouteComponentProps } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { useState, useEffect } from "react";
 import {
-  FieldVO,
   getFieldTypes,
   saveCard,
   selectFieldTypeIdToFieldVOMap,
 } from "./addSlice";
 import { Field } from "./Field";
 import { BookName } from "../bookName/BookName";
-import { FieldTypeVO } from "../../../main/facade/CardFacade";
 
 interface MatchParams {
   bookId: string;
@@ -50,13 +48,13 @@ export function Add(props: AddProps) {
 
   return initiated ? (
     <Grid divided={"vertically"}>
-      <Grid.Row columns={1}>
+      <Grid.Row columns={1} id="book-name-row">
         <Grid.Column>
           Book: <BookName bookId={bookId} />
         </Grid.Column>
       </Grid.Row>
       {fieldComponents}
-      <Grid.Row>
+      <Grid.Row id="button-row">
         <Button onClick={save}>Save</Button>
       </Grid.Row>
     </Grid>

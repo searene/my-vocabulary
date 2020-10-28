@@ -10,7 +10,7 @@
     "build-dev": "npm run build-main-dev && npm run build-renderer-dev",
     "start-renderer-dev": "webpack serve --config webpack.renderer.dev.config.js",
     "start-main-dev:build": "webpack -w --config webpack.main.dev.config.js",
-    "start-main-dev:electron": "nodemon --watch dist/main.js --exec 'electron dist/main.js' --debug",
+    "start-main-dev:electron": "nodemon --watch dist/main.js --exec 'electron dist/main.js'",
     "start-main-dev": "npm-run-all --parallel start-main-dev:build start-main-dev:electron",
     "start": "cross-env START_HOT=1 npm run start-renderer-dev",
     "lint": "eslint --ext=jsx,js,tsx,ts src",

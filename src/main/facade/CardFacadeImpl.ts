@@ -10,7 +10,7 @@ export class CardFacadeImpl implements CardFacade {
 
   async getFieldTypes(cardTypeId?: number): Promise<FieldTypeVO[]> {
     const fieldTypes = await this._fieldTypeFactory.getFieldTypes(cardTypeId);
-    return fieldTypes.map(fieldType => {
+    return fieldTypes.map((fieldType) => {
       return {
         id: fieldType.id,
         name: fieldType.name,
@@ -20,6 +20,8 @@ export class CardFacadeImpl implements CardFacade {
 
   async createCard(createCardParam: CreateCardParam): Promise<number> {
     const card = await this.cardFactory.createCard(createCardParam.bookId);
+    console.log("Here");
+    console.log(card);
     return card.id;
   }
 }

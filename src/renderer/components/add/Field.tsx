@@ -1,14 +1,16 @@
-import { changeFieldContents } from "./addSlice";
+import { changeFieldContents, selectFieldTypeIdToFieldVOMap } from "./addSlice";
 import * as React from "react";
 import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 interface FieldProps {
   fieldTypeId: number;
   fieldName: string;
 }
 export const Field = (props: FieldProps) => {
-  const [contents, setContents] = useState("");
+  const fieldTypeIdToFieldVOMap = useSelector(selectFieldTypeIdToFieldVOMap);
+  const fieldVO = fieldTypeIdToFieldVOMap[props.fieldTypeId];
+
   const dispatch = useDispatch();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -23,7 +25,7 @@ export const Field = (props: FieldProps) => {
   return (
     <div>
       <span>{props.fieldName}: </span>
-      <input value={contents} onChange={handleChange} />
+      <input value={fieldVO.contents} onChange={handleChange} />
     </div>
   );
 };
