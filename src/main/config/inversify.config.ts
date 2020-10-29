@@ -23,6 +23,8 @@ import { KnexConfigRepository } from "../infrastructure/repository/knex/KnexConf
 import { KnexFieldTypeRepository } from "../infrastructure/repository/knex/KnexFieldTypeRepository";
 import { CompositionRepository } from "../infrastructure/repository/CompositionRepository";
 import { KnexCompositionRepository } from "../infrastructure/repository/knex/KnexCompositionRepository";
+import { FieldRepository } from "../infrastructure/repository/FieldRepository";
+import { KnexFieldRepository } from "../infrastructure/repository/knex/KnexFieldRepository";
 
 export const container = new Container({
   defaultScope: "Singleton",
@@ -56,6 +58,13 @@ container
   .onActivation(async (_, fieldTypeRepository) => {
     await fieldTypeRepository.init();
     return fieldTypeRepository;
+  });
+container
+  .bind<FieldRepository>(types.FieldRepository)
+  .to(KnexFieldRepository)
+  .onActivation(async (_, fieldRepository) => {
+    await fieldRepository.init();
+    return fieldRepository;
   });
 container
   .bind<CardRepository>(types.CardRepository)

@@ -22,7 +22,7 @@ export class KnexCardRepository implements CardRepository {
   async createTableIfNotExists(): Promise<void> {
     const tablesExists = await knex.schema.hasTable("cards");
     if (!tablesExists) {
-      await knex.schema.createTable("cards", table => {
+      await knex.schema.createTable("cards", (table) => {
         table.increments();
         table.integer("card_type_id");
         table.integer("book_id");
@@ -34,7 +34,11 @@ export class KnexCardRepository implements CardRepository {
   }
 
   async query(query: CardQuery, options?: Options): Promise<CardDO[]> {
-    return RepositoryUtils.query(KnexCardRepository._CARDS, query, options);
+    return await RepositoryUtils.query(
+      KnexCardRepository._CARDS,
+      query,
+      options
+    );
   }
 
   async batchQueryByIds(id: number[]): Promise<CardDO[]> {
@@ -42,6 +46,6 @@ export class KnexCardRepository implements CardRepository {
   }
 
   async insert(cardDO: CardDO): Promise<CardDO> {
-    return RepositoryUtils.insert(KnexCardRepository._CARDS, cardDO);
+    return await RepositoryUtils.insert(KnexCardRepository._CARDS, cardDO);
   }
 }

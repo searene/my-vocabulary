@@ -15,7 +15,7 @@ export class KnexCompositionRepository implements CompositionRepository {
     await this.createTableIfNotExists();
   }
   async insert(CompositionDO: CompositionDO): Promise<CompositionDO> {
-    return RepositoryUtils.insert(
+    return await RepositoryUtils.insert(
       KnexCompositionRepository._COMPOSITIONS,
       CompositionDO
     );
@@ -27,7 +27,7 @@ export class KnexCompositionRepository implements CompositionRepository {
     query: CompositionQuery,
     options?: Options
   ): Promise<CompositionDO[]> {
-    return RepositoryUtils.query(
+    return await RepositoryUtils.query(
       KnexCompositionRepository._COMPOSITIONS,
       query,
       options
@@ -39,7 +39,7 @@ export class KnexCompositionRepository implements CompositionRepository {
   async createTableIfNotExists(): Promise<void> {
     const tablesExists = await knex.schema.hasTable("compositions");
     if (!tablesExists) {
-      await knex.schema.createTable("compositions", table => {
+      await knex.schema.createTable("compositions", (table) => {
         table.increments();
         table.string("name");
         table.integer("card_type_id");

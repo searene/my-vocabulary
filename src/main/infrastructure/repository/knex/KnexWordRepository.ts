@@ -20,7 +20,7 @@ export class KnexWordRepository implements WordRepository {
   async createTableIfNotExists(): Promise<void> {
     const tablesExists = await knex.schema.hasTable("words");
     if (!tablesExists) {
-      await knex.schema.createTable("words", table => {
+      await knex.schema.createTable("words", (table) => {
         table.increments();
         table.integer("book_id");
         table.string("word");
@@ -31,13 +31,17 @@ export class KnexWordRepository implements WordRepository {
     }
   }
   async insert(wordDO: WordDO): Promise<WordDO> {
-    return RepositoryUtils.insert(KnexWordRepository._WORDS, wordDO);
+    return await RepositoryUtils.insert(KnexWordRepository._WORDS, wordDO);
   }
   async batchInsert(wordDOs: WordDO[]): Promise<WordDO[]> {
     throw new Error("Method not implemented.");
   }
   async query(query: WordQuery, options?: Options): Promise<WordDO[]> {
-    return RepositoryUtils.query(KnexWordRepository._WORDS, query, options);
+    return await RepositoryUtils.query(
+      KnexWordRepository._WORDS,
+      query,
+      options
+    );
   }
   async batchQueryByIds(id: number[]): Promise<WordDO[]> {
     throw new Error("Method not implemented.");
@@ -51,11 +55,9 @@ export class KnexWordRepository implements WordRepository {
       .where("status", 1);
     for (const knownWord of knownWords) {
       console.log("updating: " + knownWord.word);
-      await knex("words")
-        .where("word", knownWord.word)
-        .update({
-          status: 1,
-        });
+      await knex("words").where("word", knownWord.word).update({
+        status: 1,
+      });
     }
   }
 }

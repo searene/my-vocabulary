@@ -19,7 +19,7 @@ export class KnexFieldTypeRepository implements FieldTypeRepository {
   async createTableIfNotExists(): Promise<void> {
     const tablesExists = await knex.schema.hasTable("field_types");
     if (!tablesExists) {
-      await knex.schema.createTable("field_types", table => {
+      await knex.schema.createTable("field_types", (table) => {
         table.increments();
         table.string("name");
         table.string("category");
@@ -28,7 +28,7 @@ export class KnexFieldTypeRepository implements FieldTypeRepository {
     }
   }
   async insert(fieldTypeDO: FieldTypeDO): Promise<FieldTypeDO> {
-    return RepositoryUtils.insert(
+    return await RepositoryUtils.insert(
       KnexFieldTypeRepository._FIELD_TYPES,
       fieldTypeDO
     );
@@ -37,7 +37,7 @@ export class KnexFieldTypeRepository implements FieldTypeRepository {
     throw new Error("Method not implemented.");
   }
   async query(query: FieldTypeQuery, options: Options): Promise<FieldTypeDO[]> {
-    return RepositoryUtils.query(
+    return await RepositoryUtils.query(
       KnexFieldTypeRepository._FIELD_TYPES,
       query,
       options

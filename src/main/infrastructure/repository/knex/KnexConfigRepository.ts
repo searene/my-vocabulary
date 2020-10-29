@@ -39,15 +39,12 @@ export class KnexConfigRepository implements ConfigRepository {
   }
 
   async updateById(id: number, configDO: ConfigDO): Promise<ConfigDO> {
-    return await knex("config")
-      .where({ id })
-      .update(configDO)
-      .select("*");
+    return await knex("config").where({ id }).update(configDO).select("*");
   }
   async createTableIfNotExists(): Promise<void> {
     const tablesExists = await knex.schema.hasTable("configs");
     if (!tablesExists) {
-      await knex.schema.createTable("configs", table => {
+      await knex.schema.createTable("configs", (table) => {
         table.increments();
         table.integer("default_card_type_id");
       });
@@ -60,10 +57,17 @@ export class KnexConfigRepository implements ConfigRepository {
     throw new Error("Method not implemented.");
   }
   async insert(configDO: ConfigDO): Promise<ConfigDO> {
-    return RepositoryUtils.insert(KnexConfigRepository._CONFIGS, configDO);
+    return await RepositoryUtils.insert(
+      KnexConfigRepository._CONFIGS,
+      configDO
+    );
   }
 
   async query(query: ConfigQuery, options?: Options): Promise<ConfigDO[]> {
-    return RepositoryUtils.query(KnexConfigRepository._CONFIGS, query, options);
+    return await RepositoryUtils.query(
+      KnexConfigRepository._CONFIGS,
+      query,
+      options
+    );
   }
 }

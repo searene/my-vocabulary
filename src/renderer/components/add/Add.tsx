@@ -10,6 +10,8 @@ import {
 } from "./addSlice";
 import { Field } from "./Field";
 import { BookName } from "../bookName/BookName";
+import { useAppDispatch } from "../../redux/store";
+import { unwrapResult } from "@reduxjs/toolkit";
 
 interface MatchParams {
   bookId: string;
@@ -19,7 +21,7 @@ interface AddProps extends RouteComponentProps<MatchParams> {}
 
 export function Add(props: AddProps) {
   const fieldTypeIdToFieldVOMap = useSelector(selectFieldTypeIdToFieldVOMap);
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const [initiated, setInitiated] = useState(false);
   const bookId = parseInt(props.match.params.bookId);
 
@@ -37,13 +39,23 @@ export function Add(props: AddProps) {
 
   useEffect(() => {
     if (!initiated) {
-      dispatch(getFieldTypes());
+      dispatch(getFieldTypes())
+        .then(unwrapResult)
+        .catch((e) => {
+          console.error("An error occurred when dispatching getFieldTypes");
+          console.error(e);
+        });
     }
     setInitiated(true);
   }, [initiated, dispatch]);
 
   const save = () => {
-    dispatch(saveCard({ bookId }));
+    dispatch(saveCard({ bookId }))
+      .then(unwrapResult)
+      .catch((e) => {
+        console.error("An error occurred when dispatching saveCard");
+        console.error(e);
+      });
   };
 
   return initiated ? (

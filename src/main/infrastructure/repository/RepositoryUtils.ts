@@ -1,9 +1,22 @@
 import { BaseDO } from "../do/BaseDO";
+import { FieldDO } from "../do/FieldDO";
 import { BaseQuery } from "../query/BaseQuery";
 import { Options } from "../query/Options";
 import { knex } from "./knex/KnexFactory";
 
 export class RepositoryUtils {
+  static async batchInsert(
+    table: string,
+    fieldDOs: FieldDO[]
+  ): Promise<FieldDO[]> {
+    const fieldIds = await knex(table).insert(fieldDOs);
+    const resultFieldDOs: FieldDO[] = [];
+    for (let i = 0; i < fieldIds.length; i++) {
+      const resultFieldDO = { ...fieldDOs[i] };
+      resultFieldDO.id = fieldIds[i];
+    }
+    return resultFieldDOs;
+  }
   static async query<Q extends BaseQuery, D extends BaseDO>(
     tableName: string,
     query: Q,

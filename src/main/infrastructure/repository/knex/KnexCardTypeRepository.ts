@@ -25,14 +25,14 @@ export class KnexCardTypeRepository implements CardTypeRepository {
     throw new Error("Method not implemented.");
   }
   async insert(cardTypeDO: CardTypeDO): Promise<CardTypeDO> {
-    return RepositoryUtils.insert(
+    return await RepositoryUtils.insert(
       KnexCardTypeRepository._CARD_TYPES,
       cardTypeDO
     );
   }
 
   async query(query: CardTypeQuery, options?: Options): Promise<CardTypeDO[]> {
-    return RepositoryUtils.query(
+    return await RepositoryUtils.query(
       KnexCardTypeRepository._CARD_TYPES,
       query,
       options
@@ -42,7 +42,7 @@ export class KnexCardTypeRepository implements CardTypeRepository {
   async createTableIfNotExists(): Promise<void> {
     const tableExists = await knex.schema.hasTable("card_types");
     if (!tableExists) {
-      await knex.schema.createTable("card_types", table => {
+      await knex.schema.createTable("card_types", (table) => {
         table.increments();
         table.string("name");
       });
