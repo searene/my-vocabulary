@@ -105,7 +105,7 @@ export class Book extends React.Component<BookProps, BookStates> {
           </Grid.Column>
           <Grid.Column width={4}>Book: {this.state.bookName}</Grid.Column>
           <Grid.Column width={4}>
-            <SearchWordInput onSearch={word => this.handleSearch(word)} />
+            <SearchWordInput onSearch={(word) => this.handleSearch(word)} />
           </Grid.Column>
           <Grid.Column width={4}>
             <Dropdown
@@ -324,7 +324,9 @@ export class Book extends React.Component<BookProps, BookStates> {
 
   private handleAdd = async (): Promise<void> => {
     const bookId = parseInt(this.props.match.params.bookId);
-    history.push("/add/" + bookId);
+    const urlSearchParams = new URLSearchParams();
+    urlSearchParams.set("word", this.state.wordVO.get().word);
+    history.push(`/add/${bookId}?${urlSearchParams.toString()}`);
   };
 
   private refresh = async (): Promise<void> => {
@@ -369,7 +371,7 @@ export class Book extends React.Component<BookProps, BookStates> {
   }
 
   private bindShortcuts() {
-    document.addEventListener("keyup", async e => {
+    document.addEventListener("keyup", async (e) => {
       if (e.key === "k") {
         await this.handleKnowAndNext();
       } else if (e.key === "n") {

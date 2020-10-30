@@ -23,6 +23,9 @@ export function Add(props: AddProps) {
   const fieldTypeIdToFieldVOMap = useSelector(selectFieldTypeIdToFieldVOMap);
   const dispatch = useAppDispatch();
   const [initiated, setInitiated] = useState(false);
+  const [word, setWord] = useState(
+    new URLSearchParams(props.location.search).get("word") as string
+  );
   const bookId = parseInt(props.match.params.bookId);
 
   const fieldComponents = Object.entries(fieldTypeIdToFieldVOMap).map(
@@ -64,6 +67,10 @@ export function Add(props: AddProps) {
         <Grid.Column>
           Book: <BookName bookId={bookId} />
         </Grid.Column>
+      </Grid.Row>
+      <Grid.Row>
+        <span>word: </span>
+        <input value={word} onChange={(e) => setWord(e.target.value)} />
       </Grid.Row>
       {fieldComponents}
       <Grid.Row>
