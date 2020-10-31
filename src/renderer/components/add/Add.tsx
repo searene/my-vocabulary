@@ -12,6 +12,7 @@ import { Field } from "./Field";
 import { BookName } from "../bookName/BookName";
 import { useAppDispatch } from "../../redux/store";
 import { unwrapResult } from "@reduxjs/toolkit";
+import { Router } from "../../route/Router";
 
 interface MatchParams {
   bookId: string;
@@ -55,6 +56,7 @@ export function Add(props: AddProps) {
   const save = () => {
     dispatch(saveCard({ word, bookId }))
       .then(unwrapResult)
+      .then(() => Router.toBookPage(bookId))
       .catch((e) => {
         console.error("An error occurred when dispatching saveCard");
         console.error(e);

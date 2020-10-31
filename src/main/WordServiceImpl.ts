@@ -9,7 +9,6 @@ import { WordQuery } from "./domain/WordQuery";
 import { WordCount } from "./domain/WordCount";
 import { WordContextService } from "./WordContextService";
 import { WordContextStep } from "./domain/WordContextStep";
-import { WordRepository } from "./infrastructure/repository/WordRepository";
 
 @injectable()
 export class WordServiceImpl implements WordService {
