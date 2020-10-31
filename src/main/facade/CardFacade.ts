@@ -1,4 +1,6 @@
-export type CreateCardParam = {
+export type SaveCardParam = {
+  word: string;
+
   bookId: number;
 
   /**
@@ -23,5 +25,5 @@ export interface CardFacade {
    * Save the card to database
    * @returns cardId
    */
-  createCard(createCardParam: CreateCardParam): Promise<number>;
+  saveCard(saveCardParam: SaveCardParam): Promise<number>;
 }

@@ -52,11 +52,11 @@ export class WordFactory {
   fromWordDO(wordDO: WordDO): Word {
     return new Word(
       wordDO.id as number,
-      wordDO.bookId,
-      wordDO.word,
-      wordDO.originalWord,
-      wordDO.positions.split(",").map(pos => parseInt(pos)),
-      wordDO.status
+      wordDO.bookId as number,
+      wordDO.word as string,
+      wordDO.originalWord as string,
+      (wordDO.positions as string).split(",").map((pos) => parseInt(pos)),
+      wordDO.status as WordStatus
     );
   }
 }

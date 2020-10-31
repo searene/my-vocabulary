@@ -11,6 +11,12 @@ import { knex } from "./KnexFactory";
 export class KnexWordRepository implements WordRepository {
   private static readonly _WORDS = "words";
 
+  async updateByWord(wordDO: WordDO): Promise<WordDO[]> {
+    await knex(KnexWordRepository._WORDS)
+      .where("word", wordDO.word)
+      .update(wordDO);
+    return await this.query({ word: wordDO.word });
+  }
   async init(): Promise<void> {
     await this.createTableIfNotExists();
   }
@@ -18,9 +24,9 @@ export class KnexWordRepository implements WordRepository {
     throw new Error("Method not implemented.");
   }
   async createTableIfNotExists(): Promise<void> {
-    const tablesExists = await knex.schema.hasTable("words");
+    const tablesExists = await knex.schema.hasTable(KnexWordRepository._WORDS);
     if (!tablesExists) {
-      await knex.schema.createTable("words", (table) => {
+      await knex.schema.createTable(KnexWordRepository._WORDS, (table) => {
         table.increments();
         table.integer("book_id");
         table.string("word");
@@ -49,15 +55,17 @@ export class KnexWordRepository implements WordRepository {
 
   async updateWordStatus(): Promise<void> {
     const knownWords: WordDO[] = await knex
-      .from("words")
+      .from(KnexWordRepository._WORDS)
       .select("word")
       .distinct()
       .where("status", 1);
     for (const knownWord of knownWords) {
       console.log("updating: " + knownWord.word);
-      await knex("words").where("word", knownWord.word).update({
-        status: 1,
-      });
+      await knex(KnexWordRepository._WORDS)
+        .where("word", knownWord.word)
+        .update({
+          status: 1,
+        });
     }
   }
 }

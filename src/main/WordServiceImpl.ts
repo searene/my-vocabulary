@@ -9,6 +9,7 @@ import { WordQuery } from "./domain/WordQuery";
 import { WordCount } from "./domain/WordCount";
 import { WordContextService } from "./WordContextService";
 import { WordContextStep } from "./domain/WordContextStep";
+import { WordRepository } from "./infrastructure/repository/WordRepository";
 
 @injectable()
 export class WordServiceImpl implements WordService {
@@ -41,7 +42,7 @@ export class WordServiceImpl implements WordService {
       pageSize: pageSize,
     };
     const wordDOList = await this.databaseService.queryWords(wordQuery);
-    return wordDOList.map(wordDO => {
+    return wordDOList.map((wordDO) => {
       return {
         id: wordDO.id,
         word: wordDO.word,

@@ -1,25 +1,25 @@
 import { BaseDO } from "./BaseDO";
 
 export type WordDO = BaseDO & {
-  bookId: number;
+  bookId?: number;
 
   /**
    * word shown in the book
    */
-  word: string;
+  word?: string;
 
   /**
    * the original word of the word shown in the book
    */
-  originalWord: string;
+  originalWord?: string;
 
   /**
    * positions separated by comma
    */
-  positions: string;
+  positions?: string;
 
   /**
    * @see WordStatus
    */
-  status: number;
+  status?: number;
 };

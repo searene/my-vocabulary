@@ -25,9 +25,9 @@ export const getFieldTypes = createAsyncThunk("add/getFieldTypes", async () => {
 
 export const saveCard = createAsyncThunk<
   void,
-  { bookId: number },
+  { word: string; bookId: number },
   { state: State }
->("add/saveCard", async ({ bookId }, { getState }) => {
+>("add/saveCard", async ({ word, bookId }, { getState }) => {
   const fieldTypeIdToFieldVOMap = selectFieldTypeIdToFieldVOMap(getState());
   const fieldContents: Record<number, string> = {};
   for (const [fieldTypeId, fieldVO] of Object.entries(
@@ -35,7 +35,8 @@ export const saveCard = createAsyncThunk<
   )) {
     fieldContents[parseInt(fieldTypeId)] = fieldVO.contents;
   }
-  await serviceProvider.cardFacade.createCard({
+  await serviceProvider.cardFacade.saveCard({
+    word,
     bookId,
     fieldContents,
   });

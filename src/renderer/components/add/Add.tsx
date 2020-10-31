@@ -53,7 +53,7 @@ export function Add(props: AddProps) {
   }, [initiated, dispatch]);
 
   const save = () => {
-    dispatch(saveCard({ bookId }))
+    dispatch(saveCard({ word, bookId }))
       .then(unwrapResult)
       .catch((e) => {
         console.error("An error occurred when dispatching saveCard");
