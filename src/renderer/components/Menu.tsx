@@ -9,22 +9,16 @@ import { useState, useEffect } from "react";
 import { Library } from "./Library";
 import { HashRouter, Route, Switch } from "react-router-dom";
 import { Book } from "./Book";
-import { RouteComponentProps } from "react-router";
-import { Optional } from "typescript-optional";
 import serviceProvider from "../ServiceProvider";
 import history from "../route/History";
 import { Add } from "./add/Add";
+import { RightBar } from "./bar/RightBar";
+import { BarItem } from "./bar/BarItem";
 import { Dictionary } from "./dict/Dictionary";
 
 interface MenuProps {}
 
-interface MenuStates {
-  activeMenuItem: string;
-  bookId: Optional<number>;
-  initiated: boolean;
-}
-
-export const Menu = function (props: MenuProps) {
+export const Menu = function () {
   const [activeMenuItem, setActiveMenuItem] = useState("Library");
   const [bookId, setBookId] = useState<number | undefined>(undefined);
   const [initiated, setInitiated] = useState(false);
@@ -85,7 +79,7 @@ export const Menu = function (props: MenuProps) {
           />
         </SemanticMenu>
       </Grid.Column>
-      <Grid.Column stretched width={14}>
+      <Grid.Column width={8}>
         <Segment>
           <HashRouter>
             <Switch>
@@ -96,12 +90,11 @@ export const Menu = function (props: MenuProps) {
           </HashRouter>
         </Segment>
       </Grid.Column>
-      {/* <Grid.Column>
+      <Grid.Column stretched width={2}>
         <RightBar>
-          <BarItem icon={"book"}
-                    component={<Dictionary/>}/>
+          <BarItem icon={"book"} component={<Dictionary />} />
         </RightBar>
-      </Grid.Column> */}
+      </Grid.Column>
     </Grid>
   );
 };
