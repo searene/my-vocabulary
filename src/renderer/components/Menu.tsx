@@ -16,8 +16,6 @@ import { RightBar } from "./bar/RightBar";
 import { BarItem } from "./bar/BarItem";
 import { Dictionary } from "./dict/Dictionary";
 
-interface MenuProps {}
-
 export const Menu = function () {
   const [activeMenuItem, setActiveMenuItem] = useState("Library");
   const [bookId, setBookId] = useState<number | undefined>(undefined);

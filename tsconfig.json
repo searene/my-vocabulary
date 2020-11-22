@@ -58,6 +58,6 @@
   "include": [
     "./src",
     "./test",
-    "./mocks"
+    "./mocks", "src/renderer/MenuFactory.ts"
   ]
 }
