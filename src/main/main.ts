@@ -1,4 +1,5 @@
-import { app, BrowserView, BrowserWindow } from "electron";
+import { app, Menu as SystemMenu, BrowserWindow } from "electron";
+import { menu } from "./MenuFactory";
 import * as path from "path";
 import * as url from "url";
 import { container } from "./config/inversify.config";
@@ -11,6 +12,7 @@ import { ConfigRepository } from "./infrastructure/repository/ConfigRepository";
 import { CardTypeFactory } from "./domain/card/factory/CardTypeFactory";
 import { CompositionFactory } from "./domain/card/factory/CompositionFactory";
 import * as os from "os";
+import { Menu } from "semantic-ui-react";
 
 async function initialization(): Promise<void> {
   EBookReadAgent.register("epub", EPubBookReader);
@@ -105,6 +107,8 @@ app.on("activate", () => {
     createWindow();
   }
 });
+
+SystemMenu.setApplicationMenu(menu);
 
 exports.bookService = container.get(types.BookService);
 exports.wordService = container.get(types.WordService);
