@@ -1,10 +1,12 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { useDispatch } from "react-redux";
 import { addReducer } from "../components/add/addSlice";
+import { settingsReducer } from "../components/settings/settingsSlice";
 
 const store = configureStore({
   reducer: {
     add: addReducer,
+    settings: settingsReducer,
   },
 });
 

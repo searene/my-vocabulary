@@ -6,6 +6,8 @@ import "semantic-ui-css/semantic.min.css";
 import "./style/style.less";
 import { Provider } from "react-redux";
 import store from "./redux/store";
+import { menu } from "./MenuFactory";
+import { remote } from "electron";
 
 // Create main element
 const mainElement = document.createElement("div");
@@ -24,3 +26,5 @@ const render = (Component: () => JSX.Element) => {
 };
 
 render(Application);
+
+remote.Menu.setApplicationMenu(menu);
