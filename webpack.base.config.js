@@ -24,4 +24,12 @@ module.exports = {
     plugins: [
         new ForkTsCheckerWebpackPlugin(),
     ],
+    module: {
+        rules: [
+            {
+                test: /\.node$/,
+                loader: 'node-loader',
+              },
+        ]
+    }
 };
