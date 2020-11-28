@@ -1,9 +1,12 @@
 #include <napi.h>
 #include <VocabularyService.h>
+#include <DictParserInitializer.h>
+
 
 Napi::Value GetSuggestedWords(const Napi::CallbackInfo& info) {
   Napi::Env env = info.Env();
   std::string word = info[0].As<Napi::String>();
+  DictParserInitializer::init();
   std::vector<UTF8String> suggestedWords = VocabularyService::vocab.getStringPrefixedWith(word, 20);
   Napi::Array result = Napi::Array::New(env);
   for (size_t i = 0; i < suggestedWords.size(); i++) {
