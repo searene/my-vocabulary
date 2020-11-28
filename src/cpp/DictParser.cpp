@@ -6,7 +6,6 @@
 Napi::Value GetSuggestedWords(const Napi::CallbackInfo& info) {
   Napi::Env env = info.Env();
   std::string word = info[0].As<Napi::String>();
-  DictParserInitializer::init();
   std::vector<UTF8String> suggestedWords = VocabularyService::vocab.getStringPrefixedWith(word, 20);
   Napi::Array result = Napi::Array::New(env);
   for (size_t i = 0; i < suggestedWords.size(); i++) {
@@ -37,6 +36,7 @@ Napi::Value Add(const Napi::CallbackInfo& info) {
 }
 
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
+  DictParserInitializer::init();
   exports.Set(Napi::String::New(env, "getSuggestedWords"), Napi::Function::New(env, GetSuggestedWords));
   return exports;
 }
