@@ -11,8 +11,9 @@ export const Definition = (props: DefinitionProps) => {
       style={{
         border: "1px solid #ccc",
       }}
-    >
-      hello
-    </div>
+      dangerouslySetInnerHTML={{
+        __html: serviceProvider.dictService.getHtml(props.word),
+      }}
+    ></div>
   );
 };

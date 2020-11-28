@@ -7,4 +7,8 @@ export class DictService {
   getSuggestedWords(word: string): string[] {
     return DictParser.getSuggestedWords(word);
   }
+
+  getHtml(word: string): string {
+    return DictParser.getHtml(word);
+  }
 }

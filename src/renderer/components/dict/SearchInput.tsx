@@ -32,6 +32,21 @@ export const SearchInput = (props: SearchInputProps) => {
     setSuggestions([]);
   };
 
+  const onSuggestionSelected: Autosuggest.OnSuggestionSelected<string> = (
+    event,
+    { suggestion }
+  ) => {
+    props.onSearch(suggestion);
+  };
+
+  const onInputKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (
+    event
+  ) => {
+    if (event.key === "Enter") {
+      props.onSearch(value);
+    }
+  };
+
   return (
     <Autosuggest
       suggestions={suggestions}
@@ -39,10 +54,12 @@ export const SearchInput = (props: SearchInputProps) => {
       onSuggestionsClearRequested={onSuggestionsClearRequested}
       getSuggestionValue={getSuggestionValue}
       renderSuggestion={renderSuggestion}
+      onSuggestionSelected={onSuggestionSelected}
       inputProps={{
         placeholder: "Please input a word...",
         value,
         onChange,
+        onKeyDown: onInputKeyDown,
       }}
     />
   );
