@@ -34,5 +34,3 @@ module.exports = merge(baseConfig, {
     }
   }
 });
-
-console.dir(module.exports, {depth: null});
