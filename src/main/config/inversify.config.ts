@@ -25,12 +25,14 @@ import { CompositionRepository } from "../infrastructure/repository/CompositionR
 import { KnexCompositionRepository } from "../infrastructure/repository/knex/KnexCompositionRepository";
 import { FieldRepository } from "../infrastructure/repository/FieldRepository";
 import { KnexFieldRepository } from "../infrastructure/repository/knex/KnexFieldRepository";
+import { DictService } from "../dict/DictService";
 
 export const container = new Container({
   defaultScope: "Singleton",
 });
 
 container.bind<WordService>(types.WordService).to(WordServiceImpl);
+container.bind(types.DictService).to(DictService);
 container.bind(WordFormReader).to(WordFormReader);
 container
   .bind<DatabaseService>(types.DatabaseService)

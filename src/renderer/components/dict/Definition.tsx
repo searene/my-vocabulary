@@ -1,7 +1,5 @@
 import * as React from "react";
-console.log("asjdflaskfj");
-console.log(__filename);
-const DictParser = require("node-loader!/home/searene/WebstormProjects/my-vocabulary/build/Release/DictParser.node");
+import serviceProvider from "../../ServiceProvider";
 
 interface DefinitionProps {
   word: string;
@@ -14,7 +12,7 @@ export const Definition = (props: DefinitionProps) => {
         border: "1px solid #ccc",
       }}
     >
-      {DictParser.hello()}
+      {serviceProvider.dictService.hello()}
     </div>
   );
 };

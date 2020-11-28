@@ -109,3 +109,4 @@ app.on("activate", () => {
 exports.bookService = container.get(types.BookService);
 exports.wordService = container.get(types.WordService);
 exports.cardFacade = container.get(types.CardFacade);
+exports.dictService = container.get(types.DictService);

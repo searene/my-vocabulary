@@ -13,4 +13,5 @@ export const types = {
   CompositionRepository: Symbol.for("CompositionRepository"),
   WordRepositoryProvider: Symbol.for("WordRepositoryProvider"),
   CardFacade: Symbol.for("CardFacade"),
+  DictService: Symbol.for("DictService"),
 };
