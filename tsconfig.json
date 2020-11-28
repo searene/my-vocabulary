@@ -57,7 +57,5 @@
   },
   "include": [
     "./src",
-    "./test",
-    "./mocks", "src/renderer/MenuFactory.ts"
   ]
 }

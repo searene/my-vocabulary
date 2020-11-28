@@ -12,6 +12,8 @@ import { CardTypeFactory } from "./domain/card/factory/CardTypeFactory";
 import { CompositionFactory } from "./domain/card/factory/CompositionFactory";
 import * as os from "os";
 
+console.log("here");
+
 async function initialization(): Promise<void> {
   EBookReadAgent.register("epub", EPubBookReader);
   EBookReadAgent.register("txt", PlainTextBookReader);
