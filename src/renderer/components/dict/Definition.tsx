@@ -12,7 +12,7 @@ export const Definition = (props: DefinitionProps) => {
         border: "1px solid #ccc",
       }}
     >
-      {serviceProvider.dictService.hello()}
+      hello
     </div>
   );
 };

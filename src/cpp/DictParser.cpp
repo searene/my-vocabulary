@@ -1,30 +1,41 @@
-// hello.cc using N-API
-#include <node_api.h>
-#include <DictService.h>
+#include <napi.h>
+#include <VocabularyService.h>
 
-namespace demo {
-
-napi_value GetHtml(napi_env env, napi_callback_info args) {
-  napi_value greeting;
-  napi_status status;
-
-  status = napi_create_string_utf8(env, "world", NAPI_AUTO_LENGTH, &greeting);
-  if (status != napi_ok) return nullptr;
-  return greeting;
+Napi::Value GetSuggestedWords(const Napi::CallbackInfo& info) {
+  Napi::Env env = info.Env();
+  std::string word = info[0].As<Napi::String>();
+  std::vector<UTF8String> suggestedWords = VocabularyService::vocab.getStringPrefixedWith(word, 20);
+  Napi::Array result = Napi::Array::New(env);
+  for (size_t i = 0; i < suggestedWords.size(); i++) {
+    result.Set(i, Napi::String::New(env, suggestedWords[i]));
+  }
+  return result;
 }
 
-napi_value init(napi_env env, napi_value exports) {
-  napi_status status;
-  napi_value fn;
+Napi::Value Add(const Napi::CallbackInfo& info) {
+  Napi::Env env = info.Env();
 
-  status = napi_create_function(env, nullptr, 0, GetHtml, nullptr, &fn);
-  if (status != napi_ok) return nullptr;
+  if (info.Length() < 2) {
+    Napi::TypeError::New(env, "Wrong number of arguments")
+        .ThrowAsJavaScriptException();
+    return env.Null();
+  }
 
-  status = napi_set_named_property(env, exports, "hello", fn);
-  if (status != napi_ok) return nullptr;
+  if (!info[0].IsNumber() || !info[1].IsNumber()) {
+    Napi::TypeError::New(env, "Wrong arguments").ThrowAsJavaScriptException();
+    return env.Null();
+  }
+
+  double arg0 = info[0].As<Napi::Number>().DoubleValue();
+  double arg1 = info[1].As<Napi::Number>().DoubleValue();
+  Napi::Number num = Napi::Number::New(env, arg0 + arg1);
+
+  return num;
+}
+
+Napi::Object Init(Napi::Env env, Napi::Object exports) {
+  exports.Set(Napi::String::New(env, "getSuggestedWords"), Napi::Function::New(env, GetSuggestedWords));
   return exports;
 }
 
-NAPI_MODULE(NODE_GYP_MODULE_NAME, init);
-
-}  // namespace demo
+NODE_API_MODULE(addon, Init);

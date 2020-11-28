@@ -1,6 +1,7 @@
 import * as React from "react";
 import * as Autosuggest from "react-autosuggest";
 import { useState } from "react";
+import serviceProvider from "../../ServiceProvider";
 
 interface SearchInputProps {
   value: string;
@@ -23,7 +24,8 @@ export const SearchInput = (props: SearchInputProps) => {
   };
 
   const onSuggestionsFetchRequested = ({ value }: { value: string }) => {
-    setSuggestions(["one", "two"]);
+    const suggestedWords = serviceProvider.dictService.getSuggestedWords(value);
+    setSuggestions(suggestedWords);
   };
 
   const onSuggestionsClearRequested = () => {
