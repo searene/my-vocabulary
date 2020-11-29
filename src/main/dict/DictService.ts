@@ -15,7 +15,15 @@ export class DictService {
   /**
    * Get resource contents.
    */
-  async getResource(url: string): Promise<Buffer> {
-    return Promise.resolve(DictParser.getResource(url));
+  async getResource(resourceUrl: string): Promise<Buffer> {
+    return Promise.resolve(DictParser.getResource(resourceUrl));
+  }
+
+  static getResourceMimeType(resourceUrl: string): string {
+    return DictParser.getResourceMimeType(resourceUrl);
+  }
+
+  static getResourceUrlProtocol(): string {
+    return DictParser.getResourceUrlProtocol();
   }
 }

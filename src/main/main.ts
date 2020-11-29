@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, protocol } from "electron";
 import * as path from "path";
 import * as url from "url";
 import { container } from "./config/inversify.config";
@@ -11,6 +11,8 @@ import { ConfigRepository } from "./infrastructure/repository/ConfigRepository";
 import { CardTypeFactory } from "./domain/card/factory/CardTypeFactory";
 import { CompositionFactory } from "./domain/card/factory/CompositionFactory";
 import * as os from "os";
+import * as fs from "fs-extra";
+import { DictService } from "./dict/DictService";
 
 async function initialization(): Promise<void> {
   EBookReadAgent.register("epub", EPubBookReader);
@@ -106,9 +108,32 @@ app.on("activate", () => {
   }
 });
 
-app.whenReady().then(() => {});
+const dictService = container.get<DictService>(types.DictService);
+
+app.whenReady().then(() => {
+  protocol.registerBufferProtocol(
+    DictService.getResourceUrlProtocol(),
+    (request, callback) => {
+      const resourceMimeType = DictService.getResourceMimeType(request.url);
+      dictService
+        .getResource(request.url)
+        .then((resourceContents) => {
+          // fs.writeFileSync("/home/searene/Downloads/test.jpg", resourceContents);
+          callback({
+            mimeType: resourceMimeType,
+            data: resourceContents,
+          });
+        })
+        .catch((reason) => {
+          throw new Error(
+            "Error occurred in DictService::getResource, reason: " + reason
+          );
+        });
+    }
+  );
+});
 
 exports.bookService = container.get(types.BookService);
 exports.wordService = container.get(types.WordService);
 exports.cardFacade = container.get(types.CardFacade);
-exports.dictService = container.get(types.DictService);
+exports.dictService = dictService;
