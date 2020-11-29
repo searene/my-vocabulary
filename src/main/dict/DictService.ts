@@ -4,11 +4,18 @@ const DictParser = require("../../../build/Release/DictParser.node");
 
 @injectable()
 export class DictService {
-  getSuggestedWords(word: string): string[] {
-    return DictParser.getSuggestedWords(word);
+  async getSuggestedWords(word: string): Promise<string[]> {
+    return Promise.resolve(DictParser.getSuggestedWords(word));
   }
 
-  getHtml(word: string): string {
-    return DictParser.getHtml(word);
+  async getHtml(word: string): Promise<string> {
+    return Promise.resolve(DictParser.getHtml(word));
+  }
+
+  /**
+   * Get resource contents.
+   */
+  async getResource(url: string): Promise<Buffer> {
+    return Promise.resolve(DictParser.getResource(url));
   }
 }

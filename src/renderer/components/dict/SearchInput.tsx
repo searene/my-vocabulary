@@ -23,8 +23,10 @@ export const SearchInput = (props: SearchInputProps) => {
     setValue(newValue);
   };
 
-  const onSuggestionsFetchRequested = ({ value }: { value: string }) => {
-    const suggestedWords = serviceProvider.dictService.getSuggestedWords(value);
+  const onSuggestionsFetchRequested = async ({ value }: { value: string }) => {
+    const suggestedWords = await serviceProvider.dictService.getSuggestedWords(
+      value
+    );
     setSuggestions(suggestedWords);
   };
 

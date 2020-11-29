@@ -106,6 +106,8 @@ app.on("activate", () => {
   }
 });
 
+app.whenReady().then(() => {});
+
 exports.bookService = container.get(types.BookService);
 exports.wordService = container.get(types.WordService);
 exports.cardFacade = container.get(types.CardFacade);

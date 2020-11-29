@@ -2,6 +2,9 @@
 #include <VocabularyService.h>
 #include <DictService.h>
 #include <DictParserInitializer.h>
+#include <ResourceReader.h>
+#include <common_helper/FileHelper.h>
+#include <DictFinder.h>
 
 Napi::Value GetSuggestedWords(const Napi::CallbackInfo& info) {
   Napi::Env env = info.Env();
@@ -19,6 +22,17 @@ Napi::Value GetHtml(const Napi::CallbackInfo& info) {
   std::string word = info[0].As<Napi::String>();
   std::string html = DictService::getHtml(word);
   return Napi::String::New(env, html);
+}
+
+Napi::Value GetResource(const Napi::CallbackInfo& info) {
+  Napi::Env env = info.Env();
+  std::string url = info[0].As<Napi::String>();
+  std::optional<std::vector<char>> resourceContents = ResourceReader::readResource(url);
+  if (resourceContents == std::nullopt) {
+    throw Napi::Error::New(env, "resource is not available, url: " + url);
+  }
+  return Napi::Buffer<char>::New(env, reinterpret_cast<char*>(&(*resourceContents)[0]),
+      resourceContents->size());
 }
 
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
