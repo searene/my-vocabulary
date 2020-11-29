@@ -24,12 +24,19 @@ export const Field = (props: FieldProps) => {
       })
     );
   };
+  const handleRichEditorChange = (value: string) => {
+    dispatch(
+      changeFieldContents({
+        fieldTypeId: props.fieldTypeId,
+        contents: value,
+      })
+    );
+  };
 
   return (
     <div>
       <span>{props.fieldName}: </span>
-      <input value={fieldVO.contents} onChange={handleChange} />
-      <RichEditor value={contents} onChange={setContents} />
+      <RichEditor value={fieldVO.contents} onChange={handleRichEditorChange} />
     </div>
   );
 };

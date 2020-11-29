@@ -6,6 +6,7 @@
 #include <common_helper/FileHelper.h>
 #include <DictFinder.h>
 #include <Resource.h>
+#include <common_helper/FileHelper.h>
 
 Napi::Value GetSuggestedWords(const Napi::CallbackInfo& info) {
   Napi::Env env = info.Env();
@@ -32,8 +33,12 @@ Napi::Value GetResource(const Napi::CallbackInfo& info) {
   if (resourceContents == std::nullopt) {
     throw Napi::Error::New(env, "resource is not available, url: " + url);
   }
-  return Napi::Buffer<char>::New(env, reinterpret_cast<char*>(&(*resourceContents)[0]),
-      resourceContents->size());
+//  std::ofstream outFile("/home/searene/Downloads/apple.jpg");
+//  outFile.write(resourceContents->data(), resourceContents->size());
+//  std::cout << "incpp" << std::endl;
+//  std::cout << resourceContents->size() << std::endl;
+//  std::cout << std::hex << static_cast<int>(static_cast<unsigned char>(resourceContents->at(0))) << std::endl;
+  return Napi::Buffer<char>::New(env, resourceContents->data(), resourceContents->size());
 }
 
 Napi::Value GetResourceUrlProtocol(const Napi::CallbackInfo& info) {

@@ -118,7 +118,10 @@ app.whenReady().then(() => {
       dictService
         .getResource(request.url)
         .then((resourceContents) => {
-          // fs.writeFileSync("/home/searene/Downloads/test.jpg", resourceContents);
+          fs.writeFileSync(
+            "/home/searene/Downloads/appleInNodeJS.jpg",
+            resourceContents
+          );
           callback({
             mimeType: resourceMimeType,
             data: resourceContents,

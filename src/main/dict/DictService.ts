@@ -16,7 +16,11 @@ export class DictService {
    * Get resource contents.
    */
   async getResource(resourceUrl: string): Promise<Buffer> {
-    return Promise.resolve(DictParser.getResource(resourceUrl));
+    const resource: Buffer = DictParser.getResource(resourceUrl);
+    // console.log("in nodeJS");
+    // console.log(resource.length);
+    // console.log(resource.readUInt8())
+    return Promise.resolve(resource);
   }
 
   static getResourceMimeType(resourceUrl: string): string {
