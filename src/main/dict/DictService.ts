@@ -17,9 +17,6 @@ export class DictService {
    */
   async getResource(resourceUrl: string): Promise<Buffer> {
     const resource: Buffer = DictParser.getResource(resourceUrl);
-    // console.log("in nodeJS");
-    // console.log(resource.length);
-    // console.log(resource.readUInt8())
     return Promise.resolve(resource);
   }
 

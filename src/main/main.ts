@@ -11,7 +11,6 @@ import { ConfigRepository } from "./infrastructure/repository/ConfigRepository";
 import { CardTypeFactory } from "./domain/card/factory/CardTypeFactory";
 import { CompositionFactory } from "./domain/card/factory/CompositionFactory";
 import * as os from "os";
-import * as fs from "fs-extra";
 import { DictService } from "./dict/DictService";
 
 async function initialization(): Promise<void> {
@@ -118,10 +117,6 @@ app.whenReady().then(() => {
       dictService
         .getResource(request.url)
         .then((resourceContents) => {
-          fs.writeFileSync(
-            "/home/searene/Downloads/appleInNodeJS.jpg",
-            resourceContents
-          );
           callback({
             mimeType: resourceMimeType,
             data: resourceContents,

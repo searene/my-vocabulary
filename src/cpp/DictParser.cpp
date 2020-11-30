@@ -33,12 +33,7 @@ Napi::Value GetResource(const Napi::CallbackInfo& info) {
   if (resourceContents == std::nullopt) {
     throw Napi::Error::New(env, "resource is not available, url: " + url);
   }
-//  std::ofstream outFile("/home/searene/Downloads/apple.jpg");
-//  outFile.write(resourceContents->data(), resourceContents->size());
-//  std::cout << "incpp" << std::endl;
-//  std::cout << resourceContents->size() << std::endl;
-//  std::cout << std::hex << static_cast<int>(static_cast<unsigned char>(resourceContents->at(0))) << std::endl;
-  return Napi::Buffer<char>::New(env, resourceContents->data(), resourceContents->size());
+  return Napi::Buffer<char>::Copy(env, resourceContents->data(), resourceContents->size());
 }
 
 Napi::Value GetResourceUrlProtocol(const Napi::CallbackInfo& info) {
