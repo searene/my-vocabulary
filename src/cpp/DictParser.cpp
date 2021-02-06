@@ -2,10 +2,9 @@
 #include <VocabularyService.h>
 #include <DictService.h>
 #include <DictParserInitializer.h>
-#include <ResourceReader.h>
 #include <common_helper/FileHelper.h>
 #include <DictFinder.h>
-#include <Resource.h>
+#include <resource/Resource.h>
 #include <common_helper/FileHelper.h>
 
 Napi::Value GetSuggestedWords(const Napi::CallbackInfo& info) {
@@ -29,7 +28,11 @@ Napi::Value GetHtml(const Napi::CallbackInfo& info) {
 Napi::Value GetResource(const Napi::CallbackInfo& info) {
   Napi::Env env = info.Env();
   std::string url = info[0].As<Napi::String>();
-  std::optional<std::vector<char>> resourceContents = ResourceReader::readResource(url);
+  std::optional<std::unique_ptr<Resource>> resource = Resource::getResource(url);
+  if (resource == std::nullopt || resource == std::nullopt) {
+    throw Napi::Error::New(env, "resource is not available, url: " + url);
+  }
+  std::optional<std::vector<char>> resourceContents = (*resource)->getContentsAsBinaryData();
   if (resourceContents == std::nullopt) {
     throw Napi::Error::New(env, "resource is not available, url: " + url);
   }
@@ -45,7 +48,11 @@ Napi::Value GetResourceUrlProtocol(const Napi::CallbackInfo& info) {
 Napi::Value GetResourceMimeType(const Napi::CallbackInfo& info) {
   Napi::Env env = info.Env();
   const UTF8String& resourceUrl = info[0].As<Napi::String>();
-  return Napi::String::New(env, Resource(resourceUrl).getMimeType());
+  std::optional<std::unique_ptr<Resource>> resource = Resource::getResource(resourceUrl);
+  if (resource == std::nullopt || resource == std::nullopt) {
+    throw Napi::Error::New(env, "resource is not available, url: " + resourceUrl);
+  }
+  return Napi::String::New(env, (*resource)->getMimeType());
 }
 
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
