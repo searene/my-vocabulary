@@ -17,6 +17,11 @@ export class DictService {
    */
   async getResource(resourceUrl: string): Promise<Buffer> {
     const resource: Buffer = DictParser.getResource(resourceUrl);
+    if (resourceUrl.indexOf("speaker.svg") > -1) {
+      console.log(
+        `Get resource successfully, resourceUrl: ${resourceUrl}, contents: ${resource.toString()}`
+      );
+    }
     return Promise.resolve(resource);
   }
 

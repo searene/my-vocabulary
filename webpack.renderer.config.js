@@ -2,8 +2,6 @@ const webpack = require('webpack');
 const { merge } = require('webpack-merge');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
-
 
 const baseConfig = require('./webpack.base.config');
 
@@ -81,7 +79,9 @@ module.exports = merge(baseConfig, {
         ]
     },
     plugins: [
-        new HtmlWebpackPlugin(),
+        new HtmlWebpackPlugin({
+            template: "src/template.html"
+        }),
         new webpack.DefinePlugin({
             'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
         }),
@@ -91,10 +91,5 @@ module.exports = merge(baseConfig, {
             filename: '[name].css',
             chunkFilename: '[id].css',
         }),
-        new CopyWebpackPlugin({
-            patterns: [{
-              from: "resources/speaker.svg"
-            }]
-        })
     ]
 });

@@ -109,6 +109,14 @@ app.on("activate", () => {
 
 const dictService = container.get<DictService>(types.DictService);
 
+protocol.registerSchemesAsPrivileged([
+  {
+    scheme: DictService.getResourceUrlProtocol(),
+    privileges: {
+      supportFetchAPI: true,
+    },
+  },
+]);
 app.whenReady().then(() => {
   protocol.registerBufferProtocol(
     DictService.getResourceUrlProtocol(),
