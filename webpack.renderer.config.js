@@ -2,6 +2,8 @@ const webpack = require('webpack');
 const { merge } = require('webpack-merge');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+
 
 const baseConfig = require('./webpack.base.config');
 
@@ -88,6 +90,11 @@ module.exports = merge(baseConfig, {
             // both options are optional
             filename: '[name].css',
             chunkFilename: '[id].css',
+        }),
+        new CopyWebpackPlugin({
+            patterns: [{
+              from: "resources/speaker.svg"
+            }]
         })
     ]
 });
