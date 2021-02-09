@@ -1,5 +1,5 @@
 import { injectable } from "@parisholley/inversify-async";
-import { CardFacade, FieldTypeVO, SaveCardParam } from "./CardFacade";
+import { CardFacade, CardVO, FieldTypeVO, SaveCardParam } from "./CardFacade";
 import { CardFactory } from "../domain/card/factory/CardFactory";
 import { FieldTypeFactory } from "../domain/card/factory/FieldTypeFactory";
 import { FieldFactory } from "../domain/card/factory/FieldFactory";
@@ -37,5 +37,13 @@ export class CardFacadeImpl implements CardFacade {
 
   private async getWordRepository(): Promise<WordRepository> {
     return container.getAsync(types.WordRepository);
+  }
+
+  getNextReviewCardByBookId(bookId: number): Promise<CardVO | undefined> {
+    return Promise.resolve({
+      id: 1,
+      front: "This is front.",
+      back: "This is back.",
+    });
   }
 }

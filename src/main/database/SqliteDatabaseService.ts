@@ -112,7 +112,7 @@ export class SqliteDatabaseService implements DatabaseService {
         originalWord: row.original_word,
         positions: (row.positions as string)
           .split(",")
-          .map(pos => parseInt(pos)),
+          .map((pos) => parseInt(pos)),
         status: row.status,
       });
     }
@@ -175,6 +175,7 @@ export class SqliteDatabaseService implements DatabaseService {
         wordCount.known = row.cnt;
       }
     }
+    console.log(wordCount);
     return wordCount;
   }
 
@@ -266,7 +267,7 @@ export class SqliteDatabaseService implements DatabaseService {
   private async run(sql: string, params?: any): Promise<RunResult> {
     const watchDog = new WatchDog(sql + ", params: " + JSON.stringify(params));
     return new Promise<RunResult>((resolve, reject) => {
-      this.db.run(sql, params, function(err) {
+      this.db.run(sql, params, function (err) {
         if (err != null) {
           reject(err);
         } else {

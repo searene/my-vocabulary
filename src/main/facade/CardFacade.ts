@@ -14,6 +14,17 @@ export type FieldTypeVO = {
   id: number;
   name: string;
 };
+
+export type CardVO = {
+  /**
+   * card id
+   */
+  id: number;
+
+  front: string;
+
+  back: string;
+};
 export interface CardFacade {
   /**
    * Get field types of the given cardType, if no cardType was given,
@@ -26,4 +37,6 @@ export interface CardFacade {
    * @returns cardId
    */
   saveCard(saveCardParam: SaveCardParam): Promise<number>;
+
+  getNextReviewCardByBookId(bookId: number): Promise<CardVO | undefined>;
 }

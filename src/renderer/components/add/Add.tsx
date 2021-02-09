@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Button, Grid } from "semantic-ui-react";
 import { RouteComponentProps } from "react-router";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { useState, useEffect } from "react";
 import {
   getFieldTypes,
@@ -43,19 +43,13 @@ export function Add(props: AddProps) {
 
   useEffect(() => {
     if (!initiated) {
-      dispatch(getFieldTypes())
-        .then(unwrapResult)
-        .catch((e) => {
-          console.error("An error occurred when dispatching getFieldTypes");
-          console.error(e);
-        });
+      dispatch(getFieldTypes());
     }
     setInitiated(true);
   }, [initiated, dispatch]);
 
   const save = () => {
     dispatch(saveCard({ word, bookId }))
-      .then(unwrapResult)
       .then(() => Router.toBookPage(bookId))
       .catch((e) => {
         console.error("An error occurred when dispatching saveCard");

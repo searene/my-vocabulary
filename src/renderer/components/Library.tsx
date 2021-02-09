@@ -131,7 +131,9 @@ export function Library(props: LibraryProps) {
                 </Modal.Actions>
               </Modal>
               <Table.Cell>
-                <Button>Review</Button>
+                <Button onClick={() => Router.toReviewPage(book.id)}>
+                  Review
+                </Button>
               </Table.Cell>
             </Table.Row>
           ))}
