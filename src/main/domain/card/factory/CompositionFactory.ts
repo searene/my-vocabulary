@@ -16,7 +16,7 @@ export class CompositionFactory {
   ): Promise<Composition> {
     const compositionRepository = await this.getCompositionRepository();
     const compositions = await compositionRepository.query({
-      cardTypeId: frontFieldType.cardTypeId,
+      cardTypeId: frontFieldType.cardType.id,
     });
     if (compositions.length > 1) {
       return this.fromCompositionDO(compositions[0]);
@@ -25,7 +25,7 @@ export class CompositionFactory {
       name: "normal",
       frontTypeIds: `${frontFieldType.id}`,
       backTypeIds: `${backFieldType.id}`,
-      cardTypeId: frontFieldType.cardTypeId,
+      cardTypeId: frontFieldType.cardType.id,
     });
     return this.fromCompositionDO(compositionDO);
   }

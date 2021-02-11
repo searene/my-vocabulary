@@ -38,7 +38,7 @@ export class CardTypeFactory {
       throw new Error("cardTypes.length should be 1.");
     }
     const cardTypeDO = cardTypeDOArray[0];
-    return this.fromCardTypeDO(cardTypeDO);
+    return CardType.fromCardTypeDO(cardTypeDO);
   }
 
   async createInitialCardType(): Promise<CardType> {
@@ -51,13 +51,13 @@ export class CardTypeFactory {
           id: defaultCardTypeId,
         })
       )[0];
-      return this.fromCardTypeDO(defaultCardTypeDO);
+      return CardType.fromCardTypeDO(defaultCardTypeDO);
     }
     const cardTypeDO = await cardTypeRepository.insert({
       name: "normal",
     });
     await configRepository.setDefaultCardTypeId(cardTypeDO.id as number);
-    return this.fromCardTypeDO(cardTypeDO);
+    return CardType.fromCardTypeDO(cardTypeDO);
   }
 
   static get() {
@@ -73,9 +73,5 @@ export class CardTypeFactory {
 
   private async getCardTypeRepository(): Promise<CardTypeRepository> {
     return await container.getAsync(types.CardTypeRepository);
-  }
-
-  private fromCardTypeDO(cardTypeDO: CardTypeDO): CardType {
-    return CardType.get(cardTypeDO.id as number, cardTypeDO.name as string);
   }
 }

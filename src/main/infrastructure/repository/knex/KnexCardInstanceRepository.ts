@@ -5,8 +5,6 @@ import { CardInstanceQuery } from "../../query/CardInstanceQuery";
 import { injectable } from "@parisholley/inversify-async";
 import { Options } from "../../query/Options";
 import { RepositoryUtils } from "../RepositoryUtils";
-import { Simulate } from "react-dom/test-utils";
-import wheel = Simulate.wheel;
 
 const knex = KnexFactory.knex;
 

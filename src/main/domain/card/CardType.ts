@@ -1,3 +1,5 @@
+import { CardTypeDO } from "../../infrastructure/do/CardTypeDO";
+
 export class CardType {
   private constructor(
     // CardType id
@@ -16,5 +18,9 @@ export class CardType {
 
   get name(): string {
     return this._name;
+  }
+
+  static fromCardTypeDO(cardTypeDO: CardTypeDO): CardType {
+    return CardType.get(cardTypeDO.id as number, cardTypeDO.name as string);
   }
 }

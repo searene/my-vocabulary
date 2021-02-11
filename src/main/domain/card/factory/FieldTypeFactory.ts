@@ -24,7 +24,11 @@ export class FieldTypeFactory {
     const fieldTypeDOs = await fieldTypeRepository.query({
       cardTypeId,
     });
-    return fieldTypeDOs.map(fieldTypeDO => this.fromFieldTypeDO(fieldTypeDO));
+    return await Promise.all(
+      fieldTypeDOs.map(
+        async (fieldTypeDO) => await FieldType.fromFieldTypeDO(fieldTypeDO)
+      )
+    );
   }
 
   async createInitialFieldTypes(
@@ -36,7 +40,11 @@ export class FieldTypeFactory {
     });
     if (fieldTypeDOs.length > 0) {
       // The initial field types already exist
-      return fieldTypeDOs.map(fieldTypeDO => this.fromFieldTypeDO(fieldTypeDO));
+      return await Promise.all(
+        fieldTypeDOs.map(
+          async (fieldTypeDO) => await FieldType.fromFieldTypeDO(fieldTypeDO)
+        )
+      );
     }
     const frontFieldDO = await fieldTypeRepository.insert({
       name: "front",
@@ -48,10 +56,9 @@ export class FieldTypeFactory {
       category: "text",
       cardTypeId: initialCardTypeId,
     });
-    return [
-      this.fromFieldTypeDO(frontFieldDO),
-      this.fromFieldTypeDO(backFieldDO),
-    ];
+    const frontField = await FieldType.fromFieldTypeDO(frontFieldDO);
+    const backField = await FieldType.fromFieldTypeDO(backFieldDO);
+    return [frontField, backField];
   }
 
   static get(): FieldTypeFactory {
@@ -63,14 +70,5 @@ export class FieldTypeFactory {
 
   private async getFieldTypeRepository(): Promise<FieldTypeRepository> {
     return container.getAsync(types.FieldTypeRepository);
-  }
-
-  private fromFieldTypeDO(fieldTypeDO: FieldTypeDO): FieldType {
-    return new FieldType(
-      fieldTypeDO.id as number,
-      fieldTypeDO.name as string,
-      fieldTypeDO.cardTypeId as number,
-      fieldTypeDO.category as FieldTypeCategory
-    );
   }
 }

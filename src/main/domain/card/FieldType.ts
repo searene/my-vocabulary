@@ -1,10 +1,18 @@
 import { FieldTypeCategory } from "../../infrastructure/common/FieldTypeCategory";
+import { CardType } from "./CardType";
+import { FieldTypeDO } from "../../infrastructure/do/FieldTypeDO";
+import { ReviewRepository } from "../../infrastructure/repository/ReviewRepository";
+import { container } from "../../config/inversify.config";
+import { types } from "../../config/types";
+import { FieldRepository } from "../../infrastructure/repository/FieldRepository";
+import { FieldTypeRepository } from "../../infrastructure/repository/FieldTypeRepository";
+import { CardTypeRepository } from "../../infrastructure/repository/CardTypeRepository";
 
 export class FieldType {
   constructor(
     private readonly _id: number,
     private readonly _name: string,
-    private readonly _cardTypeId: number,
+    private readonly _cardType: CardType,
     private readonly _category: FieldTypeCategory
   ) {}
 
@@ -14,10 +22,29 @@ export class FieldType {
   public get name(): string {
     return this._name;
   }
-  public get cardTypeId(): number {
-    return this._cardTypeId;
+  public get cardType(): CardType {
+    return this._cardType;
   }
   public get category(): FieldTypeCategory {
     return this._category;
+  }
+
+  static async fromFieldTypeDO(fieldTypeDO: FieldTypeDO): Promise<FieldType> {
+    const cardTypeRepo: CardTypeRepository = await container.getAsync(
+      types.CardTypeRepository
+    );
+    const cardTypeDO = await cardTypeRepo.queryById(
+      fieldTypeDO.cardTypeId as number
+    );
+    if (cardTypeDO == undefined) {
+      throw new Error("Invalid cardType id: " + fieldTypeDO.cardTypeId);
+    }
+    const cardType = CardType.fromCardTypeDO(cardTypeDO);
+    return new FieldType(
+      fieldTypeDO.id as number,
+      fieldTypeDO.name as string,
+      cardType,
+      fieldTypeDO.category as FieldTypeCategory
+    );
   }
 }
