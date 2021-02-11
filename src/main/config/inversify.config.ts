@@ -26,6 +26,13 @@ import { KnexCompositionRepository } from "../infrastructure/repository/knex/Kne
 import { FieldRepository } from "../infrastructure/repository/FieldRepository";
 import { KnexFieldRepository } from "../infrastructure/repository/knex/KnexFieldRepository";
 import { DictService } from "../dict/DictService";
+import { KnexCardInstanceRepository } from "../infrastructure/repository/knex/KnexCardInstanceRepository";
+import { CardInstance } from "../domain/card/instance/CardInstance";
+import { CardInstanceRepository } from "../infrastructure/repository/CardInstanceRepository";
+import { ReviewRepository } from "../infrastructure/repository/ReviewRepository";
+import { KnexReviewRepository } from "../infrastructure/repository/knex/KnexReviewRepository";
+import { Scheduler } from "../domain/scheduler/Scheduler";
+import { DefaultScheduler } from "../domain/scheduler/DefaultScheduler";
 
 export const container = new Container({
   defaultScope: "Singleton",
@@ -76,6 +83,20 @@ container
     return cardRepository;
   });
 container
+  .bind<CardInstanceRepository>(types.CardInstanceRepository)
+  .to(KnexCardInstanceRepository)
+  .onActivation(async (_, cardInstanceRepository) => {
+    await cardInstanceRepository.init();
+    return cardInstanceRepository;
+  });
+container
+  .bind<ReviewRepository>(types.ReviewRepository)
+  .to(KnexReviewRepository)
+  .onActivation(async (_, reviewRepository) => {
+    await reviewRepository.init();
+    return reviewRepository;
+  });
+container
   .bind<WordRepository>(types.WordRepository)
   .to(KnexWordRepository)
   .onActivation(async (_, wordRepository) => {
@@ -89,3 +110,4 @@ container
     await compositionRepository.init();
     return compositionRepository;
   });
+container.bind<Scheduler>(types.Scheduler).to(DefaultScheduler);

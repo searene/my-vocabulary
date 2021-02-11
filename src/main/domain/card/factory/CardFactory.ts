@@ -10,9 +10,6 @@ import { assert } from "../../../utils/Assert";
 import { Card } from "../Card";
 
 export class CardFactory {
-  /**
-   * @param fieldContents fieldTypeId -> field contents
-   */
   async createCard(bookId: number, cardTypeId?: number): Promise<Card> {
     const cardRepository = await this.getCardRepository();
     if (cardTypeId === undefined) {

@@ -6,6 +6,7 @@ import { injectable } from "@parisholley/inversify-async";
 import { Options } from "../../query/Options";
 import { RepositoryUtils } from "../RepositoryUtils";
 import { assert } from "../../../utils/Assert";
+import { CardInstanceDO } from "../../do/CardInstanceDO";
 
 @injectable()
 export class KnexConfigRepository implements ConfigRepository {
@@ -69,5 +70,9 @@ export class KnexConfigRepository implements ConfigRepository {
       query,
       options
     );
+  }
+
+  async queryById(id: number): Promise<CardInstanceDO | undefined> {
+    return await RepositoryUtils.queryById(KnexConfigRepository._CONFIGS, id);
   }
 }

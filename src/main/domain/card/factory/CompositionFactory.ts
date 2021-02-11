@@ -23,8 +23,8 @@ export class CompositionFactory {
     }
     const compositionDO = await compositionRepository.insert({
       name: "normal",
-      front: `${frontFieldType.id}`,
-      back: `${backFieldType.id}`,
+      frontTypeIds: `${frontFieldType.id}`,
+      backTypeIds: `${backFieldType.id}`,
       cardTypeId: frontFieldType.cardTypeId,
     });
     return this.fromCompositionDO(compositionDO);
@@ -35,8 +35,8 @@ export class CompositionFactory {
       compositionDO.id as number,
       compositionDO.name as string,
       compositionDO.cardTypeId as number,
-      compositionDO.front as string,
-      compositionDO.back as string
+      compositionDO.frontTypeIds as string,
+      compositionDO.backTypeIds as string
     );
   }
 

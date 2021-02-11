@@ -1,4 +1,4 @@
-import { CardVO } from "../../../main/facade/CardFacade";
+import { CardInstanceVO } from "../../../main/facade/CardFacade";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import serviceProvider from "../../ServiceProvider";
 
@@ -7,18 +7,20 @@ interface State {
 }
 
 interface ReviewState {
-  reviewCard: CardVO | undefined;
+  reviewCard: CardInstanceVO | undefined;
 }
 const initialState: ReviewState = {
   reviewCard: undefined,
 };
 
 export const getNextReviewCard = createAsyncThunk<
-  CardVO | undefined,
+  CardInstanceVO | undefined,
   { bookId: number },
   { state: State }
 >("review/getNextReviewCard", async ({ bookId }) => {
-  return await serviceProvider.cardFacade.getNextReviewCardByBookId(bookId);
+  return await serviceProvider.cardFacade.getNextReviewCardInstanceByBookId(
+    bookId
+  );
 });
 
 const reviewSlice = createSlice({

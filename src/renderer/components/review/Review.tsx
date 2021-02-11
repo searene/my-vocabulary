@@ -1,7 +1,7 @@
 import { RouteComponentProps } from "react-router";
 import { useSelector } from "react-redux";
 import { getNextReviewCard, selectReviewCard } from "./reviewSlice";
-import { CardVO } from "../../../main/facade/CardFacade";
+import { CardInstanceVO } from "../../../main/facade/CardFacade";
 import { useEffect, useState } from "react";
 import * as React from "react";
 import { useAppDispatch } from "../../redux/store";
@@ -17,7 +17,7 @@ export function Review(props: ReviewProps) {
   const bookId = parseInt(props.match.params.bookId);
   const [initiated, setInitiated] = useState(false);
 
-  const reviewCard: CardVO | undefined = useSelector(selectReviewCard);
+  const reviewCard: CardInstanceVO | undefined = useSelector(selectReviewCard);
 
   const dispatch = useAppDispatch();
   useEffect(() => {

@@ -1,3 +1,5 @@
+import { TimeInterval } from "../domain/time/TimeInterval";
+
 export type SaveCardParam = {
   word: string;
 
@@ -15,15 +17,17 @@ export type FieldTypeVO = {
   name: string;
 };
 
-export type CardVO = {
+export type CardInstanceVO = {
   /**
-   * card id
+   * cardInstance id
    */
   id: number;
 
   front: string;
 
   back: string;
+
+  reviewTimeMap: Map<Level, TimeInterval>;
 };
 export interface CardFacade {
   /**
@@ -38,5 +42,7 @@ export interface CardFacade {
    */
   saveCard(saveCardParam: SaveCardParam): Promise<number>;
 
-  getNextReviewCardByBookId(bookId: number): Promise<CardVO | undefined>;
+  getNextReviewCardInstanceByBookId(
+    bookId: number
+  ): Promise<CardInstanceVO | undefined>;
 }

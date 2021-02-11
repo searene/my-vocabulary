@@ -11,6 +11,8 @@ export interface BaseRepository<Q extends BaseQuery, D extends BaseDO> {
 
   query(query: Q, options?: Options): Promise<D[]>;
 
+  queryById(id: number): Promise<D | undefined>;
+
   batchQueryByIds(id: number[], options?: Options): Promise<D[]>;
 
   createTableIfNotExists(): Promise<void>;

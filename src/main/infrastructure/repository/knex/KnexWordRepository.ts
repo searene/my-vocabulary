@@ -6,6 +6,7 @@ import { WordQuery } from "../../query/WordQuery";
 import { RepositoryUtils } from "../RepositoryUtils";
 import { WordRepository } from "../WordRepository";
 import { knex } from "./KnexFactory";
+import { CardInstanceDO } from "../../do/CardInstanceDO";
 
 @injectable()
 export class KnexWordRepository implements WordRepository {
@@ -67,5 +68,9 @@ export class KnexWordRepository implements WordRepository {
           status: 1,
         });
     }
+  }
+
+  async queryById(id: number): Promise<CardInstanceDO | undefined> {
+    return await RepositoryUtils.queryById(KnexWordRepository._WORDS, id);
   }
 }

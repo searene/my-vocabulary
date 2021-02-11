@@ -5,6 +5,7 @@ import { Options } from "../../query/Options";
 import { FieldRepository } from "../FieldRepository";
 import { RepositoryUtils } from "../RepositoryUtils";
 import { knex } from "./KnexFactory";
+import { CardInstanceDO } from "../../do/CardInstanceDO";
 
 @injectable()
 export class KnexFieldRepository implements FieldRepository {
@@ -50,5 +51,9 @@ export class KnexFieldRepository implements FieldRepository {
   }
   async batchQueryByIds(id: number[]): Promise<FieldDO[]> {
     throw new Error("Method not implemented.");
+  }
+
+  async queryById(id: number): Promise<CardInstanceDO | undefined> {
+    return await RepositoryUtils.queryById(KnexFieldRepository._FIELDS, id);
   }
 }

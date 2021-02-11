@@ -1,5 +1,10 @@
 import { injectable } from "@parisholley/inversify-async";
-import { CardFacade, CardVO, FieldTypeVO, SaveCardParam } from "./CardFacade";
+import {
+  CardFacade,
+  CardInstanceVO,
+  FieldTypeVO,
+  SaveCardParam,
+} from "./CardFacade";
 import { CardFactory } from "../domain/card/factory/CardFactory";
 import { FieldTypeFactory } from "../domain/card/factory/FieldTypeFactory";
 import { FieldFactory } from "../domain/card/factory/FieldFactory";
@@ -7,6 +12,9 @@ import { types } from "../config/types";
 import { WordStatus } from "../enum/WordStatus";
 import { WordRepository } from "../infrastructure/repository/WordRepository";
 import { container } from "../config/inversify.config";
+import { Scheduler } from "../domain/scheduler/Scheduler";
+import { CardInstanceRepository } from "../infrastructure/repository/CardInstanceRepository";
+import { CardInstance } from "../domain/card/instance/CardInstance";
 
 @injectable()
 export class CardFacadeImpl implements CardFacade {
@@ -39,11 +47,22 @@ export class CardFacadeImpl implements CardFacade {
     return container.getAsync(types.WordRepository);
   }
 
-  getNextReviewCardByBookId(bookId: number): Promise<CardVO | undefined> {
-    return Promise.resolve({
-      id: 1,
-      front: "This is front.",
-      back: "This is back.",
-    });
+  async getNextReviewCardInstanceByBookId(
+    bookId: number
+  ): Promise<CardInstanceVO | undefined> {
+    const cardInstanceRepository = container.get<CardInstanceRepository>(
+      types.CardInstanceRepository
+    );
+    const dueCardInstanceDO = await cardInstanceRepository.queryNextDueCardInstance(
+      bookId
+    );
+    if (dueCardInstanceDO == undefined) {
+      return undefined;
+    }
+    const dueCardInstance = await CardInstance.fromCardInstanceDO(
+      dueCardInstanceDO
+    );
+    const scheduler = container.get<Scheduler>(types.Scheduler);
+    const reviewTimeMap = await scheduler.getNextReviewTimeMap(dueCardInstance);
   }
 }

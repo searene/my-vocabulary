@@ -3,18 +3,18 @@ export class Composition {
     private readonly _id: number,
     private readonly _name: string,
     private readonly _cardTypeId: number,
-    private readonly _front: string,
-    private readonly _back: string
+    private readonly _frontTypeIds: string,
+    private readonly _backTypeIds: string
   ) {}
 
   public static build(
     id: number,
     name: string,
     cardTypeId: number,
-    front: string,
-    back: string
+    frontTypeIds: string,
+    backTypeIds: string
   ) {
-    return new Composition(id, name, cardTypeId, front, back);
+    return new Composition(id, name, cardTypeId, frontTypeIds, backTypeIds);
   }
 
   public get id(): number {
@@ -27,9 +27,9 @@ export class Composition {
     return this._cardTypeId;
   }
   public get backFields(): string {
-    return this._back;
+    return this._backTypeIds;
   }
   public get frontFields(): string {
-    return this._front;
+    return this._frontTypeIds;
   }
 }

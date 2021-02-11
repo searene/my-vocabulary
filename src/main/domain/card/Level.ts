@@ -1,6 +1,6 @@
 enum Level {
-  EASY,
-  GOOD,
-  HARD,
-  FORGOTTEN,
+  EASY = "EASY",
+  GOOD = "GOOD",
+  HARD = "HARD",
+  FORGOTTEN = "FORGOTTEN",
 }

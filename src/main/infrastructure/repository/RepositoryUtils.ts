@@ -3,6 +3,7 @@ import { FieldDO } from "../do/FieldDO";
 import { BaseQuery } from "../query/BaseQuery";
 import { Options } from "../query/Options";
 import { knex } from "./knex/KnexFactory";
+import { CardInstanceDO } from "../do/CardInstanceDO";
 
 export class RepositoryUtils {
   static async batchInsert(
@@ -44,5 +45,18 @@ export class RepositoryUtils {
     const dataObjectWithId = { ...dataObject };
     dataObjectWithId.id = await knex(tableName).insert(dataObject);
     return dataObjectWithId;
+  }
+
+  static async queryById<D extends BaseDO>(tableName: string, id: number) {
+    const array = await RepositoryUtils.query(tableName, { id }, undefined);
+    if (array.length > 1) {
+      throw new Error(
+        "array.length cannot be greater than 1, actual: " + array.length
+      );
+    } else if (array.length == 0) {
+      return undefined;
+    } else {
+      return array[0];
+    }
   }
 }

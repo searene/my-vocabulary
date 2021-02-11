@@ -6,6 +6,7 @@ import { Options } from "../../query/Options";
 import { CompositionRepository } from "../CompositionRepository";
 import { RepositoryUtils } from "../RepositoryUtils";
 import { knex } from "./KnexFactory";
+import { CardInstanceDO } from "../../do/CardInstanceDO";
 
 @injectable()
 export class KnexCompositionRepository implements CompositionRepository {
@@ -43,8 +44,8 @@ export class KnexCompositionRepository implements CompositionRepository {
         table.increments();
         table.string("name");
         table.integer("card_type_id");
-        table.string("front");
-        table.string("back");
+        table.string("front_type_ids");
+        table.string("back_type_ids");
       });
     }
   }
@@ -53,5 +54,12 @@ export class KnexCompositionRepository implements CompositionRepository {
     dataObject: CompositionDO
   ): Promise<CompositionDO> {
     throw new Error("Method not implemented.");
+  }
+
+  async queryById(id: number): Promise<CardInstanceDO | undefined> {
+    return await RepositoryUtils.queryById(
+      KnexCompositionRepository._COMPOSITIONS,
+      id
+    );
   }
 }
