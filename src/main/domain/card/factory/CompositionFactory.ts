@@ -1,6 +1,5 @@
 import { container } from "../../../config/inversify.config";
 import { types } from "../../../config/types";
-import { CompositionDO } from "../../../infrastructure/do/CompositionDO";
 import { CompositionRepository } from "../../../infrastructure/repository/CompositionRepository";
 import { Composition } from "../Composition";
 import { FieldType } from "../FieldType";
@@ -19,7 +18,7 @@ export class CompositionFactory {
       cardTypeId: frontFieldType.cardType.id,
     });
     if (compositions.length > 1) {
-      return this.fromCompositionDO(compositions[0]);
+      return await Composition.fromCompositionDO(compositions[0]);
     }
     const compositionDO = await compositionRepository.insert({
       name: "normal",
@@ -27,17 +26,7 @@ export class CompositionFactory {
       backTypeIds: `${backFieldType.id}`,
       cardTypeId: frontFieldType.cardType.id,
     });
-    return this.fromCompositionDO(compositionDO);
-  }
-
-  private fromCompositionDO(compositionDO: CompositionDO): Composition {
-    return Composition.build(
-      compositionDO.id as number,
-      compositionDO.name as string,
-      compositionDO.cardTypeId as number,
-      compositionDO.frontTypeIds as string,
-      compositionDO.backTypeIds as string
-    );
+    return await Composition.fromCompositionDO(compositionDO);
   }
 
   private async getCompositionRepository(): Promise<CompositionRepository> {

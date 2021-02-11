@@ -6,17 +6,18 @@ import { knex } from "./knex/KnexFactory";
 import { CardInstanceDO } from "../do/CardInstanceDO";
 
 export class RepositoryUtils {
-  static async batchInsert(
+  static async batchInsert<D extends BaseDO>(
     table: string,
-    fieldDOs: FieldDO[]
-  ): Promise<FieldDO[]> {
-    const fieldIds = await knex(table).insert(fieldDOs);
-    const resultFieldDOs: FieldDO[] = [];
-    for (let i = 0; i < fieldIds.length; i++) {
-      const resultFieldDO = { ...fieldDOs[i] };
-      resultFieldDO.id = fieldIds[i];
+    dataObjects: D[]
+  ): Promise<D[]> {
+    const ids = await knex(table).insert(dataObjects);
+    const result: D[] = [];
+    for (let i = 0; i < ids.length; i++) {
+      const dataObject = { ...dataObjects[i] };
+      dataObject.id = ids[i];
+      result.push(dataObject);
     }
-    return resultFieldDOs;
+    return result;
   }
   static async query<Q extends BaseQuery, D extends BaseDO>(
     tableName: string,
@@ -58,5 +59,16 @@ export class RepositoryUtils {
     } else {
       return array[0];
     }
+  }
+
+  static async queryByIdOrThrow<D extends BaseDO>(
+    tableName: string,
+    id: number
+  ) {
+    const dataObject = await this.queryById(tableName, id);
+    if (dataObject == undefined) {
+      throw new Error(`Invalid id ${id} for table ${tableName}`);
+    }
+    return dataObject;
   }
 }

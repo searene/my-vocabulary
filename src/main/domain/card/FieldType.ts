@@ -1,11 +1,8 @@
 import { FieldTypeCategory } from "../../infrastructure/common/FieldTypeCategory";
 import { CardType } from "./CardType";
 import { FieldTypeDO } from "../../infrastructure/do/FieldTypeDO";
-import { ReviewRepository } from "../../infrastructure/repository/ReviewRepository";
 import { container } from "../../config/inversify.config";
 import { types } from "../../config/types";
-import { FieldRepository } from "../../infrastructure/repository/FieldRepository";
-import { FieldTypeRepository } from "../../infrastructure/repository/FieldTypeRepository";
 import { CardTypeRepository } from "../../infrastructure/repository/CardTypeRepository";
 
 export class FieldType {

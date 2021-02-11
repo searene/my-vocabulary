@@ -11,6 +11,10 @@ export class TimeInterval {
     return new TimeInterval(TimeUnit.DAYS, days);
   }
 
+  static now(): TimeInterval {
+    return TimeInterval.ofMinutes(0);
+  }
+
   /**
    * @param timeIntervalStr example: 10 min, 1 day, etc.
    */

@@ -20,7 +20,7 @@ export class CardFactory {
       cardTypeId,
       bookId,
     });
-    return this.fromCardDO(insertedCardDO);
+    return await Card.fromCardDO(insertedCardDO);
   }
 
   async getById(id: number): Promise<Card> {
@@ -29,7 +29,7 @@ export class CardFactory {
     );
     const cardDOs = await cardRepository.query({ id });
     assert(cardDOs.length === 1, "cardDOs.length should be 1");
-    return this.fromCardDO(cardDOs[0]);
+    return await Card.fromCardDO(cardDOs[0]);
   }
 
   private async getCardRepository() {
@@ -38,13 +38,5 @@ export class CardFactory {
 
   private async getConfigRepository() {
     return await container.getAsync<ConfigRepository>(types.ConfigRepository);
-  }
-
-  fromCardDO(cardDO: CardDO): Card {
-    return new Card(
-      cardDO.id as number,
-      cardDO.bookId as number,
-      cardDO.cardTypeId as number
-    );
   }
 }

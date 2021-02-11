@@ -7,6 +7,7 @@ import { RepositoryUtils } from "../RepositoryUtils";
 import { WordRepository } from "../WordRepository";
 import { knex } from "./KnexFactory";
 import { CardInstanceDO } from "../../do/CardInstanceDO";
+import { CardDO } from "../../do/CardDO";
 
 @injectable()
 export class KnexWordRepository implements WordRepository {
@@ -72,5 +73,12 @@ export class KnexWordRepository implements WordRepository {
 
   async queryById(id: number): Promise<CardInstanceDO | undefined> {
     return await RepositoryUtils.queryById(KnexWordRepository._WORDS, id);
+  }
+
+  async queryByIdOrThrow(id: number): Promise<CardDO> {
+    return await RepositoryUtils.queryByIdOrThrow(
+      KnexWordRepository._WORDS,
+      id
+    );
   }
 }

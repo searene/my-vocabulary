@@ -7,6 +7,7 @@ import { CompositionRepository } from "../CompositionRepository";
 import { RepositoryUtils } from "../RepositoryUtils";
 import { knex } from "./KnexFactory";
 import { CardInstanceDO } from "../../do/CardInstanceDO";
+import { CardDO } from "../../do/CardDO";
 
 @injectable()
 export class KnexCompositionRepository implements CompositionRepository {
@@ -58,6 +59,13 @@ export class KnexCompositionRepository implements CompositionRepository {
 
   async queryById(id: number): Promise<CardInstanceDO | undefined> {
     return await RepositoryUtils.queryById(
+      KnexCompositionRepository._COMPOSITIONS,
+      id
+    );
+  }
+
+  async queryByIdOrThrow(id: number): Promise<CardDO> {
+    return await RepositoryUtils.queryByIdOrThrow(
       KnexCompositionRepository._COMPOSITIONS,
       id
     );

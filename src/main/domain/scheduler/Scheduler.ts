@@ -5,4 +5,6 @@ export interface Scheduler {
   getNextReviewTimeMap(
     cardInstance: CardInstance
   ): Promise<Map<Level, TimeInterval>>;
+
+  getInitialReviewDate(): Date;
 }

@@ -6,6 +6,7 @@ import { FieldTypeRepository } from "../FieldTypeRepository";
 import { RepositoryUtils } from "../RepositoryUtils";
 import { knex } from "./KnexFactory";
 import { CardInstanceDO } from "../../do/CardInstanceDO";
+import { CardDO } from "../../do/CardDO";
 
 @injectable()
 export class KnexFieldTypeRepository implements FieldTypeRepository {
@@ -49,6 +50,13 @@ export class KnexFieldTypeRepository implements FieldTypeRepository {
   }
   async queryById(id: number): Promise<CardInstanceDO | undefined> {
     return await RepositoryUtils.queryById(
+      KnexFieldTypeRepository._FIELD_TYPES,
+      id
+    );
+  }
+
+  async queryByIdOrThrow(id: number): Promise<CardDO> {
+    return await RepositoryUtils.queryByIdOrThrow(
       KnexFieldTypeRepository._FIELD_TYPES,
       id
     );

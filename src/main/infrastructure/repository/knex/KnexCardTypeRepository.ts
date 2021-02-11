@@ -6,6 +6,7 @@ import { injectable } from "@parisholley/inversify-async";
 import { Options } from "../../query/Options";
 import { RepositoryUtils } from "../RepositoryUtils";
 import { CardInstanceDO } from "../../do/CardInstanceDO";
+import { CardDO } from "../../do/CardDO";
 
 const knex = KnexFactory.knex;
 
@@ -52,6 +53,13 @@ export class KnexCardTypeRepository implements CardTypeRepository {
 
   async queryById(id: number): Promise<CardInstanceDO | undefined> {
     return await RepositoryUtils.queryById(
+      KnexCardTypeRepository._CARD_TYPES,
+      id
+    );
+  }
+
+  async queryByIdOrThrow(id: number): Promise<CardDO> {
+    return await RepositoryUtils.queryByIdOrThrow(
       KnexCardTypeRepository._CARD_TYPES,
       id
     );

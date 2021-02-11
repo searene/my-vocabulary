@@ -6,6 +6,7 @@ import { Options } from "../../query/Options";
 import { RepositoryUtils } from "../RepositoryUtils";
 import { ReviewRepository } from "../ReviewRepository";
 import { CardInstanceDO } from "../../do/CardInstanceDO";
+import { CardDO } from "../../do/CardDO";
 
 const knex = KnexFactory.knex;
 
@@ -57,5 +58,12 @@ export class KnexReviewRepository implements ReviewRepository {
 
   async queryById(id: number): Promise<CardInstanceDO | undefined> {
     return await RepositoryUtils.queryById(KnexReviewRepository._REVIEWS, id);
+  }
+
+  async queryByIdOrThrow(id: number): Promise<CardDO> {
+    return await RepositoryUtils.queryByIdOrThrow(
+      KnexReviewRepository._REVIEWS,
+      id
+    );
   }
 }

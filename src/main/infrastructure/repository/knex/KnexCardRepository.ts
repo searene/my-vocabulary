@@ -53,4 +53,11 @@ export class KnexCardRepository implements CardRepository {
   async queryById(id: number): Promise<CardInstanceDO | undefined> {
     return await RepositoryUtils.queryById(KnexCardRepository._CARDS, id);
   }
+
+  async queryByIdOrThrow(id: number): Promise<CardDO> {
+    return await RepositoryUtils.queryByIdOrThrow(
+      KnexCardRepository._CARDS,
+      id
+    );
+  }
 }

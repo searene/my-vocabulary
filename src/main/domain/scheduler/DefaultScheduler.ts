@@ -4,7 +4,7 @@ import { Review } from "../review/Review";
 import { ReviewFactory } from "../review/ReviewFactory";
 import { TimeInterval } from "../time/TimeInterval";
 import { TimeUnit } from "../time/TimeUnit";
-import { inject, injectable } from "@parisholley/inversify-async";
+import { injectable } from "@parisholley/inversify-async";
 
 @injectable()
 export class DefaultScheduler implements Scheduler {
@@ -14,20 +14,17 @@ export class DefaultScheduler implements Scheduler {
     const reviewArray: Review[] = await ReviewFactory.queryByCardInstanceId(
       cardInstance.id
     );
-    const result: Map<Level, TimeInterval> = new Map();
     if (reviewArray.length == 0) {
-      result.set(Level.FORGOTTEN, TimeInterval.ofMinutes(10));
-      result.set(Level.HARD, TimeInterval.ofDays(1));
-      result.set(Level.GOOD, TimeInterval.ofDays(2));
-      result.set(Level.EASY, TimeInterval.ofDays(4));
+      return this.getInitialReviewTimeMap();
     } else {
+      const result: Map<Level, TimeInterval> = new Map();
       const lastReview: Review = reviewArray[reviewArray.length - 1];
       result.set(Level.FORGOTTEN, TimeInterval.ofMinutes(10));
       result.set(Level.HARD, this.getNextTimeInterval(lastReview, 1.2));
       result.set(Level.GOOD, this.getNextTimeInterval(lastReview, 1.3));
       result.set(Level.EASY, this.getNextTimeInterval(lastReview, 1.4));
+      return result;
     }
-    return result;
   }
 
   private getNextTimeInterval(
@@ -43,5 +40,18 @@ export class DefaultScheduler implements Scheduler {
     } else {
       throw new Error("Unsupported timeUnit: " + lastReview.timeInterval);
     }
+  }
+
+  getInitialReviewDate(): Date {
+    return new Date();
+  }
+
+  getInitialReviewTimeMap(): Map<Level, TimeInterval> {
+    const result: Map<Level, TimeInterval> = new Map();
+    result.set(Level.FORGOTTEN, TimeInterval.ofMinutes(10));
+    result.set(Level.HARD, TimeInterval.ofDays(1));
+    result.set(Level.GOOD, TimeInterval.ofDays(2));
+    result.set(Level.EASY, TimeInterval.ofDays(4));
+    return result;
   }
 }

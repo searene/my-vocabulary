@@ -1,7 +1,6 @@
 import { ConfigRepository } from "../../../infrastructure/repository/ConfigRepository";
 import { types } from "../../../config/types";
 import { CardTypeRepository } from "../../../infrastructure/repository/CardTypeRepository";
-import { CardTypeDO } from "../../../infrastructure/do/CardTypeDO";
 import { CardType } from "../CardType";
 import { container } from "../../../config/inversify.config";
 

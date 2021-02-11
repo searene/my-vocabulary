@@ -15,6 +15,7 @@ import { container } from "../config/inversify.config";
 import { Scheduler } from "../domain/scheduler/Scheduler";
 import { CardInstanceRepository } from "../infrastructure/repository/CardInstanceRepository";
 import { CardInstance } from "../domain/card/instance/CardInstance";
+import { CompositionRepository } from "../infrastructure/repository/CompositionRepository";
 
 @injectable()
 export class CardFacadeImpl implements CardFacade {
@@ -35,6 +36,28 @@ export class CardFacadeImpl implements CardFacade {
   async saveCard(saveCardParam: SaveCardParam): Promise<number> {
     const card = await this._cardFactory.createCard(saveCardParam.bookId);
     await this._fieldFactory.batchCreate(card.id, saveCardParam.fieldContents);
+
+    // create card instances
+    const compositionRepo = await container.getAsync<CompositionRepository>(
+      types.CompositionRepository
+    );
+    const compositionDOs = await compositionRepo.query({
+      cardTypeId: card.cardType.id,
+    });
+    const scheduler = await container.getAsync<Scheduler>(types.Scheduler);
+    const cardInstanceDOs = compositionDOs.map((compositionDO) => {
+      return {
+        cardId: card.id,
+        compositionId: compositionDO.id,
+        dueTime: scheduler.getInitialReviewDate(),
+        bookId: saveCardParam.bookId,
+      };
+    });
+    const cardInstanceRepo = await container.getAsync<CardInstanceRepository>(
+      types.CardInstanceRepository
+    );
+    await cardInstanceRepo.batchInsert(cardInstanceDOs);
+
     const wordRepository = await this.getWordRepository();
     await wordRepository.updateByWord({
       word: saveCardParam.word,
@@ -64,5 +87,12 @@ export class CardFacadeImpl implements CardFacade {
     );
     const scheduler = container.get<Scheduler>(types.Scheduler);
     const reviewTimeMap = await scheduler.getNextReviewTimeMap(dueCardInstance);
+    const contents = await dueCardInstance.getFrontAndBackContents();
+    return {
+      id: dueCardInstance.id,
+      front: contents[0],
+      back: contents[1],
+      reviewTimeMap: reviewTimeMap,
+    };
   }
 }

@@ -20,13 +20,15 @@ export class FieldFactory {
       cardId,
       contents,
     });
-    return this.fromFieldDO(fieldDO);
+    return await Field.fromFieldDO(fieldDO);
   }
 
   async getByCardId(cardId: number): Promise<Field[]> {
     const fieldRepository = await this.getFieldRepository();
     const fieldDOs = await fieldRepository.query({ cardId });
-    return fieldDOs.map((fieldDO) => this.fromFieldDO(fieldDO));
+    return Promise.all(
+      fieldDOs.map(async (fieldDO) => await Field.fromFieldDO(fieldDO))
+    );
   }
 
   async batchCreate(
@@ -43,20 +45,13 @@ export class FieldFactory {
     }
     const fieldRepository = await this.getFieldRepository();
     const insertedFieldDOs = await fieldRepository.batchInsert(fieldDOs);
-    return insertedFieldDOs.map((fieldDO) => this.fromFieldDO(fieldDO));
+    return Promise.all(
+      insertedFieldDOs.map(async (fieldDO) => await Field.fromFieldDO(fieldDO))
+    );
   }
 
   private async getFieldRepository(): Promise<FieldRepository> {
     return await container.getAsync(types.FieldRepository);
-  }
-
-  private fromFieldDO(fieldDO: FieldDO): Field {
-    return new Field(
-      fieldDO.id as number,
-      fieldDO.contents as string,
-      fieldDO.fieldTypeId as number,
-      fieldDO.cardId as number
-    );
   }
 
   static get(): FieldFactory {
