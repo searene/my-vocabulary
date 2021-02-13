@@ -1,10 +1,11 @@
 import { CardInstance } from "../card/instance/CardInstance";
 import { TimeInterval } from "../time/TimeInterval";
+import { Level } from "../card/Level";
 
 export interface Scheduler {
-  getNextReviewTimeMap(
+  getNextReviewTimeRecord(
     cardInstance: CardInstance
-  ): Promise<Map<Level, TimeInterval>>;
+  ): Promise<Record<Level, TimeInterval>>;
 
   getInitialReviewDate(): Date;
 }

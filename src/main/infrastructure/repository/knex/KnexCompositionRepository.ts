@@ -35,8 +35,11 @@ export class KnexCompositionRepository implements CompositionRepository {
       options
     );
   }
-  async batchQueryByIds(id: number[]): Promise<CompositionDO[]> {
-    throw new Error("Method not implemented.");
+  async batchQueryByIds(ids: number[]): Promise<CompositionDO[]> {
+    return await RepositoryUtils.batchQueryByIds(
+      KnexCompositionRepository._COMPOSITIONS,
+      ids
+    );
   }
   async createTableIfNotExists(): Promise<void> {
     const tablesExists = await knex.schema.hasTable("compositions");

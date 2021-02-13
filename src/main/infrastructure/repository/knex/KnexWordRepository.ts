@@ -51,8 +51,11 @@ export class KnexWordRepository implements WordRepository {
       options
     );
   }
-  async batchQueryByIds(id: number[]): Promise<WordDO[]> {
-    throw new Error("Method not implemented.");
+  async batchQueryByIds(ids: number[]): Promise<WordDO[]> {
+    return await RepositoryUtils.batchQueryByIds(
+      KnexWordRepository._WORDS,
+      ids
+    );
   }
 
   async updateWordStatus(): Promise<void> {

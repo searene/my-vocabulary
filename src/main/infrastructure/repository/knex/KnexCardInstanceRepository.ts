@@ -51,8 +51,11 @@ export class KnexCardInstanceRepository implements CardInstanceRepository {
     );
   }
 
-  async batchQueryByIds(id: number[]): Promise<CardInstanceDO[]> {
-    throw new Error("Method not implemented.");
+  async batchQueryByIds(ids: number[]): Promise<CardInstanceDO[]> {
+    return await RepositoryUtils.batchQueryByIds(
+      KnexCardInstanceRepository._CARD_INSTANCES,
+      ids
+    );
   }
 
   async insert(cardInstanceDO: CardInstanceDO): Promise<CardInstanceDO> {
@@ -79,12 +82,13 @@ export class KnexCardInstanceRepository implements CardInstanceRepository {
   async queryNextDueCardInstance(
     bookId: number
   ): Promise<CardInstanceDO | undefined> {
-    const rows = (await knex
+    const queryBuilder = knex
       .from(KnexCardInstanceRepository._CARD_INSTANCES)
       .select("*")
       .where({ bookId })
-      .andWhere("due_time", ">", new Date())
-      .limit(1)) as CardInstanceDO[];
+      .andWhere("due_time", "<=", Date.now())
+      .limit(1);
+    const rows = (await queryBuilder) as CardInstanceDO[];
     if (rows.length == 0) {
       return undefined;
     }

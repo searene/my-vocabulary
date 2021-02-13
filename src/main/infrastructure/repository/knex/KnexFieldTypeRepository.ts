@@ -45,8 +45,11 @@ export class KnexFieldTypeRepository implements FieldTypeRepository {
       options
     );
   }
-  async batchQueryByIds(id: number[]): Promise<FieldTypeDO[]> {
-    throw new Error("Method not implemented.");
+  async batchQueryByIds(ids: number[]): Promise<FieldTypeDO[]> {
+    return await RepositoryUtils.batchQueryByIds(
+      KnexFieldTypeRepository._FIELD_TYPES,
+      ids
+    );
   }
   async queryById(id: number): Promise<CardInstanceDO | undefined> {
     return await RepositoryUtils.queryById(

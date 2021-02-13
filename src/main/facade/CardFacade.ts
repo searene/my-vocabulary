@@ -1,4 +1,5 @@
 import { TimeInterval } from "../domain/time/TimeInterval";
+import { Level } from "../domain/card/Level";
 
 export type SaveCardParam = {
   word: string;
@@ -27,7 +28,7 @@ export type CardInstanceVO = {
 
   back: string;
 
-  reviewTimeMap: Map<Level, TimeInterval>;
+  reviewTimeRecord: Record<Level, TimeInterval>;
 };
 export interface CardFacade {
   /**

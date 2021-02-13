@@ -10,12 +10,9 @@ export class CardInstanceFactory {
     const cardInstanceRepository: CardInstanceRepository = await container.getAsync(
       types.CardInstanceRepository
     );
-    const cardInstanceDO = await cardInstanceRepository.queryById(
+    const cardInstanceDO = await cardInstanceRepository.queryByIdOrThrow(
       cardInstanceId
     );
-    if (cardInstanceDO == undefined) {
-      throw new Error("Cannot find cardInstance by id: " + cardInstanceId);
-    }
     return await CardInstance.fromCardInstanceDO(cardInstanceDO);
   }
 }

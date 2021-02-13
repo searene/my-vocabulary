@@ -1,6 +1,6 @@
-enum Level {
-  EASY = "EASY",
-  GOOD = "GOOD",
-  HARD = "HARD",
-  FORGOTTEN = "FORGOTTEN",
+export enum Level {
+  EASY = "Easy",
+  GOOD = "Good",
+  HARD = "Hard",
+  FORGOTTEN = "Forgotten",
 }

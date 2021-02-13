@@ -45,8 +45,11 @@ export class KnexReviewRepository implements ReviewRepository {
     );
   }
 
-  async batchQueryByIds(id: number[]): Promise<ReviewDO[]> {
-    throw new Error("Method not implemented.");
+  async batchQueryByIds(ids: number[]): Promise<ReviewDO[]> {
+    return await RepositoryUtils.batchQueryByIds(
+      KnexReviewRepository._REVIEWS,
+      ids
+    );
   }
 
   async insert(reviewDO: ReviewDO): Promise<ReviewDO> {

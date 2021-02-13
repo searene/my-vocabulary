@@ -55,8 +55,11 @@ export class KnexConfigRepository implements ConfigRepository {
   async batchInsert(configDOs: ConfigDO[]): Promise<ConfigDO[]> {
     throw new Error("Method not implemented.");
   }
-  async batchQueryByIds(id: number[]): Promise<ConfigDO[]> {
-    throw new Error("Method not implemented.");
+  async batchQueryByIds(ids: number[]): Promise<ConfigDO[]> {
+    return await RepositoryUtils.batchQueryByIds(
+      KnexConfigRepository._CONFIGS,
+      ids
+    );
   }
   async insert(configDO: ConfigDO): Promise<ConfigDO> {
     return await RepositoryUtils.insert(

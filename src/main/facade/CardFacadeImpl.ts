@@ -73,9 +73,9 @@ export class CardFacadeImpl implements CardFacade {
   async getNextReviewCardInstanceByBookId(
     bookId: number
   ): Promise<CardInstanceVO | undefined> {
-    const cardInstanceRepository = container.get<CardInstanceRepository>(
-      types.CardInstanceRepository
-    );
+    const cardInstanceRepository = await container.getAsync<
+      CardInstanceRepository
+    >(types.CardInstanceRepository);
     const dueCardInstanceDO = await cardInstanceRepository.queryNextDueCardInstance(
       bookId
     );
@@ -86,13 +86,15 @@ export class CardFacadeImpl implements CardFacade {
       dueCardInstanceDO
     );
     const scheduler = container.get<Scheduler>(types.Scheduler);
-    const reviewTimeMap = await scheduler.getNextReviewTimeMap(dueCardInstance);
+    const reviewTimeRecord = await scheduler.getNextReviewTimeRecord(
+      dueCardInstance
+    );
     const contents = await dueCardInstance.getFrontAndBackContents();
     return {
       id: dueCardInstance.id,
       front: contents[0],
       back: contents[1],
-      reviewTimeMap: reviewTimeMap,
+      reviewTimeRecord: reviewTimeRecord,
     };
   }
 }

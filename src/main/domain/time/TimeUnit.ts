@@ -1,6 +1,6 @@
 export enum TimeUnit {
-  MINUTES = "min",
-  DAYS = "day",
+  MINUTES = "minutes",
+  DAYS = "days",
 }
 
 export function fromTimeUnitStr(timeUnitStr: string): TimeUnit {

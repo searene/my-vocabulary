@@ -52,14 +52,14 @@ export class CardInstance {
     const cardDO = await cardRepo.queryByIdOrThrow(
       cardInstanceDO.cardId as number
     );
-    return Promise.resolve(
-      new CardInstance(
-        cardInstanceDO.id as number,
-        await Composition.fromCompositionDO(compositionDO),
-        await Card.fromCardDO(cardDO),
-        cardInstanceDO.dueTime as Date,
-        cardInstanceDO.bookId as number
-      )
+    const composition = await Composition.fromCompositionDO(compositionDO);
+    const card = await Card.fromCardDO(cardDO);
+    return new CardInstance(
+      cardInstanceDO.id as number,
+      composition,
+      card,
+      cardInstanceDO.dueTime as Date,
+      cardInstanceDO.bookId as number
     );
   }
 
@@ -82,10 +82,10 @@ export class CardInstance {
       (fieldType) => fieldType.id
     );
     const frontFields = fields.filter(
-      (field) => frontFieldTypeIds.indexOf(field.id) > -1
+      (field) => frontFieldTypeIds.indexOf(field.fieldType.id) > -1
     );
     const backFields = fields.filter(
-      (field) => backFieldTypeIds.indexOf(field.id) > -1
+      (field) => backFieldTypeIds.indexOf(field.fieldType.id) > -1
     );
     return [
       frontFields.map((frontField) => frontField.contents).join("\n"),

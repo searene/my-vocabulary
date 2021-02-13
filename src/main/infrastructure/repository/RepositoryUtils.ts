@@ -71,4 +71,12 @@ export class RepositoryUtils {
     }
     return dataObject;
   }
+
+  static async batchQueryByIds<D extends BaseDO>(
+    table: string,
+    ids: number[]
+  ): Promise<D[]> {
+    const queryBuilder = knex.from(table).select("*").whereIn("id", ids);
+    return (await queryBuilder) as D[];
+  }
 }

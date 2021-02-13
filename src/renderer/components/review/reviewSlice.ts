@@ -31,6 +31,11 @@ const reviewSlice = createSlice({
     builder.addCase(getNextReviewCard.fulfilled, (state, action) => {
       state.reviewCard = action.payload;
     });
+    builder.addCase(getNextReviewCard.rejected, (state, action) => {
+      console.error(
+        "Error in getNextReviewCard, reason: " + action.error.message
+      );
+    });
   },
 });
 

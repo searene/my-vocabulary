@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 import * as React from "react";
 import { useAppDispatch } from "../../redux/store";
 import { setIn } from "immutable";
+import { Button } from "semantic-ui-react";
+import { convertTimeIntervalToString } from "../../../main/domain/time/TimeInterval";
 
 interface MatchParams {
   bookId: string;
@@ -37,6 +39,16 @@ export function Review(props: ReviewProps) {
         <div>{reviewCard.front}</div>
         <hr />
         <div>{reviewCard.back}</div>
+        <hr />
+        <div>
+          {Object.entries(reviewCard.reviewTimeRecord).map(
+            ([level, timeInterval]) => (
+              <Button key={level}>
+                {level}({convertTimeIntervalToString(timeInterval)})
+              </Button>
+            )
+          )}
+        </div>
       </div>
     );
   }

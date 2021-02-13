@@ -5,7 +5,6 @@ import { CardQuery } from "../../query/CardQuery";
 import { injectable } from "@parisholley/inversify-async";
 import { Options } from "../../query/Options";
 import { RepositoryUtils } from "../RepositoryUtils";
-import { KnexCardTypeRepository } from "./KnexCardTypeRepository";
 import { CardInstanceDO } from "../../do/CardInstanceDO";
 
 const knex = KnexFactory.knex;
@@ -42,8 +41,11 @@ export class KnexCardRepository implements CardRepository {
     );
   }
 
-  async batchQueryByIds(id: number[]): Promise<CardDO[]> {
-    throw new Error("Method not implemented.");
+  async batchQueryByIds(ids: number[]): Promise<CardDO[]> {
+    return await RepositoryUtils.batchQueryByIds(
+      KnexCardRepository._CARDS,
+      ids
+    );
   }
 
   async insert(cardDO: CardDO): Promise<CardDO> {

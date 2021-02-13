@@ -4,7 +4,8 @@ import { container } from "../../config/inversify.config";
 import { types } from "../../config/types";
 import { CardInstance } from "../card/instance/CardInstance";
 import { CardInstanceFactory } from "../card/instance/CardInstanceFactory";
-import { TimeInterval } from "../time/TimeInterval";
+import { fromTimeIntervalStr, TimeInterval } from "../time/TimeInterval";
+import { Level } from "../card/Level";
 
 export class Review {
   constructor(
@@ -29,7 +30,7 @@ export class Review {
       cardInstance,
       reviewDO.reviewTime as Date,
       reviewDO.level as Level,
-      TimeInterval.fromTimeIntervalStr(reviewDO.timeInterval as string)
+      fromTimeIntervalStr(reviewDO.timeInterval as string)
     );
   }
 
