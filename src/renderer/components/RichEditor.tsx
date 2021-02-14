@@ -19,6 +19,15 @@ export class RichEditor extends React.Component<
     this.state = {};
   }
 
+  componentDidMount() {
+    this.divComponent.current?.addEventListener("paste", (event) => {
+      const dataTransfer = event.clipboardData;
+      const html = dataTransfer?.getData("text/html");
+      document.execCommand("insertHTML", false, html);
+      event.preventDefault();
+    });
+  }
+
   shouldComponentUpdate(nextProps: RichEditorProps) {
     return nextProps.value !== this.divComponent.current!.innerHTML;
   }
