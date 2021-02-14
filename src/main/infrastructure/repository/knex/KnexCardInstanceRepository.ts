@@ -15,11 +15,11 @@ export class KnexCardInstanceRepository implements CardInstanceRepository {
   async init(): Promise<void> {
     await this.createTableIfNotExists();
   }
-  async updateById(
-    id: number,
-    dataObject: CardInstanceDO
-  ): Promise<CardInstanceDO> {
-    throw new Error("Method not implemented.");
+  async updateById(dataObject: CardInstanceDO): Promise<void> {
+    await RepositoryUtils.updateById(
+      KnexCardInstanceRepository._CARD_INSTANCES,
+      dataObject
+    );
   }
   async createTableIfNotExists(): Promise<void> {
     const tablesExists = await knex.schema.hasTable("card_instances");

@@ -7,6 +7,7 @@ import { RepositoryUtils } from "../RepositoryUtils";
 import { knex } from "./KnexFactory";
 import { CardInstanceDO } from "../../do/CardInstanceDO";
 import { CardDO } from "../../do/CardDO";
+import { table } from "html-to-text/lib/formatter";
 
 @injectable()
 export class KnexFieldTypeRepository implements FieldTypeRepository {
@@ -15,8 +16,11 @@ export class KnexFieldTypeRepository implements FieldTypeRepository {
   async init(): Promise<void> {
     await this.createTableIfNotExists();
   }
-  async updateById(id: number, dataObject: FieldTypeDO): Promise<FieldTypeDO> {
-    throw new Error("Method not implemented.");
+  async updateById(dataObject: FieldTypeDO): Promise<void> {
+    await RepositoryUtils.updateById(
+      KnexFieldTypeRepository._FIELD_TYPES,
+      dataObject
+    );
   }
   async createTableIfNotExists(): Promise<void> {
     const tablesExists = await knex.schema.hasTable("field_types");

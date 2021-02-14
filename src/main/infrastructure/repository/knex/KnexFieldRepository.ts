@@ -15,8 +15,8 @@ export class KnexFieldRepository implements FieldRepository {
   async init(): Promise<void> {
     await this.createTableIfNotExists();
   }
-  async updateById(id: number, dataObject: FieldDO): Promise<FieldDO> {
-    throw new Error("Method not implemented.");
+  async updateById(dataObject: FieldDO): Promise<void> {
+    await RepositoryUtils.updateById(KnexFieldRepository._FIELDS, dataObject);
   }
   async createTableIfNotExists(): Promise<void> {
     const tablesExists = await knex.schema.hasTable(

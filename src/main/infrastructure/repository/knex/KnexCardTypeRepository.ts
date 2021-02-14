@@ -17,8 +17,11 @@ export class KnexCardTypeRepository implements CardTypeRepository {
   async init(): Promise<void> {
     await this.createTableIfNotExists();
   }
-  async updateById(id: number, dataObject: CardTypeDO): Promise<CardTypeDO> {
-    throw new Error("Method not implemented.");
+  async updateById(dataObject: CardTypeDO): Promise<void> {
+    await RepositoryUtils.updateById(
+      KnexCardTypeRepository._CARD_TYPES,
+      dataObject
+    );
   }
   async batchInsert(dataObjects: CardTypeDO[]): Promise<CardTypeDO[]> {
     throw new Error("Method not implemented.");

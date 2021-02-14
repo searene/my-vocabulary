@@ -22,8 +22,8 @@ export class KnexWordRepository implements WordRepository {
   async init(): Promise<void> {
     await this.createTableIfNotExists();
   }
-  async updateById(id: number, dataObject: WordDO): Promise<WordDO> {
-    throw new Error("Method not implemented.");
+  async updateById(dataObject: WordDO): Promise<void> {
+    await RepositoryUtils.updateById(KnexWordRepository._WORDS, dataObject);
   }
   async createTableIfNotExists(): Promise<void> {
     const tablesExists = await knex.schema.hasTable(KnexWordRepository._WORDS);

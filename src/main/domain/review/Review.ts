@@ -1,11 +1,17 @@
 import { ReviewDO } from "../../infrastructure/do/ReviewDO";
 import { CardInstanceRepository } from "../../infrastructure/repository/CardInstanceRepository";
 import { container } from "../../config/inversify.config";
-import { types } from "../../config/types";
 import { CardInstance } from "../card/instance/CardInstance";
 import { CardInstanceFactory } from "../card/instance/CardInstanceFactory";
-import { fromTimeIntervalStr, TimeInterval } from "../time/TimeInterval";
+import {
+  addTimeInterval,
+  convertTimeIntervalToString,
+  fromTimeIntervalStr,
+  TimeInterval,
+} from "../time/TimeInterval";
 import { Level } from "../card/Level";
+import { ReviewRepository } from "../../infrastructure/repository/ReviewRepository";
+import { types } from "../../config/types";
 
 export class Review {
   constructor(
@@ -32,10 +38,6 @@ export class Review {
       reviewDO.level as Level,
       fromTimeIntervalStr(reviewDO.timeInterval as string)
     );
-  }
-
-  async save(): Promise<void> {
-    throw new Error("Method not implemented.");
   }
 
   get id(): number {

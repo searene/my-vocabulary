@@ -56,3 +56,18 @@ export function convertTimeIntervalToString(
     return `${timeInterval.value} ${timeInterval.timeUnit}`;
   }
 }
+
+export function addTimeInterval(
+  fromDate: Date,
+  timeInterval: TimeInterval
+): Date {
+  const result = new Date(fromDate);
+  if (timeInterval.timeUnit == TimeUnit.MINUTES) {
+    result.setMinutes(result.getMinutes() + timeInterval.value);
+  } else if (timeInterval.timeUnit == TimeUnit.DAYS) {
+    result.setDate(result.getDate() + timeInterval.value);
+  } else {
+    throw new Error("Unsupported timeUnit: " + timeInterval.timeUnit);
+  }
+  return result;
+}

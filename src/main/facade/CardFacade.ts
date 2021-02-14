@@ -30,6 +30,12 @@ export type CardInstanceVO = {
 
   reviewTimeRecord: Record<Level, TimeInterval>;
 };
+
+export type ReviewRequest = {
+  cardInstanceId: number;
+  level: Level;
+  timeInterval: TimeInterval;
+};
 export interface CardFacade {
   /**
    * Get field types of the given cardType, if no cardType was given,
@@ -46,4 +52,9 @@ export interface CardFacade {
   getNextReviewCardInstanceByBookId(
     bookId: number
   ): Promise<CardInstanceVO | undefined>;
+
+  /**
+   * Run a review on a card instance
+   */
+  review(reviewRequest: ReviewRequest): Promise<void>;
 }

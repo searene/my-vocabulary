@@ -16,8 +16,8 @@ export class KnexCardRepository implements CardRepository {
   async init(): Promise<void> {
     await this.createTableIfNotExists();
   }
-  async updateById(id: number, dataObject: CardDO): Promise<CardDO> {
-    throw new Error("Method not implemented.");
+  async updateById(dataObject: CardDO): Promise<void> {
+    await RepositoryUtils.updateById(KnexCardRepository._CARDS, dataObject);
   }
   async createTableIfNotExists(): Promise<void> {
     const tablesExists = await knex.schema.hasTable("cards");

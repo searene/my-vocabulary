@@ -28,7 +28,10 @@ export class KnexConfigRepository implements ConfigRepository {
       await this.insert({ defaultCardTypeId });
       return;
     }
-    await this.updateById(config.id as number, { defaultCardTypeId });
+    await this.updateById({
+      id: config.id,
+      defaultCardTypeId,
+    });
   }
 
   async init(): Promise<void> {
@@ -40,8 +43,8 @@ export class KnexConfigRepository implements ConfigRepository {
     return configs.length === 0 ? undefined : configs[0].defaultCardTypeId;
   }
 
-  async updateById(id: number, configDO: ConfigDO): Promise<ConfigDO> {
-    return await knex("config").where({ id }).update(configDO).select("*");
+  async updateById(configDO: ConfigDO): Promise<void> {
+    await RepositoryUtils.updateById(KnexConfigRepository._CONFIGS, configDO);
   }
   async createTableIfNotExists(): Promise<void> {
     const tablesExists = await knex.schema.hasTable("configs");

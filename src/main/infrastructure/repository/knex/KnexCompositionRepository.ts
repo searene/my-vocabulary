@@ -53,11 +53,11 @@ export class KnexCompositionRepository implements CompositionRepository {
       });
     }
   }
-  async updateById(
-    id: number,
-    dataObject: CompositionDO
-  ): Promise<CompositionDO> {
-    throw new Error("Method not implemented.");
+  async updateById(dataObject: CompositionDO): Promise<void> {
+    await RepositoryUtils.updateById(
+      KnexCompositionRepository._COMPOSITIONS,
+      dataObject
+    );
   }
 
   async queryById(id: number): Promise<CardInstanceDO | undefined> {

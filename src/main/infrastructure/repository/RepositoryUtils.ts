@@ -79,4 +79,11 @@ export class RepositoryUtils {
     const queryBuilder = knex.from(table).select("*").whereIn("id", ids);
     return (await queryBuilder) as D[];
   }
+
+  static async updateById<D extends BaseDO>(
+    table: string,
+    dataObject: D
+  ): Promise<void> {
+    await knex(table).where("id", dataObject.id).update(dataObject);
+  }
 }

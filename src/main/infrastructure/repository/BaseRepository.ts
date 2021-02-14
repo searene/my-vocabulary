@@ -19,5 +19,5 @@ export interface BaseRepository<Q extends BaseQuery, D extends BaseDO> {
 
   createTableIfNotExists(): Promise<void>;
 
-  updateById(id: number, dataObject: D): Promise<D>;
+  updateById(dataObject: D): Promise<void>;
 }

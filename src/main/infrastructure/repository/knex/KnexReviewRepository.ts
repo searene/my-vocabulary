@@ -17,8 +17,8 @@ export class KnexReviewRepository implements ReviewRepository {
   async init(): Promise<void> {
     await this.createTableIfNotExists();
   }
-  async updateById(id: number, dataObject: ReviewDO): Promise<ReviewDO> {
-    throw new Error("Method not implemented.");
+  async updateById(dataObject: ReviewDO): Promise<void> {
+    await RepositoryUtils.updateById(KnexReviewRepository._REVIEWS, dataObject);
   }
   async createTableIfNotExists(): Promise<void> {
     const tablesExists = await knex.schema.hasTable(
@@ -30,6 +30,7 @@ export class KnexReviewRepository implements ReviewRepository {
         table.integer("card_instance_id");
         table.dateTime("review_time");
         table.string("level");
+        table.string("time_interval");
       });
     }
   }

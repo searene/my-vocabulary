@@ -3,6 +3,7 @@ import {
   CardFacade,
   CardInstanceVO,
   FieldTypeVO,
+  ReviewRequest,
   SaveCardParam,
 } from "./CardFacade";
 import { CardFactory } from "../domain/card/factory/CardFactory";
@@ -16,6 +17,11 @@ import { Scheduler } from "../domain/scheduler/Scheduler";
 import { CardInstanceRepository } from "../infrastructure/repository/CardInstanceRepository";
 import { CardInstance } from "../domain/card/instance/CardInstance";
 import { CompositionRepository } from "../infrastructure/repository/CompositionRepository";
+import { ReviewRepository } from "../infrastructure/repository/ReviewRepository";
+import {
+  addTimeInterval,
+  convertTimeIntervalToString,
+} from "../domain/time/TimeInterval";
 
 @injectable()
 export class CardFacadeImpl implements CardFacade {
@@ -96,5 +102,25 @@ export class CardFacadeImpl implements CardFacade {
       back: contents[1],
       reviewTimeRecord: reviewTimeRecord,
     };
+  }
+
+  async review(reviewRequest: ReviewRequest): Promise<void> {
+    const reviewRepo = await container.getAsync<ReviewRepository>(
+      types.ReviewRepository
+    );
+    await reviewRepo.insert({
+      cardInstanceId: reviewRequest.cardInstanceId,
+      reviewTime: new Date(),
+      level: reviewRequest.level,
+      timeInterval: convertTimeIntervalToString(reviewRequest.timeInterval),
+    });
+
+    const cardInstanceRepo = await container.getAsync<CardInstanceRepository>(
+      types.CardInstanceRepository
+    );
+    await cardInstanceRepo.updateById({
+      id: reviewRequest.cardInstanceId,
+      dueTime: addTimeInterval(new Date(), reviewRequest.timeInterval),
+    });
   }
 }
