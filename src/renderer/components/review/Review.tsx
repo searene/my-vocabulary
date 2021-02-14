@@ -10,9 +10,6 @@ import {
   convertTimeIntervalToString,
   TimeInterval,
 } from "../../../main/domain/time/TimeInterval";
-import { container } from "../../../main/config/inversify.config";
-import { ReviewRepository } from "../../../main/infrastructure/repository/ReviewRepository";
-import { types } from "../../../main/config/types";
 import { Level } from "../../../main/domain/card/Level";
 import serviceProvider from "../../ServiceProvider";
 
@@ -25,6 +22,7 @@ interface ReviewProps extends RouteComponentProps<MatchParams> {}
 export function Review(props: ReviewProps) {
   const bookId = parseInt(props.match.params.bookId);
   const [initiated, setInitiated] = useState(false);
+  const [showBack, setShowBack] = useState(false);
 
   const cardInstanceVO: CardInstanceVO | undefined = useSelector(
     selectReviewCard
@@ -48,6 +46,7 @@ export function Review(props: ReviewProps) {
       timeInterval,
     });
     dispatch(getNextReviewCard({ bookId }));
+    setShowBack(false);
   };
 
   if (!initiated) {
@@ -57,22 +56,28 @@ export function Review(props: ReviewProps) {
   } else {
     return (
       <div>
-        <div>{cardInstanceVO.front}</div>
+        <div dangerouslySetInnerHTML={{ __html: cardInstanceVO.front }} />
         <hr />
-        <div>{cardInstanceVO.back}</div>
-        <hr />
-        <div>
-          {Object.entries(cardInstanceVO.reviewTimeRecord).map(
-            ([level, timeInterval]) => (
-              <Button
-                key={level}
-                onClick={() => doReview(level as Level, timeInterval)}
-              >
-                {level}({convertTimeIntervalToString(timeInterval)})
-              </Button>
-            )
-          )}
-        </div>
+        {showBack ? (
+          <>
+            <div dangerouslySetInnerHTML={{ __html: cardInstanceVO.back }} />
+            <hr />
+            <div>
+              {Object.entries(cardInstanceVO.reviewTimeRecord).map(
+                ([level, timeInterval]) => (
+                  <Button
+                    key={level}
+                    onClick={() => doReview(level as Level, timeInterval)}
+                  >
+                    {level}({convertTimeIntervalToString(timeInterval)})
+                  </Button>
+                )
+              )}
+            </div>
+          </>
+        ) : (
+          <Button onClick={() => setShowBack(true)}>Show Answer</Button>
+        )}
       </div>
     );
   }

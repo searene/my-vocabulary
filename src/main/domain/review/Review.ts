@@ -31,6 +31,7 @@ export class Review {
         "cardInstance cannot be undefined, reviewId: " + reviewDO.id
       );
     }
+    console.log(reviewDO);
     return new Review(
       reviewDO.id as number,
       cardInstance,
