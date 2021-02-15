@@ -7,6 +7,8 @@ import { RepositoryUtils } from "../RepositoryUtils";
 import { ReviewRepository } from "../ReviewRepository";
 import { CardInstanceDO } from "../../do/CardInstanceDO";
 import { CardDO } from "../../do/CardDO";
+import { FieldTypeQuery } from "../../query/FieldTypeQuery";
+import { FieldTypeDO } from "../../do/FieldTypeDO";
 
 const knex = KnexFactory.knex;
 
@@ -69,5 +71,11 @@ export class KnexReviewRepository implements ReviewRepository {
       KnexReviewRepository._REVIEWS,
       id
     );
+  }
+
+  async queryOne(query: ReviewQuery): Promise<ReviewDO | undefined> {
+    return await RepositoryUtils.queryOne(
+      KnexReviewRepository._REVIEWS,
+      query);
   }
 }

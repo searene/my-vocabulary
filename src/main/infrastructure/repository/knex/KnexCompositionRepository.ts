@@ -8,6 +8,8 @@ import { RepositoryUtils } from "../RepositoryUtils";
 import { knex } from "./KnexFactory";
 import { CardInstanceDO } from "../../do/CardInstanceDO";
 import { CardDO } from "../../do/CardDO";
+import { CardTypeQuery } from "../../query/CardTypeQuery";
+import { CardTypeDO } from "../../do/CardTypeDO";
 
 @injectable()
 export class KnexCompositionRepository implements CompositionRepository {
@@ -72,5 +74,11 @@ export class KnexCompositionRepository implements CompositionRepository {
       KnexCompositionRepository._COMPOSITIONS,
       id
     );
+  }
+
+  async queryOne(query: CompositionQuery): Promise<CompositionDO | undefined> {
+    return await RepositoryUtils.queryOne(
+      KnexCompositionRepository._COMPOSITIONS,
+      query);
   }
 }

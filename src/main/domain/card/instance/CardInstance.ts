@@ -88,8 +88,8 @@ export class CardInstance {
       (field) => backFieldTypeIds.indexOf(field.fieldType.id) > -1
     );
     return [
-      frontFields.map((frontField) => frontField.contents).join("\n"),
-      backFields.map((backField) => backField.contents).join("\n"),
+      frontFields.map((frontField) => frontField.contents).join("<br/>"),
+      backFields.map((backField) => backField.contents).join("<br/>"),
     ];
   }
 

@@ -25,10 +25,10 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged"
+      "_comment_pre-commit": "lint-staged"
     }
   },
-  "lint-staged": {
+  "_comment_lint-staged": {
     "{src,test,mocks}/**/*.{json,css,scss,less,md}": [
       "prettier --config ./.prettierrc --write"
     ],

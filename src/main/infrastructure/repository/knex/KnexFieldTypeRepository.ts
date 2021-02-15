@@ -8,6 +8,8 @@ import { knex } from "./KnexFactory";
 import { CardInstanceDO } from "../../do/CardInstanceDO";
 import { CardDO } from "../../do/CardDO";
 import { table } from "html-to-text/lib/formatter";
+import { FieldQuery } from "../../query/FieldQuery";
+import { FieldDO } from "../../do/FieldDO";
 
 @injectable()
 export class KnexFieldTypeRepository implements FieldTypeRepository {
@@ -67,5 +69,11 @@ export class KnexFieldTypeRepository implements FieldTypeRepository {
       KnexFieldTypeRepository._FIELD_TYPES,
       id
     );
+  }
+
+  async queryOne(query: FieldTypeQuery): Promise<FieldTypeDO | undefined> {
+    return await RepositoryUtils.queryOne(
+      KnexFieldTypeRepository._FIELD_TYPES,
+      query);
   }
 }

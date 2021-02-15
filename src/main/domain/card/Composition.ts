@@ -82,6 +82,6 @@ export class Composition {
   }
 
   private static getFieldTypeIdsFromStr(fieldTypeIdsStr: string): number[] {
-    return fieldTypeIdsStr.split(",").map(parseInt);
+    return fieldTypeIdsStr.split(",").map(id => parseInt(id));
   }
 }

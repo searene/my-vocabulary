@@ -12,6 +12,71 @@ import { CardTypeFactory } from "./domain/card/factory/CardTypeFactory";
 import { CompositionFactory } from "./domain/card/factory/CompositionFactory";
 import * as os from "os";
 import { DictService } from "./dict/DictService";
+import { CardType } from "./domain/card/CardType";
+import { CardTypeRepository } from "./infrastructure/repository/CardTypeRepository";
+import { FieldType } from "./domain/card/FieldType";
+import { FieldTypeRepository } from "./infrastructure/repository/FieldTypeRepository";
+import { CompositionRepository } from "./infrastructure/repository/CompositionRepository";
+
+async function createSimpleCard(): Promise<void> {
+  const cardTypeRepo = await container.getAsync<CardTypeRepository>(types.CardTypeRepository);
+  const cardTypeDO = await cardTypeRepo.insert({name: "simple"});
+
+  const fieldTypeRepo = await container.getAsync<FieldTypeRepository>(types.FieldTypeRepository);
+  const frontFieldTypeDO = await fieldTypeRepo.insert({
+    name: "front",
+    category: "text",
+    cardTypeId: cardTypeDO.id,
+  });
+  const backFieldTypeDO = await fieldTypeRepo.insert({
+    name: "back",
+    category: "text",
+    cardTypeId: cardTypeDO.id,
+  });
+
+  const compositionRepo = await container.getAsync<CompositionRepository>(types.CompositionRepository);
+  await compositionRepo.insert({
+    name: "simple",
+    frontTypeIds: `${frontFieldTypeDO.id}`,
+    backTypeIds: `${backFieldTypeDO.id}`,
+    cardTypeId: frontFieldTypeDO.cardTypeId
+  });
+}
+
+async function createStandardCard(): Promise<void> {
+  const cardTypeRepo = await container.getAsync<CardTypeRepository>(types.CardTypeRepository);
+  const cardTypeDO = await cardTypeRepo.insert({name: "standard"});
+
+  const fieldTypeRepo = await container.getAsync<FieldTypeRepository>(types.FieldTypeRepository);
+  const frontFieldTypeDO = await fieldTypeRepo.insert({
+    name: "front",
+    category: "text",
+    cardTypeId: cardTypeDO.id,
+  });
+  const baseBackFieldTypeDO = await fieldTypeRepo.insert({
+    name: "baseBack",
+    category: "text",
+    cardTypeId: cardTypeDO.id,
+  });
+  const imageBackFieldTypeDO = await fieldTypeRepo.insert({
+    name: "imageBack",
+    category: "google-image",
+    cardTypeId: cardTypeDO.id,
+  });
+
+  const compositionRepo = await container.getAsync<CompositionRepository>(types.CompositionRepository);
+  await compositionRepo.insert({
+    name: "simple",
+    frontTypeIds: `${frontFieldTypeDO.id}`,
+    backTypeIds: `${baseBackFieldTypeDO.id},${imageBackFieldTypeDO.id}`,
+    cardTypeId: frontFieldTypeDO.cardTypeId
+  });
+
+  const configRepo = await container.getAsync<ConfigRepository>(types.ConfigRepository);
+  await configRepo.insert({
+    defaultCardTypeId: cardTypeDO.id
+  });
+}
 
 async function initialization(): Promise<void> {
   EBookReadAgent.register("epub", EPubBookReader);
@@ -21,20 +86,8 @@ async function initialization(): Promise<void> {
     types.ConfigRepository
   );
   if ((await configRepository.query({})).length === 0) {
-    // defaultCardTypeId hasn't been inserted, we need to create and init it.
-
-    // initialCardType is the defaultCardTypeId at start
-    const initialCardTypeId = (
-      await CardTypeFactory.get().createInitialCardType()
-    ).id;
-    const [
-      frontFieldType,
-      backFieldType,
-    ] = await FieldTypeFactory.get().createInitialFieldTypes(initialCardTypeId);
-    await (await CompositionFactory.get()).createInitialComposition(
-      frontFieldType,
-      backFieldType
-    );
+    await createSimpleCard();
+    await createStandardCard();
   }
 }
 

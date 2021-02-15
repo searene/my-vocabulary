@@ -31,7 +31,7 @@ export class FieldTypeFactory {
     );
   }
 
-  async createInitialFieldTypes(
+  async createSimpleFieldTypes(
     initialCardTypeId: number
   ): Promise<FieldType[]> {
     const fieldTypeRepository = await this.getFieldTypeRepository();

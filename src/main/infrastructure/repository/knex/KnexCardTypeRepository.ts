@@ -7,6 +7,7 @@ import { Options } from "../../query/Options";
 import { RepositoryUtils } from "../RepositoryUtils";
 import { CardInstanceDO } from "../../do/CardInstanceDO";
 import { CardDO } from "../../do/CardDO";
+import { CardQuery } from "../../query/CardQuery";
 
 const knex = KnexFactory.knex;
 
@@ -69,5 +70,11 @@ export class KnexCardTypeRepository implements CardTypeRepository {
       KnexCardTypeRepository._CARD_TYPES,
       id
     );
+  }
+
+  async queryOne(query: CardTypeQuery): Promise<CardTypeDO | undefined> {
+    return await RepositoryUtils.queryOne(
+      KnexCardTypeRepository._CARD_TYPES,
+      query);
   }
 }

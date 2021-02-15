@@ -67,4 +67,10 @@ export class KnexFieldRepository implements FieldRepository {
       id
     );
   }
+
+  async queryOne(query: FieldQuery): Promise<FieldDO | undefined> {
+    return await RepositoryUtils.queryOne(
+      KnexFieldRepository._FIELDS,
+      query);
+  }
 }

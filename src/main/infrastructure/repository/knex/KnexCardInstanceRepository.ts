@@ -94,4 +94,13 @@ export class KnexCardInstanceRepository implements CardInstanceRepository {
     }
     return rows[0];
   }
+
+  async queryOneOrThrow(query: CardInstanceQuery): Promise<CardInstanceDO | undefined> {
+    return await RepositoryUtils.queryOne(
+      KnexCardInstanceRepository._CARD_INSTANCES, query);
+  }
+
+  async queryOne(query: CardInstanceQuery): Promise<CardInstanceDO | undefined> {
+    return Promise.resolve(undefined);
+  }
 }

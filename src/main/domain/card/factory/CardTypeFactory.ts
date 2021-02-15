@@ -40,25 +40,6 @@ export class CardTypeFactory {
     return CardType.fromCardTypeDO(cardTypeDO);
   }
 
-  async createInitialCardType(): Promise<CardType> {
-    const configRepository = await this.getConfigRepository();
-    const defaultCardTypeId = await configRepository.getDefaultCardTypeId();
-    const cardTypeRepository = await this.getCardTypeRepository();
-    if (defaultCardTypeId !== undefined) {
-      const defaultCardTypeDO = (
-        await cardTypeRepository.query({
-          id: defaultCardTypeId,
-        })
-      )[0];
-      return CardType.fromCardTypeDO(defaultCardTypeDO);
-    }
-    const cardTypeDO = await cardTypeRepository.insert({
-      name: "normal",
-    });
-    await configRepository.setDefaultCardTypeId(cardTypeDO.id as number);
-    return CardType.fromCardTypeDO(cardTypeDO);
-  }
-
   static get() {
     if (this._instance === undefined) {
       this._instance = new CardTypeFactory();

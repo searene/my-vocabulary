@@ -72,6 +72,16 @@ export class RepositoryUtils {
     return dataObject;
   }
 
+  static async queryOne<Q extends BaseQuery, D extends BaseDO>
+      (tableName: string, query: Q): Promise<D | undefined> {
+    const dataObjects: D[] = await RepositoryUtils.query(tableName, query);
+    if (dataObjects.length == 0) {
+      return undefined;
+    } else {
+      return dataObjects[0];
+    }
+  }
+
   static async batchQueryByIds<D extends BaseDO>(
     table: string,
     ids: number[]

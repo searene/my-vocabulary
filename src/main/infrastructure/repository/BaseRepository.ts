@@ -11,6 +11,8 @@ export interface BaseRepository<Q extends BaseQuery, D extends BaseDO> {
 
   query(query: Q, options?: Options): Promise<D[]>;
 
+  queryOne(query: Q): Promise<D | undefined>;
+
   queryById(id: number): Promise<D | undefined>;
 
   queryByIdOrThrow(id: number): Promise<D>;

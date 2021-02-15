@@ -8,6 +8,8 @@ import { WordRepository } from "../WordRepository";
 import { knex } from "./KnexFactory";
 import { CardInstanceDO } from "../../do/CardInstanceDO";
 import { CardDO } from "../../do/CardDO";
+import { ReviewQuery } from "../../query/ReviewQuery";
+import { ReviewDO } from "../../do/ReviewDO";
 
 @injectable()
 export class KnexWordRepository implements WordRepository {
@@ -83,5 +85,11 @@ export class KnexWordRepository implements WordRepository {
       KnexWordRepository._WORDS,
       id
     );
+  }
+
+  async queryOne(query: WordQuery): Promise<WordDO | undefined> {
+    return await RepositoryUtils.queryOne(
+      KnexWordRepository._WORDS,
+      query);
   }
 }

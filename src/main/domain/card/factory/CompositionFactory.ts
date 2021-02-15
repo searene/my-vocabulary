@@ -9,7 +9,7 @@ export class CompositionFactory {
 
   private constructor() {}
 
-  async createInitialComposition(
+  async createSimpleComposition(
     frontFieldType: FieldType,
     backFieldType: FieldType
   ): Promise<Composition> {
@@ -21,7 +21,7 @@ export class CompositionFactory {
       return await Composition.fromCompositionDO(compositions[0]);
     }
     const compositionDO = await compositionRepository.insert({
-      name: "normal",
+      name: "simple",
       frontTypeIds: `${frontFieldType.id}`,
       backTypeIds: `${backFieldType.id}`,
       cardTypeId: frontFieldType.cardType.id,
