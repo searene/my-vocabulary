@@ -6,6 +6,7 @@ interface State {
 }
 export interface FieldVO {
   id: number;
+  category: string;
   name: string;
   contents: string;
 }

@@ -92,14 +92,4 @@ export class CardInstance {
       backFields.map((backField) => backField.contents).join("<br/>"),
     ];
   }
-
-  static getNextDueCardInstance(
-    bookId: number
-  ): Promise<CardInstance | undefined> {
-    throw new Error("not implemented");
-  }
-
-  static getTotalDueCardInstanceCount(bookId: number): Promise<number> {
-    throw new Error("not implemented");
-  }
 }

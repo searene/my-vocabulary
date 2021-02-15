@@ -34,6 +34,7 @@ export class CardFacadeImpl implements CardFacade {
     return fieldTypes.map((fieldType) => {
       return {
         id: fieldType.id,
+        category: fieldType.category,
         name: fieldType.name,
       };
     });

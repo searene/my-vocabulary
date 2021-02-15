@@ -11,7 +11,6 @@ import {
 import { Field } from "./Field";
 import { BookName } from "../bookName/BookName";
 import { useAppDispatch } from "../../redux/store";
-import { unwrapResult } from "@reduxjs/toolkit";
 import { Router } from "../../route/Router";
 
 interface MatchParams {
@@ -36,6 +35,7 @@ export function Add(props: AddProps) {
           key={fieldTypeId}
           fieldTypeId={parseInt(fieldTypeId)}
           fieldName={fieldVO.name}
+          word={word}
         />
       </Grid.Row>
     )

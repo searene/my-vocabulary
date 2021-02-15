@@ -15,6 +15,7 @@ export type SaveCardParam = {
 };
 export type FieldTypeVO = {
   id: number;
+  category: string;
   name: string;
 };
 

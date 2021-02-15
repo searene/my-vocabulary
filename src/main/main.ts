@@ -1,4 +1,4 @@
-import { app, BrowserWindow, protocol } from "electron";
+import { app, BrowserWindow, HeadersReceivedResponse, OnHeadersReceivedListenerDetails, protocol } from "electron";
 import * as path from "path";
 import * as url from "url";
 import { container } from "./config/inversify.config";
@@ -118,6 +118,7 @@ const createWindow = async () => {
     webPreferences: {
       nodeIntegration: true,
       enableRemoteModule: true,
+      webSecurity: false,
     },
   });
   win.maximize();
@@ -144,7 +145,22 @@ const createWindow = async () => {
   win.on("closed", () => {
     win = null;
   });
+
+  win.webContents.session.setProxy({
+    proxyRules: "http://127.0.0.1:3128"
+  });
+
+  const onHeadersReceived=(details: OnHeadersReceivedListenerDetails, callback: (headersReceivedResponse: HeadersReceivedResponse) => void)=>{
+    const responseHeaders = details.responseHeaders;
+    if(responseHeaders != undefined && responseHeaders['x-frame-options']){
+      delete responseHeaders['x-frame-options'];
+    }
+    callback({cancel: false, responseHeaders: responseHeaders});
+  }
+  win.webContents.session.webRequest.onHeadersReceived({urls: []}, onHeadersReceived);
 };
+
+app.commandLine.appendSwitch("proxy-server", "127.0.0.1:3128");
 
 app.on("ready", createWindow);
 
@@ -154,9 +170,9 @@ app.on("window-all-closed", () => {
   }
 });
 
-app.on("activate", () => {
+app.on("activate", async () => {
   if (win === null) {
-    createWindow();
+    await createWindow();
   }
 });
 
