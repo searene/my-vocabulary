@@ -5,18 +5,18 @@ import {
   DropdownItemProps,
   DropdownProps,
   Grid,
-  Input,
   Modal,
 } from "semantic-ui-react";
-import { WordStatus } from "../../main/enum/WordStatus";
+import { WordStatus } from "../../../main/enum/WordStatus";
 import { RouteComponentProps } from "react-router";
-import serviceProvider from "../ServiceProvider";
-import { WordVO } from "../../main/database/WordVO";
+import serviceProvider from "../../ServiceProvider";
+import { WordVO } from "../../../main/database/WordVO";
 import { Link } from "react-router-dom";
 import { Optional } from "typescript-optional";
-import { WordCount } from "../../main/domain/WordCount";
-import { SearchWordInput } from "./SearchWordInput";
-import history from "../route/History";
+import { WordCount } from "../../../main/domain/WordCount";
+import { SearchWordInput } from "../SearchWordInput";
+import history from "../../route/History";
+import { addItemToArray } from "../../utils/ImmutableUtils";
 
 interface MatchParams {
   bookId: string;
@@ -48,7 +48,7 @@ interface BookStates {
   /**
    * The current word.
    */
-  wordVO: Optional<WordVO>;
+  wordVO: WordVO | undefined;
 
   /**
    * The count of known words, unknown words, etc.
@@ -61,6 +61,11 @@ interface BookStates {
   longWordContextModalIndex: Optional<number>;
 
   needRefresh: boolean;
+
+  /**
+   * Word ids that are marked as known by the user.
+   */
+  markedKnownWords: number[];
 }
 
 export class Book extends React.Component<BookProps, BookStates> {
@@ -77,16 +82,20 @@ export class Book extends React.Component<BookProps, BookStates> {
       bookName: "",
       wordStatus: WordStatus.Unknown,
       pageNo: pageNo,
-      wordVO: Optional.empty(),
+      wordVO: undefined,
       wordCount: { unknown: 0, known: 0 },
       longWordContextModalIndex: Optional.empty(),
       needRefresh: true,
+      markedKnownWords: [],
     };
   }
 
   async componentDidMount() {
     await this.refresh();
     this.bindShortcuts();
+    this.setState({
+      markedKnownWords: [],
+    });
   }
 
   async componentDidUpdate() {
@@ -122,20 +131,16 @@ export class Book extends React.Component<BookProps, BookStates> {
             {this.state.wordCount.unknown}
           </Grid.Column>
         </Grid.Row>
-        {this.state.wordVO.isEmpty() ? (
+        {this.state.wordVO == undefined ? (
           <div>No more words.</div>
         ) : (
           <>
-            <Grid.Row>Word: {this.state.wordVO.get().word}</Grid.Row>
-            <Grid.Row>
-              Original Word: {this.state.wordVO.get().originalWord}
-            </Grid.Row>
-            <Grid.Row>
-              Status: {WordStatus[this.state.wordVO.get().status]}
-            </Grid.Row>
+            <Grid.Row>Word: {this.state.wordVO.word}</Grid.Row>
+            <Grid.Row>Original Word: {this.state.wordVO.originalWord}</Grid.Row>
+            <Grid.Row>Status: {WordStatus[this.state.wordVO.status]}</Grid.Row>
             <Grid.Row>
               <Grid.Row>Context:</Grid.Row>
-              {this.state.wordVO.get().contextList.map((context, i) => (
+              {this.state.wordVO.contextList.map((context, i) => (
                 <Modal
                   key={i}
                   trigger={
@@ -162,7 +167,7 @@ export class Book extends React.Component<BookProps, BookStates> {
                   <Modal.Content
                     dangerouslySetInnerHTML={{
                       __html: this.state.longWordContextModalIndex.isPresent()
-                        ? this.state.wordVO.get().contextList[
+                        ? this.state.wordVO!.contextList[
                             this.state.longWordContextModalIndex.get()
                           ].long.htmlContents
                         : "",
@@ -195,13 +200,13 @@ export class Book extends React.Component<BookProps, BookStates> {
                   Previous (p)
                 </Button>
                 <Button
-                  disabled={this.state.wordVO.isEmpty()}
+                  disabled={this.state.wordVO == undefined}
                   onClick={this.handleKnowAndNext}
                 >
                   Know and Next (k)
                 </Button>
                 <Button
-                  disabled={this.state.wordVO.isEmpty()}
+                  disabled={this.state.wordVO == undefined}
                   onClick={this.handleNext}
                 >
                   Next (n)
@@ -253,14 +258,14 @@ export class Book extends React.Component<BookProps, BookStates> {
       console.log("Nothing is found.");
     }
     this.setState({
-      wordVO: Optional.of(wordVOArray[0]),
+      wordVO: wordVOArray[0],
     });
   }
 
   private async getCurrentWord(
     bookId: number,
     pageNo: number
-  ): Promise<Optional<WordVO>> {
+  ): Promise<WordVO | undefined> {
     const wordVOArray = await serviceProvider.wordService.getWords(
       bookId,
       undefined,
@@ -274,9 +279,9 @@ export class Book extends React.Component<BookProps, BookStates> {
       5
     );
     if (wordVOArray.length === 0) {
-      return Optional.empty();
+      return undefined;
     }
-    return Optional.of(wordVOArray[0]);
+    return wordVOArray[0];
   }
 
   private handleStatusChange = (
@@ -290,12 +295,8 @@ export class Book extends React.Component<BookProps, BookStates> {
   };
 
   private handleKnowAndNext = async (): Promise<void> => {
-    // const knowAndNextCommand = new KnowAndNextCommand(this.state.wordVO.get().id);
-    // const newCommands = commands.slice().push(knowAndNextCommand);
-    // this.setState({commands: newCommands});
-
     await serviceProvider.wordService.updateWord({
-      id: this.state.wordVO.get().id,
+      id: this.state.wordVO!.id,
       status: WordStatus.Known,
     });
     const wordVO = await this.getCurrentWord(
@@ -305,6 +306,10 @@ export class Book extends React.Component<BookProps, BookStates> {
     this.setState({
       needRefresh: true,
       wordVO,
+      markedKnownWords: addItemToArray(
+        this.state.markedKnownWords,
+        this.state.wordVO!.id
+      ),
     });
   };
 
@@ -325,7 +330,7 @@ export class Book extends React.Component<BookProps, BookStates> {
   private handleAdd = async (): Promise<void> => {
     const bookId = parseInt(this.props.match.params.bookId);
     const urlSearchParams = new URLSearchParams();
-    urlSearchParams.set("word", this.state.wordVO.get().word);
+    urlSearchParams.set("word", this.state.wordVO!.word);
     history.push(`/add/${bookId}?${urlSearchParams.toString()}`);
   };
 
@@ -353,13 +358,13 @@ export class Book extends React.Component<BookProps, BookStates> {
    * Check if wordVO is changed
    */
   private isWordVOChanged(wordVO: Optional<WordVO>) {
-    if (wordVO.isEmpty() && this.state.wordVO.isEmpty()) {
+    if (wordVO.isEmpty() && this.state.wordVO == undefined) {
       return false;
     }
     return !(
       wordVO.isPresent() &&
-      this.state.wordVO.isPresent() &&
-      wordVO.get().id === this.state.wordVO.get().id
+      this.state.wordVO != undefined &&
+      wordVO.get().id === this.state.wordVO.id
     );
   }
 
@@ -380,6 +385,11 @@ export class Book extends React.Component<BookProps, BookStates> {
         await this.handlePrevious();
       }
     });
+    document.addEventListener("keydown", async (event) => {
+      if (event.ctrlKey && event.key === "z") {
+        await this.undo();
+      }
+    });
   }
 
   private handlePrevious = async (): Promise<void> => {
@@ -395,4 +405,18 @@ export class Book extends React.Component<BookProps, BookStates> {
       pageNo: newPageNo,
     });
   };
+
+  private async undo(): Promise<void> {
+    const newMarkedKnownWords = [...this.state.markedKnownWords];
+    const lastKnownWordId = newMarkedKnownWords.pop();
+    await serviceProvider.wordService.updateWord({
+      id: lastKnownWordId,
+      status: WordStatus.Unknown,
+    });
+    this.setState({
+      needRefresh: true,
+      markedKnownWords: newMarkedKnownWords,
+    });
+    await this.refresh();
+  }
 }

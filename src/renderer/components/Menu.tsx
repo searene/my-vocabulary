@@ -8,7 +8,7 @@ import * as React from "react";
 import { useState, useEffect } from "react";
 import { Library } from "./Library";
 import { HashRouter, Route, Switch } from "react-router-dom";
-import { Book } from "./Book";
+import { Book } from "./book/Book";
 import serviceProvider from "../ServiceProvider";
 import history from "../route/History";
 import { Add } from "./add/Add";

@@ -96,6 +96,7 @@ export class SqliteDatabaseService implements DatabaseService {
       sql += `${where}`;
     }
 
+    sql += " ORDER BY id";
     const limitExpression = SqliteDatabaseService.getLimitExpression(wordQuery);
     if (limitExpression.isPresent()) {
       sql += limitExpression.get();
@@ -179,24 +180,24 @@ export class SqliteDatabaseService implements DatabaseService {
     return wordCount;
   }
 
-  async updateWord(wordQuery: WordQuery): Promise<number> {
+  async updateWord(wordDO: WordDO): Promise<number> {
     await this.init();
-    if (wordQuery.id === undefined) {
+    if (wordDO.id === undefined) {
       console.error("id must be provided.");
       return 0;
     }
     let setExpr: string[] = [];
-    if (wordQuery.status != undefined) {
-      setExpr.push(`status = ${wordQuery.status}`);
+    if (wordDO.status != undefined) {
+      setExpr.push(`status = ${wordDO.status}`);
     }
-    if (wordQuery.bookId != undefined) {
-      setExpr.push(`bookId = ${wordQuery.bookId}`);
+    if (wordDO.bookId != undefined) {
+      setExpr.push(`bookId = ${wordDO.bookId}`);
     }
-    if (wordQuery.word != undefined) {
-      setExpr.push(`word = "${wordQuery.word}"`);
+    if (wordDO.word != undefined) {
+      setExpr.push(`word = "${wordDO.word}"`);
     }
     const runResult = await this.run(`UPDATE words SET ${setExpr.join(",")}
-    WHERE id = ${wordQuery.id}`);
+    WHERE id = ${wordDO.id}`);
     return runResult.changes;
   }
 

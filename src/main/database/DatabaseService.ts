@@ -30,7 +30,7 @@ export interface DatabaseService {
    * Update a record on the table "words", based on the given id.
    * @returns the number of lines being changed.
    */
-  updateWord(wordQuery: WordQuery): Promise<number>;
+  updateWord(wordDO: WordDO): Promise<number>;
 
   /**
    * Calculate the count of words by status in a book.

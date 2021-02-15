@@ -9,6 +9,7 @@ import { WordQuery } from "./domain/WordQuery";
 import { WordCount } from "./domain/WordCount";
 import { WordContextService } from "./WordContextService";
 import { WordContextStep } from "./domain/WordContextStep";
+import { WordDO } from "./domain/WordDO";
 
 @injectable()
 export class WordServiceImpl implements WordService {
@@ -58,8 +59,8 @@ export class WordServiceImpl implements WordService {
     });
   }
 
-  async updateWord(wordQuery: WordQuery): Promise<void> {
-    const updatedRecords = await this.databaseService.updateWord(wordQuery);
+  async updateWord(wordDO: WordDO): Promise<void> {
+    const updatedRecords = await this.databaseService.updateWord(wordDO);
     if (updatedRecords === 0) {
       console.error("Nothing was updated");
     }
