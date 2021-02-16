@@ -9,7 +9,14 @@ const baseConfig = require('./webpack.base.config');
 module.exports = merge(baseConfig, {
     target: 'electron-renderer',
     entry: {
-        app: ['./src/renderer/App.tsx']
+        app: {
+            import: "./src/renderer/App.tsx",
+            filename: "./app.js"
+        },
+        googleImage: {
+            import: "./src/renderer/ipc/GoogleImage.ts",
+            filename: "./ipc/google-image.js"
+        }
     },
     module: {
         rules: [
@@ -92,11 +99,11 @@ module.exports = merge(baseConfig, {
             filename: '[name].css',
             chunkFilename: '[id].css',
         }),
-        new CopyPlugin({
-            patterns: [{
-                from: "src/renderer/ipc/google-image.js",
-                to: "ipc/google-image.js"
-            }]
-        }),
+        // new CopyPlugin({
+        //     patterns: [{
+        //         from: "src/renderer/ipc/google-image.js",
+        //         to: "ipc/google-image.js"
+        //     }]
+        // }),
     ]
 });

@@ -119,6 +119,7 @@ const createWindow = async () => {
       nodeIntegration: true,
       enableRemoteModule: true,
       webSecurity: false,
+      webviewTag: true,
     },
   });
   win.maximize();
