@@ -11,40 +11,35 @@ export function GoogleImageEditor(props: GoogleImageProps) {
   const [showModal, setShowModal] = React.useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
+  const showBrowserView = async () => {
+    const view = new remote.BrowserView({
+      webPreferences: {
+        nodeIntegration: true,
+        enableRemoteModule: true,
+        preload: "ipc/google-image.js"
+      }
+    });
+    remote.getCurrentWindow().addBrowserView(view);
+    view.setBounds({
+      x: 50,
+      y: 50,
+      width: remote.getCurrentWindow().getContentBounds()['width'] - 100,
+      height: remote.getCurrentWindow().getContentBounds()["height"] - 100,
+    });
+    view.setAutoResize({ width: true, height: true })
+    await view.webContents.loadURL(`https://www.google.com/search?tbm=isch&q=${props.word}`);
+  }
+
   useEffect(() => {
-    async function inner() {
-      const view = new remote.BrowserView();
-      remote.getCurrentWindow().addBrowserView(view);
-      view.setBounds({
-        x: 0,
-        y: 0,
-        width: remote.getCurrentWindow().getContentBounds()['width'] - 50,
-        height: remote.getCurrentWindow().getContentBounds()["height"] - 50,
-      });
-      await view.webContents.loadURL(`https://www.google.com/search?tbm=isch&q=${props.word}`);
-    }
-    inner();
-  }, []);
+    remote.ipcMain.on("something", (event, arg) => {
+      alert("test");
+    });
+  });
 
   return (
-    <Modal
-      onClose={() => setShowModal(false)}
-      onOpen={() => setShowModal(true)}
-      open={showModal}
-      style={{
-        width: "100%",
-        height: "100%",
-      }}
-      trigger={<div style={{border: "1px solid black", minHeight: "50px", color: "gray"}}>
-          Click here to select images...
-        </div>}>
-      <Modal.Header>Select an image</Modal.Header>
-      <Modal.Content>
-        {/*<iframe style={{width: "100%", height: "100%"}}*/}
-        {/*        // src={"https://www.baidu.com"}*/}
-        {/*        src={`https://www.google.com/search?tbm=isch&q=${props.word}`}*/}
-        {/*        ref={iframeRef}/>*/}
-      </Modal.Content>
-    </Modal>
-  )
+    <div style={{border: "1px solid black", minHeight: "50px", color: "gray"}}
+         onClick={showBrowserView}>
+      Click here to select images...
+    </div>
+  );
 }

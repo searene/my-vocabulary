@@ -160,6 +160,7 @@
     "@parisholley/inversify-async": "^1.1.7",
     "@reduxjs/toolkit": "^1.4.0",
     "@types/react-autosuggest": "^10.0.1",
+    "copy-webpack-plugin": "^7.0.0",
     "epub": "^1.2.1",
     "html-to-text": "^5.1.1",
     "immutable": "^4.0.0-rc.12",

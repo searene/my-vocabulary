@@ -2,6 +2,7 @@ const webpack = require('webpack');
 const { merge } = require('webpack-merge');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const CopyPlugin = require("copy-webpack-plugin");
 
 const baseConfig = require('./webpack.base.config');
 
@@ -90,6 +91,12 @@ module.exports = merge(baseConfig, {
             // both options are optional
             filename: '[name].css',
             chunkFilename: '[id].css',
+        }),
+        new CopyPlugin({
+            patterns: [{
+                from: "src/renderer/ipc/google-image.js",
+                to: "ipc/google-image.js"
+            }]
         }),
     ]
 });
