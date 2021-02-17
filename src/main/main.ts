@@ -66,7 +66,7 @@ async function createStandardCard(): Promise<void> {
 
   const compositionRepo = await container.getAsync<CompositionRepository>(types.CompositionRepository);
   await compositionRepo.insert({
-    name: "simple",
+    name: "standard",
     frontTypeIds: `${frontFieldTypeDO.id}`,
     backTypeIds: `${baseBackFieldTypeDO.id},${imageBackFieldTypeDO.id}`,
     cardTypeId: frontFieldTypeDO.cardTypeId

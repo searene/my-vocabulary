@@ -97,6 +97,7 @@ export class CardFacadeImpl implements CardFacade {
       dueCardInstance
     );
     const contents = await dueCardInstance.getFrontAndBackContents();
+    console.log(dueCardInstance);
     return {
       id: dueCardInstance.id,
       front: contents[0],

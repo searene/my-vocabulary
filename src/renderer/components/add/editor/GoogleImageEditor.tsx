@@ -1,14 +1,16 @@
 import * as React from "react";
 import { Modal } from "semantic-ui-react";
 import { useEffect, useRef } from "react";
-import { ConsoleMessageEvent, IpcMessageEvent, remote } from "electron";
+import { ConsoleMessageEvent, IpcMessageEvent } from "electron";
 
 interface GoogleImageProps {
   word: string;
+  onChange: (html: string) => void;
 }
 
 export function GoogleImageEditor(props: GoogleImageProps) {
   const [showModal, setShowModal] = React.useState(false);
+  const [imgSrc, setImgSrc] = React.useState<string | undefined>(undefined);
   const webviewRef = useRef<HTMLWebViewElement>(null);
 
   useEffect(() => {
@@ -16,7 +18,10 @@ export function GoogleImageEditor(props: GoogleImageProps) {
       console.log("WEBVIEW", (e as ConsoleMessageEvent).message);
     });
     webviewRef.current?.addEventListener("ipc-message", (event) => {
-      console.log((event as IpcMessageEvent).channel);
+      const imageSrc = (event as IpcMessageEvent).channel;
+      setImgSrc(imageSrc);
+      props.onChange(`<img src="${imageSrc}" alt="${props.word}"/>`)
+      setShowModal(false);
     });
   }, [showModal]);
 
@@ -31,7 +36,9 @@ export function GoogleImageEditor(props: GoogleImageProps) {
         height: "100%",
       }}
       trigger={<div style={{border: "1px solid black", minHeight: "50px", color: "gray"}}>
-        Click here to select images...
+        {imgSrc == undefined ? "Click here to select images..." :
+          <img src={imgSrc} alt={props.word} />
+        }
       </div>}>
       <Modal.Header>Select an image</Modal.Header>
       <Modal.Content>

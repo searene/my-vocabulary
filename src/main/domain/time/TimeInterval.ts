@@ -30,7 +30,7 @@ export function now(): TimeInterval {
  * @param timeIntervalStr example: 10 min, 1 day, etc.
  */
 export function fromTimeIntervalStr(timeIntervalStr: string): TimeInterval {
-  const timeIntervalSplit = timeIntervalStr.split("s");
+  const timeIntervalSplit = timeIntervalStr.split(/\s/);
   if (timeIntervalSplit.length != 2) {
     throw new Error(
       "timeIntervalSplit.length is not 2, actual value: " +

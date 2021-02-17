@@ -29,7 +29,7 @@ export const Field = (props: FieldProps) => {
     if (fieldVO.category === "text") {
       return <RichEditor value={fieldVO.contents} onChange={handleRichEditorChange} />;
     } else if (fieldVO.category == "google-image") {
-      return <GoogleImageEditor word={props.word} />
+      return <GoogleImageEditor word={props.word} onChange={handleRichEditorChange} />
     } else {
       throw new Error("Unsupported category: " + fieldVO.category);
     }
