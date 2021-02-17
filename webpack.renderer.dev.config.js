@@ -15,7 +15,6 @@ module.exports = merge(baseConfig, {
     noInfo: true,
     stats: 'errors-only',
     inline: true,
-    hot: true,
     headers: { 'Access-Control-Allow-Origin': '*' },
     historyApiFallback: {
       verbose: true,

@@ -25,4 +25,4 @@ const browserSlice = createSlice({
 export const selectBrowserVisibility = (state: State) =>
   state.browser.visibility;
 export const { setBrowserVisibility } = browserSlice.actions;
-export const settingsReducer = browserSlice.reducer;
+export const browserReducer = browserSlice.reducer;

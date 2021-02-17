@@ -3,12 +3,14 @@ import { useDispatch } from "react-redux";
 import { addReducer } from "../components/add/addSlice";
 import { reviewReducer } from "../components/review/reviewSlice";
 import { settingsReducer } from "../components/settings/settingsSlice";
+import { browserReducer } from "../components/browser/browserSlice";
 
 const store = configureStore({
   reducer: {
     add: addReducer,
     review: reviewReducer,
     settings: settingsReducer,
+    browser: browserReducer,
   },
 });
 
