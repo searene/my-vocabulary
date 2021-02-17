@@ -8,6 +8,7 @@ import { Provider } from "react-redux";
 import store from "./redux/store";
 import { menu } from "./MenuFactory";
 import { remote } from "electron";
+import { Modal } from "semantic-ui-react";
 
 // Create main element
 const mainElement = document.createElement("div");
@@ -19,6 +20,10 @@ const render = (Component: () => JSX.Element) => {
     <AppContainer>
       <Provider store={store}>
         <Component />
+        {/*<webview src={`https://www.google.com/search?tbm=isch&q=apple`}*/}
+        {/*         autosize={true}*/}
+        {/*         style={{width: "100vw", height: "100vh"}}*/}
+        {/*         preload={"./ipc/google-image.js"}/>*/}
       </Provider>
     </AppContainer>,
     mainElement

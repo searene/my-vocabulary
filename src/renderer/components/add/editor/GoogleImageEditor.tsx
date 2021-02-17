@@ -37,6 +37,7 @@ export function GoogleImageEditor(props: GoogleImageProps) {
       <Modal.Content>
         <webview src={`https://www.google.com/search?tbm=isch&q=${props.word}`}
                  ref={webviewRef}
+                 style={{width: "100vw", height: "100vh"}}
                  preload={"./ipc/google-image.js"}
         />
       </Modal.Content>
