@@ -27,6 +27,7 @@ export class KnexCardRepository implements CardRepository {
         table.increments();
         table.integer("card_type_id");
         table.integer("book_id");
+        table.string("word");
       });
     }
   }

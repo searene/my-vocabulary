@@ -10,7 +10,7 @@ import { assert } from "../../../utils/Assert";
 import { Card } from "../Card";
 
 export class CardFactory {
-  async createCard(bookId: number, cardTypeId?: number): Promise<Card> {
+  async createCard(bookId: number, word: string, cardTypeId?: number): Promise<Card> {
     const cardRepository = await this.getCardRepository();
     if (cardTypeId === undefined) {
       const configRepository = await this.getConfigRepository();
@@ -19,6 +19,7 @@ export class CardFactory {
     const insertedCardDO = await cardRepository.insert({
       cardTypeId,
       bookId,
+      word,
     });
     return await Card.fromCardDO(insertedCardDO);
   }

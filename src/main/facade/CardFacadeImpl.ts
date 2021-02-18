@@ -41,7 +41,8 @@ export class CardFacadeImpl implements CardFacade {
   }
 
   async saveCard(saveCardParam: SaveCardParam): Promise<number> {
-    const card = await this._cardFactory.createCard(saveCardParam.bookId);
+    const card = await this._cardFactory.createCard(saveCardParam.bookId,
+      saveCardParam.word);
     await this._fieldFactory.batchCreate(card.id, saveCardParam.fieldContents);
 
     // create card instances
@@ -97,7 +98,6 @@ export class CardFacadeImpl implements CardFacade {
       dueCardInstance
     );
     const contents = await dueCardInstance.getFrontAndBackContents();
-    console.log(dueCardInstance);
     return {
       id: dueCardInstance.id,
       front: contents[0],
