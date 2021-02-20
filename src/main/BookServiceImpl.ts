@@ -1,92 +1,60 @@
-import { EBookReadAgent } from "./EBookReadAgent";
-import { container } from "./config/inversify.config";
-import { DatabaseService } from "./database/DatabaseService";
-import { types } from "./config/types";
-import { BookVO } from "./domain/BookVO";
-import { inject, injectable } from "@parisholley/inversify-async";
-import { BookStatus } from "./enum/BookStatus";
 import { BookService } from "./BookService";
-import { BookDO } from "./domain/BookDO";
+import { BookVO, convertBookDOToBookVO } from "./domain/BookVO";
+import { container } from "./config/inversify.config";
+import { types } from "./config/types";
+import { BookRepository } from "./infrastructure/repository/BookRepository";
+import { EBookReadAgent } from "./EBookReadAgent";
 import * as path from "path";
-import { Optional } from "typescript-optional";
 import { WordFactory } from "./domain/card/factory/WordFactory";
+import { BookDO } from "./infrastructure/do/BookDO";
+import { WordRepository } from "./infrastructure/repository/WordRepository";
+import { injectable } from "@parisholley/inversify-async";
 
 @injectable()
 export class BookServiceImpl implements BookService {
-  constructor(
-    @inject(types.DatabaseService) private databaseService: DatabaseService
-  ) {}
-
-  /**
-   * @param filePath absolute path of the EBook file
-   * @return bookId
-   */
   async addBook(filePath: string): Promise<BookVO> {
     const contents = await EBookReadAgent.readAllContents(filePath);
-    if (!contents.isPresent()) {
+    if (contents == undefined) {
       throw new Error("plainContents not available");
     }
+
+    const bookRepo = await container.getAsync<BookRepository>(types.BookRepository);
+    const bookDO: BookDO = await bookRepo.insert({
+      name: path.parse(filePath).name,
+      contents
+    });
     const wordToPositionsMap = await EBookReadAgent.readAllWords(filePath);
-
-    const databaseService = container.get<DatabaseService>(
-      types.DatabaseService
-    );
-    const bookId = await databaseService.writeBookContents(
-      path.parse(filePath).name,
-      contents.get()
-    );
     for (const [word, positions] of wordToPositionsMap) {
-      await WordFactory.get().createWord(bookId, word, positions);
+      await WordFactory.get().createWord(bookDO.id as number, word, positions);
     }
-    // await databaseService.writeWords(bookId, words);
-    const bookDOList = await databaseService.queryBooks({
-      id: bookId,
-    });
-    if (bookDOList.length !== 1) {
-      throw new Error(
-        "bookDOList.length is not 1, the actual value is" + bookDOList.length
-      );
-    }
-    return BookServiceImpl.toBookVO(bookDOList[0]);
-  }
-
-  async getBooks(): Promise<BookVO[]> {
-    const bookDOList = await this.databaseService.queryBooks({
-      status: BookStatus.Normal,
-    });
-    return bookDOList.map(bookDO => {
-      return BookServiceImpl.toBookVO(bookDO);
-    });
+    return convertBookDOToBookVO(bookDO);
   }
 
   async getBook(bookId: number): Promise<BookVO> {
-    const bookDOArray = await this.databaseService.queryBooks({
-      id: bookId,
-    });
-    return bookDOArray.map(bookDO => BookServiceImpl.toBookVO(bookDO))[0];
+    const bookRepo = await container.getAsync<BookRepository>(types.BookRepository);
+    const bookDO = await bookRepo.queryByIdOrThrow(bookId);
+    return convertBookDOToBookVO(bookDO);
+  }
+
+  async getBooks(): Promise<BookVO[]> {
+    const bookRepo = await container.getAsync<BookRepository>(types.BookRepository);
+    const bookDOs = await bookRepo.query({});
+    return bookDOs.map(bookDO => convertBookDOToBookVO(bookDO));
+  }
+
+  async getFirstBook(): Promise<BookVO | undefined> {
+    const bookRepo = await container.getAsync<BookRepository>(types.BookRepository);
+    const bookDOs = await bookRepo.query({}, {offset: 0, limit: 1});
+    if (bookDOs.length == 0) {
+      return undefined;
+    }
+    return convertBookDOToBookVO(bookDOs[0]);
   }
 
   async removeBook(bookId: number): Promise<void> {
-    await this.databaseService.removeBook(bookId);
-  }
-
-  async getFirstBook(): Promise<Optional<BookVO>> {
-    const bookDOList = await this.databaseService.queryBooks({
-      pageNo: 1,
-      pageSize: 1,
-    });
-    if (bookDOList.length === 0) {
-      return Optional.empty();
-    } else {
-      return Optional.of(BookServiceImpl.toBookVO(bookDOList[0]));
-    }
-  }
-
-  static toBookVO(bookDO: BookDO): BookVO {
-    return {
-      id: bookDO.id,
-      name: bookDO.name,
-      totalWordCount: bookDO.contents.split(/\s/).length,
-    };
+    const bookRepo = await container.getAsync<BookRepository>(types.BookRepository);
+    await bookRepo.deleteById(bookId);
+    const wordRepo = await container.getAsync<WordRepository>(types.WordRepository);
+    await wordRepo.delete({bookId});
   }
 }

@@ -5,6 +5,6 @@ export interface BookService {
   addBook(filePath: string): Promise<BookVO>;
   getBooks(): Promise<BookVO[]>;
   getBook(bookId: number): Promise<BookVO>;
-  getFirstBook(): Promise<Optional<BookVO>>;
+  getFirstBook(): Promise<BookVO | undefined>;
   removeBook(bookId: number): Promise<void>;
 }

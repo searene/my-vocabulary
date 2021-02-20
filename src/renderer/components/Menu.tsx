@@ -39,10 +39,9 @@ export const Menu = function () {
 
   useEffect(() => {
     async function innerFunction() {
-      const bookId = (await serviceProvider.bookService.getFirstBook()).map(
-        (bookVO) => bookVO.id
-      );
-      setBookId(bookId.isPresent() ? bookId.get() : undefined);
+      const firstBook = await serviceProvider.bookService.getFirstBook();
+      const firstBookId = firstBook == undefined ? undefined : firstBook.id;
+      setBookId(firstBookId);
       setInitiated(true);
     }
     innerFunction();

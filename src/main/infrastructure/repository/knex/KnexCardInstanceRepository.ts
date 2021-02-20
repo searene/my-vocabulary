@@ -22,9 +22,9 @@ export class KnexCardInstanceRepository implements CardInstanceRepository {
     );
   }
   async createTableIfNotExists(): Promise<void> {
-    const tablesExists = await knex.schema.hasTable("card_instances");
+    const tablesExists = await knex.schema.hasTable(KnexCardInstanceRepository._CARD_INSTANCES);
     if (!tablesExists) {
-      await knex.schema.createTable("card_instances", (table) => {
+      await knex.schema.createTable(KnexCardInstanceRepository._CARD_INSTANCES, (table) => {
         table.increments();
         table.integer("card_id");
         table.integer("composition_id");
@@ -95,12 +95,22 @@ export class KnexCardInstanceRepository implements CardInstanceRepository {
     return rows[0];
   }
 
-  async queryOneOrThrow(query: CardInstanceQuery): Promise<CardInstanceDO | undefined> {
+  async queryOne(query: CardInstanceQuery): Promise<CardInstanceDO | undefined> {
     return await RepositoryUtils.queryOne(
       KnexCardInstanceRepository._CARD_INSTANCES, query);
   }
 
-  async queryOne(query: CardInstanceQuery): Promise<CardInstanceDO | undefined> {
-    return Promise.resolve(undefined);
+  async deleteById(id: number): Promise<void> {
+    await RepositoryUtils.deleteById(
+      KnexCardInstanceRepository._CARD_INSTANCES,
+      id
+    );
+  }
+
+  async delete(query: CardInstanceQuery): Promise<number> {
+    return await RepositoryUtils.delete(
+      KnexCardInstanceRepository._CARD_INSTANCES,
+      query
+    );
   }
 }

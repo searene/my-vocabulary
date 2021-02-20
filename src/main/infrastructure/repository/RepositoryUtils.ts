@@ -96,4 +96,18 @@ export class RepositoryUtils {
   ): Promise<void> {
     await knex(table).where("id", dataObject.id).update(dataObject);
   }
+
+  static async deleteById<D extends BaseDO>(
+    table: string,
+    id: number
+  ): Promise<void> {
+    await knex(table).where("id", id).delete();
+  }
+
+  static async delete<Q extends BaseQuery>(
+    table: string,
+    query: Q
+  ): Promise<number> {
+    return knex(table).where(query).delete();
+  }
 }

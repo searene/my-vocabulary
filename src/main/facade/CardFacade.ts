@@ -37,6 +37,15 @@ export type ReviewRequest = {
   level: Level;
   timeInterval: TimeInterval;
 };
+
+export type BrowseData = {
+  firstFieldId: number;
+  firstFieldContents: string;
+  word: string;
+  bookName: string
+  dueTime: Date
+};
+
 export interface CardFacade {
   /**
    * Get field types of the given cardType, if no cardType was given,
@@ -58,4 +67,6 @@ export interface CardFacade {
    * Run a review on a card instance
    */
   review(reviewRequest: ReviewRequest): Promise<void>;
+
+  getBrowseData(offset: number, limit: number): Promise<BrowseData>;
 }

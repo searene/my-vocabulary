@@ -7,6 +7,7 @@ import { RepositoryUtils } from "../RepositoryUtils";
 import { knex } from "./KnexFactory";
 import { CardInstanceDO } from "../../do/CardInstanceDO";
 import { CardDO } from "../../do/CardDO";
+import { CardQuery } from "../../query/CardQuery";
 
 @injectable()
 export class KnexFieldRepository implements FieldRepository {
@@ -73,4 +74,18 @@ export class KnexFieldRepository implements FieldRepository {
       KnexFieldRepository._FIELDS,
       query);
   }
+
+  async deleteById(id: number): Promise<void> {
+    await RepositoryUtils.deleteById(
+      KnexFieldRepository._FIELDS,
+      id
+    );
+  }
+  async delete(query: FieldQuery): Promise<number> {
+    return await RepositoryUtils.delete(
+      KnexFieldRepository._FIELDS,
+      query
+    );
+  }
+
 }

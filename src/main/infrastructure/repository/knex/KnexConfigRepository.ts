@@ -10,6 +10,7 @@ import { CardInstanceDO } from "../../do/CardInstanceDO";
 import { CardDO } from "../../do/CardDO";
 import { CompositionQuery } from "../../query/CompositionQuery";
 import { CompositionDO } from "../../do/CompositionDO";
+import { CardQuery } from "../../query/CardQuery";
 
 @injectable()
 export class KnexConfigRepository implements ConfigRepository {
@@ -97,4 +98,18 @@ export class KnexConfigRepository implements ConfigRepository {
       KnexConfigRepository._CONFIGS,
       query);
   }
+
+  async deleteById(id: number): Promise<void> {
+    await RepositoryUtils.deleteById(
+      KnexConfigRepository._CONFIGS,
+      id
+    );
+  }
+  async delete(query: ConfigQuery): Promise<number> {
+    return await RepositoryUtils.delete(
+      KnexConfigRepository._CONFIGS,
+      query
+    );
+  }
+
 }

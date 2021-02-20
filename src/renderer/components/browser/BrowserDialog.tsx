@@ -21,9 +21,10 @@ export const BrowserDialog = () => {
         <Table celled>
           <Table.Header>
             <Table.Row>
-              <Table.HeaderCell>Header</Table.HeaderCell>
-              <Table.HeaderCell>Header</Table.HeaderCell>
-              <Table.HeaderCell>Header</Table.HeaderCell>
+              <Table.HeaderCell>Field</Table.HeaderCell>
+              <Table.HeaderCell>Word</Table.HeaderCell>
+              <Table.HeaderCell>Due Time</Table.HeaderCell>
+              <Table.HeaderCell>Book</Table.HeaderCell>
             </Table.Row>
           </Table.Header>
 

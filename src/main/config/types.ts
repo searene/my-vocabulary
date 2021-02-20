@@ -13,6 +13,7 @@ export const types = {
   FieldRepository: Symbol.for("FieldRepository"),
   WordRepository: Symbol.for("WordRepository"),
   CompositionRepository: Symbol.for("CompositionRepository"),
+  BookRepository: Symbol.for("BookRepository"),
   CardFacade: Symbol.for("CardFacade"),
   DictService: Symbol.for("DictService"),
   Scheduler: Symbol.for("Scheduler"),

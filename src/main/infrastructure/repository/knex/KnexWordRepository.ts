@@ -10,6 +10,7 @@ import { CardInstanceDO } from "../../do/CardInstanceDO";
 import { CardDO } from "../../do/CardDO";
 import { ReviewQuery } from "../../query/ReviewQuery";
 import { ReviewDO } from "../../do/ReviewDO";
+import { CardQuery } from "../../query/CardQuery";
 
 @injectable()
 export class KnexWordRepository implements WordRepository {
@@ -92,4 +93,18 @@ export class KnexWordRepository implements WordRepository {
       KnexWordRepository._WORDS,
       query);
   }
+
+  async deleteById(id: number): Promise<void> {
+    await RepositoryUtils.deleteById(
+      KnexWordRepository._WORDS,
+      id
+    );
+  }
+  async delete(query: WordQuery): Promise<number> {
+    return await RepositoryUtils.delete(
+      KnexWordRepository._WORDS,
+      query
+    );
+  }
+
 }

@@ -77,4 +77,18 @@ export class KnexCardTypeRepository implements CardTypeRepository {
       KnexCardTypeRepository._CARD_TYPES,
       query);
   }
+
+  async deleteById(id: number): Promise<void> {
+    await RepositoryUtils.deleteById(
+      KnexCardTypeRepository._CARD_TYPES,
+      id
+    );
+  }
+  async delete(query: CardTypeQuery): Promise<number> {
+    return await RepositoryUtils.delete(
+      KnexCardTypeRepository._CARD_TYPES,
+      query
+    );
+  }
+
 }

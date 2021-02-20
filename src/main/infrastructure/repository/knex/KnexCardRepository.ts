@@ -70,4 +70,18 @@ export class KnexCardRepository implements CardRepository {
       KnexCardRepository._CARDS,
       query);
   }
+
+  async deleteById(id: number): Promise<void> {
+    await RepositoryUtils.deleteById(
+      KnexCardRepository._CARDS,
+      id
+    );
+  }
+
+  async delete(query: CardQuery): Promise<number> {
+    return await RepositoryUtils.delete(
+      KnexCardRepository._CARDS,
+      query
+    );
+  }
 }

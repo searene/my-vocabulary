@@ -22,4 +22,11 @@ export interface BaseRepository<Q extends BaseQuery, D extends BaseDO> {
   createTableIfNotExists(): Promise<void>;
 
   updateById(dataObject: D): Promise<void>;
+
+  deleteById(id: number): Promise<void>;
+
+  /**
+   * @returns deleted records count
+   */
+  delete(query: Q): Promise<number>
 }

@@ -10,6 +10,9 @@ import { WordCount } from "./domain/WordCount";
 import { WordContextService } from "./WordContextService";
 import { WordContextStep } from "./domain/WordContextStep";
 import { WordDO } from "./domain/WordDO";
+import { container } from "./config/inversify.config";
+import { BookRepository } from "./infrastructure/repository/BookRepository";
+import { BookDO } from "./infrastructure/do/BookDO";
 
 @injectable()
 export class WordServiceImpl implements WordService {
@@ -26,14 +29,8 @@ export class WordServiceImpl implements WordService {
     contextStep: WordContextStep,
     contextLimit: number
   ): Promise<WordVO[]> {
-    const bookDOList = await this.databaseService.queryBooks({
-      id: bookId,
-      status: BookStatus.Normal,
-    });
-    if (bookDOList.length != 1) {
-      throw new Error("The size of bookDOList must be 1");
-    }
-    const bookDO = bookDOList[0];
+    const bookRepo = await container.getAsync<BookRepository>(types.BookRepository);
+    const bookDO = await bookRepo.queryByIdOrThrow(bookId);
     let wordQuery: WordQuery = {
       bookId: bookId,
       status: wordStatus,
@@ -50,7 +47,7 @@ export class WordServiceImpl implements WordService {
         contextList: WordContextService.getContextList(
           wordDO.word,
           wordDO.positions,
-          bookDO.contents,
+          bookDO.contents as string,
           contextStep,
           contextLimit
         ),

@@ -1,5 +1,6 @@
 import { injectable } from "@parisholley/inversify-async";
 import {
+    BrowseData,
   CardFacade,
   CardInstanceVO,
   FieldTypeVO,
@@ -22,6 +23,11 @@ import {
   addTimeInterval,
   convertTimeIntervalToString,
 } from "../domain/time/TimeInterval";
+import { FieldRepository } from "../infrastructure/repository/FieldRepository";
+import { CardRepository } from "../infrastructure/repository/CardRepository";
+import { FieldDO } from "../infrastructure/do/FieldDO";
+import { Database } from "sqlite3";
+import { DatabaseService } from "../database/DatabaseService";
 
 @injectable()
 export class CardFacadeImpl implements CardFacade {
@@ -124,5 +130,20 @@ export class CardFacadeImpl implements CardFacade {
       id: reviewRequest.cardInstanceId,
       dueTime: addTimeInterval(new Date(), reviewRequest.timeInterval),
     });
+  }
+
+  async getBrowseData(offset: number, limit: number): Promise<BrowseData> {
+    const fieldRepo = await container.getAsync<FieldRepository>(types.FieldRepository);
+    const fieldDOs = await fieldRepo.query({}, { offset, limit });
+    const cardRepo = await container.getAsync<CardRepository>(types.CardRepository);
+    const cardDOs = await cardRepo.batchQueryByIds(fieldDOs.map(fieldDO => fieldDO.cardId as number));
+    const databaseService = await container.getAsync<DatabaseService>(types.DatabaseService);
+    return {
+      firstFieldId: -1,
+      firstFieldContents: "mock",
+      word: "mock",
+      bookName: "mock",
+      dueTime: new Date(),
+    }
   }
 }

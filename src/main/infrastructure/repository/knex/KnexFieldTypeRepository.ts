@@ -10,6 +10,7 @@ import { CardDO } from "../../do/CardDO";
 import { table } from "html-to-text/lib/formatter";
 import { FieldQuery } from "../../query/FieldQuery";
 import { FieldDO } from "../../do/FieldDO";
+import { CardQuery } from "../../query/CardQuery";
 
 @injectable()
 export class KnexFieldTypeRepository implements FieldTypeRepository {
@@ -76,4 +77,18 @@ export class KnexFieldTypeRepository implements FieldTypeRepository {
       KnexFieldTypeRepository._FIELD_TYPES,
       query);
   }
+
+  async deleteById(id: number): Promise<void> {
+    await RepositoryUtils.deleteById(
+      KnexFieldTypeRepository._FIELD_TYPES,
+      id
+    );
+  }
+  async delete(query: FieldTypeQuery): Promise<number> {
+    return await RepositoryUtils.delete(
+      KnexFieldTypeRepository._FIELD_TYPES,
+      query
+    );
+  }
+
 }

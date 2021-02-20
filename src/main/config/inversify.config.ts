@@ -1,5 +1,5 @@
 import "reflect-metadata";
-import { CardFacade } from "./../facade/CardFacade";
+import { CardFacade } from "../facade/CardFacade";
 import { Container } from "@parisholley/inversify-async";
 import { WordFormReader } from "../WordFormReader";
 import { SqliteDatabaseService } from "../database/SqliteDatabaseService";
@@ -7,7 +7,6 @@ import { DatabaseService } from "../database/DatabaseService";
 import { ConfigReader } from "../ConfigReader";
 import { WordServiceImpl } from "../WordServiceImpl";
 import { types } from "./types";
-import { BookServiceImpl } from "../BookServiceImpl";
 import { BookService } from "../BookService";
 import { WordService } from "../WordService";
 import { ConfigRepository } from "../infrastructure/repository/ConfigRepository";
@@ -27,12 +26,14 @@ import { FieldRepository } from "../infrastructure/repository/FieldRepository";
 import { KnexFieldRepository } from "../infrastructure/repository/knex/KnexFieldRepository";
 import { DictService } from "../dict/DictService";
 import { KnexCardInstanceRepository } from "../infrastructure/repository/knex/KnexCardInstanceRepository";
-import { CardInstance } from "../domain/card/instance/CardInstance";
 import { CardInstanceRepository } from "../infrastructure/repository/CardInstanceRepository";
 import { ReviewRepository } from "../infrastructure/repository/ReviewRepository";
 import { KnexReviewRepository } from "../infrastructure/repository/knex/KnexReviewRepository";
 import { Scheduler } from "../domain/scheduler/Scheduler";
 import { DefaultScheduler } from "../domain/scheduler/DefaultScheduler";
+import { BookRepository } from "../infrastructure/repository/BookRepository";
+import { KnexBookRepository } from "../infrastructure/repository/knex/KnexBookRepository";
+import { BookServiceImpl } from "../BookServiceImpl";
 
 export const container = new Container({
   defaultScope: "Singleton",
@@ -109,5 +110,12 @@ container
   .onActivation(async (_, compositionRepository) => {
     await compositionRepository.init();
     return compositionRepository;
+  });
+container
+  .bind<BookRepository>(types.BookRepository)
+  .to(KnexBookRepository)
+  .onActivation(async (_, bookRepo) => {
+    await bookRepo.init();
+    return bookRepo;
   });
 container.bind<Scheduler>(types.Scheduler).to(DefaultScheduler);

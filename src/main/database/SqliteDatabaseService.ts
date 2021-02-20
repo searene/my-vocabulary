@@ -9,8 +9,6 @@ import { WordQuery } from "../domain/WordQuery";
 import { WordDO } from "../domain/WordDO";
 import { BaseQuery } from "../domain/BaseQuery";
 import { Optional } from "typescript-optional";
-import { BookQuery } from "../domain/BookQuery";
-import { BookDO } from "../domain/BookDO";
 import { WordFormReader } from "../WordFormReader";
 import { WordCount } from "../domain/WordCount";
 import { WordStatus } from "../enum/WordStatus";
@@ -37,23 +35,6 @@ export class SqliteDatabaseService implements DatabaseService {
     }
     await this.createTablesIfNotExists();
     this.initiated = true;
-  }
-
-  async writeBookContents(
-    bookName: string,
-    bookContents: string
-  ): Promise<number> {
-    await this.init();
-    const runResult = await this.run(
-      `
-      INSERT INTO books (name, contents, status) VALUES ($bookName, $bookContents, 0)
-    `,
-      {
-        $bookName: bookName,
-        $bookContents: bookContents,
-      }
-    );
-    return runResult.lastID;
   }
 
   async writeWords(
@@ -120,47 +101,6 @@ export class SqliteDatabaseService implements DatabaseService {
     return wordDOList;
   }
 
-  async queryBooks(bookQuery: BookQuery): Promise<BookDO[]> {
-    await this.init();
-    let sql = `SELECT id, name, contents, status FROM books WHERE 1 = 1`;
-
-    // build where
-    let where = "";
-    let params: any = {};
-    if (bookQuery.id != undefined) {
-      where += " AND id = $id";
-      params["$id"] = bookQuery.id;
-    }
-    if (bookQuery.status != undefined) {
-      where += " AND status = $status";
-      params["$status"] = bookQuery.status;
-    }
-    if (bookQuery.name != undefined) {
-      where += " AND name LIKE %$name%";
-      params["$name"] = bookQuery.name;
-    }
-    if (where != "") {
-      sql += `${where}`;
-    }
-
-    const limitExpression = SqliteDatabaseService.getLimitExpression(bookQuery);
-    if (limitExpression.isPresent()) {
-      sql += limitExpression.get();
-    }
-
-    const rows = await this.all(sql, params);
-    const bookDOList: BookDO[] = [];
-    for (const row of rows) {
-      bookDOList.push({
-        id: row.id,
-        name: row.name,
-        status: row.status,
-        contents: row.contents,
-      });
-    }
-    return bookDOList;
-  }
-
   async getWordCount(bookId: number): Promise<WordCount> {
     await this.init();
     const rows = await this.all(`SELECT status, COUNT(*) AS cnt
@@ -199,17 +139,6 @@ export class SqliteDatabaseService implements DatabaseService {
     const runResult = await this.run(`UPDATE words SET ${setExpr.join(",")}
     WHERE id = ${wordDO.id}`);
     return runResult.changes;
-  }
-
-  async removeBook(bookId: number): Promise<void> {
-    await this.init();
-    const deleteBookResult = await this.run(
-      `DELETE FROM books WHERE id = ${bookId}`
-    );
-    const deleteWordResult = await this.run(
-      `DELETE FROM words WHERE book_id = ${bookId}`
-    );
-    return Promise.resolve();
   }
 
   private async getInsertWordsSqlList(

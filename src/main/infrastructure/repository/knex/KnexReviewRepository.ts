@@ -9,6 +9,7 @@ import { CardInstanceDO } from "../../do/CardInstanceDO";
 import { CardDO } from "../../do/CardDO";
 import { FieldTypeQuery } from "../../query/FieldTypeQuery";
 import { FieldTypeDO } from "../../do/FieldTypeDO";
+import { CardQuery } from "../../query/CardQuery";
 
 const knex = KnexFactory.knex;
 
@@ -78,4 +79,18 @@ export class KnexReviewRepository implements ReviewRepository {
       KnexReviewRepository._REVIEWS,
       query);
   }
+
+  async deleteById(id: number): Promise<void> {
+    await RepositoryUtils.deleteById(
+      KnexReviewRepository._REVIEWS,
+      id
+    );
+  }
+  async delete(query: ReviewQuery): Promise<number> {
+    return await RepositoryUtils.delete(
+      KnexReviewRepository._REVIEWS,
+      query
+    );
+  }
+
 }
