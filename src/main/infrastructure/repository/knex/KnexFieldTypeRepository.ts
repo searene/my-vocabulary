@@ -11,6 +11,7 @@ import { table } from "html-to-text/lib/formatter";
 import { FieldQuery } from "../../query/FieldQuery";
 import { FieldDO } from "../../do/FieldDO";
 import { CardQuery } from "../../query/CardQuery";
+import { BookQuery } from "../../query/BookQuery";
 
 @injectable()
 export class KnexFieldTypeRepository implements FieldTypeRepository {
@@ -91,4 +92,10 @@ export class KnexFieldTypeRepository implements FieldTypeRepository {
     );
   }
 
+  async queryCount(query: FieldTypeQuery): Promise<number> {
+    return await RepositoryUtils.queryCount(
+      KnexFieldTypeRepository._FIELD_TYPES,
+      query
+    );
+  }
 }

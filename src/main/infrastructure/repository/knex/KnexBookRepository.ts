@@ -94,4 +94,11 @@ export class KnexBookRepository implements BookRepository {
       query
     );
   }
+
+  async queryCount(query: BookQuery): Promise<number> {
+    return await RepositoryUtils.queryCount(
+      KnexBookRepository._BOOKS,
+      query
+    );
+  }
 }

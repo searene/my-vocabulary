@@ -8,21 +8,21 @@ interface State {
 
 interface BrowserState {
   visibility: boolean;
-  browseDataList: BrowseData[];
+  browseData: BrowseData;
 }
 
 const initialState: BrowserState = {
   visibility: false,
-  browseDataList: [],
+  browseData: { reviewItems: [], totalCount: 0 },
 };
 
 
 export const getBrowseData = createAsyncThunk<
-  BrowseData[],
+  BrowseData,
   { offset: number; limit: number },
   { state: State }
-  >("browser/getBrowseDataList", async ({ offset, limit }) => {
-  return await serviceProvider.cardFacade.getBrowseDataList(offset, limit);
+  >("browser/getBrowseData", async ({ offset, limit }) => {
+  return await serviceProvider.cardFacade.getBrowseData(offset, limit);
 });
 
 const browserSlice = createSlice({
@@ -35,10 +35,11 @@ const browserSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(getBrowseData.fulfilled, (state, action) => {
-      state.browseDataList = action.payload;
+      state.browseData.reviewItems = action.payload.reviewItems;
+      state.browseData.totalCount = action.payload.totalCount;
     });
     builder.addCase(getBrowseData.rejected, (state, action) => {
-      console.error("getBrowseDataList.rejected: an error occurred");
+      console.error("getBrowseData.rejected: an error occurred");
       console.error(action.error);
     });
   }
@@ -46,5 +47,5 @@ const browserSlice = createSlice({
 
 export const selectBrowserVisibility = (state: State) => state.browser.visibility;
 export const { setBrowserVisibility } = browserSlice.actions;
-export const selectBrowseData = (state: State) => state.browser.browseDataList;
+export const selectBrowseData = (state: State) => state.browser.browseData;
 export const browserReducer = browserSlice.reducer;

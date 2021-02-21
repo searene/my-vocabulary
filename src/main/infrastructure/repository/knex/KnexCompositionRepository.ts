@@ -11,6 +11,7 @@ import { CardDO } from "../../do/CardDO";
 import { CardTypeQuery } from "../../query/CardTypeQuery";
 import { CardTypeDO } from "../../do/CardTypeDO";
 import { CardQuery } from "../../query/CardQuery";
+import { BookQuery } from "../../query/BookQuery";
 
 @injectable()
 export class KnexCompositionRepository implements CompositionRepository {
@@ -91,6 +92,13 @@ export class KnexCompositionRepository implements CompositionRepository {
   }
   async delete(query: CompositionQuery): Promise<number> {
     return await RepositoryUtils.delete(
+      KnexCompositionRepository._COMPOSITIONS,
+      query
+    );
+  }
+
+  async queryCount(query: CompositionQuery): Promise<number> {
+    return await RepositoryUtils.queryCount(
       KnexCompositionRepository._COMPOSITIONS,
       query
     );

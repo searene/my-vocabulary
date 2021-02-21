@@ -39,6 +39,18 @@ export class RepositoryUtils {
     return rows as D[];
   }
 
+  static async queryCount<Q extends BaseQuery>(tableName: string, query: Q): Promise<number> {
+    const queryInterface = knex
+      .from(tableName)
+      .count("*", {as: "cnt"})
+      .where(query);
+    const rows = await queryInterface;
+    if (rows.length !== 1) {
+      throw new Error("The size of rows must be 1, actual rows: " + rows);
+    }
+    return rows[0].cnt as number;
+  }
+
   static async insert<D extends BaseDO>(
     tableName: string,
     dataObject: D

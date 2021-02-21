@@ -10,6 +10,7 @@ import { CardDO } from "../../do/CardDO";
 import { FieldTypeQuery } from "../../query/FieldTypeQuery";
 import { FieldTypeDO } from "../../do/FieldTypeDO";
 import { CardQuery } from "../../query/CardQuery";
+import { BookQuery } from "../../query/BookQuery";
 
 const knex = KnexFactory.knex;
 
@@ -93,4 +94,10 @@ export class KnexReviewRepository implements ReviewRepository {
     );
   }
 
+  async queryCount(query: ReviewQuery): Promise<number> {
+    return await RepositoryUtils.queryCount(
+      KnexReviewRepository._REVIEWS,
+      query
+    );
+  }
 }

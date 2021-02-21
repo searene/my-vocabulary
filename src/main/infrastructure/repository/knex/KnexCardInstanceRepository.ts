@@ -5,6 +5,7 @@ import { CardInstanceQuery } from "../../query/CardInstanceQuery";
 import { injectable } from "@parisholley/inversify-async";
 import { Options } from "../../query/Options";
 import { RepositoryUtils } from "../RepositoryUtils";
+import { BookQuery } from "../../query/BookQuery";
 
 const knex = KnexFactory.knex;
 
@@ -109,6 +110,13 @@ export class KnexCardInstanceRepository implements CardInstanceRepository {
 
   async delete(query: CardInstanceQuery): Promise<number> {
     return await RepositoryUtils.delete(
+      KnexCardInstanceRepository._CARD_INSTANCES,
+      query
+    );
+  }
+
+  async queryCount(query: CardInstanceQuery): Promise<number> {
+    return await RepositoryUtils.queryCount(
       KnexCardInstanceRepository._CARD_INSTANCES,
       query
     );

@@ -7,6 +7,7 @@ import { RepositoryUtils } from "../RepositoryUtils";
 import { knex } from "./KnexFactory";
 import { CardInstanceDO } from "../../do/CardInstanceDO";
 import { CardDO } from "../../do/CardDO";
+import { BookQuery } from "../../query/BookQuery";
 
 @injectable()
 export class KnexFieldRepository implements FieldRepository {
@@ -94,4 +95,10 @@ export class KnexFieldRepository implements FieldRepository {
     return (await queryBuilder) as FieldDO[];
   }
 
+  async queryCount(query: FieldQuery): Promise<number> {
+    return await RepositoryUtils.queryCount(
+      KnexFieldRepository._FIELDS,
+      query
+    );
+  }
 }

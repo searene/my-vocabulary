@@ -1,26 +1,36 @@
 import * as React from "react";
 import { useSelector } from "react-redux";
 import { getBrowseData, selectBrowseData, selectBrowserVisibility, setBrowserVisibility } from "./browserSlice";
-import { Icon, Label, Menu, Modal, Table } from "semantic-ui-react";
+import { Icon, Label, Menu, Modal, Pagination, Table } from "semantic-ui-react";
 import { useAppDispatch } from "../../redux/store";
 import { BrowseData } from "../../../main/facade/CardFacade";
 import { useEffect, useState } from "react";
 import { dateToYYYYMMDD } from "../../utils/DateUtils";
+import { PaginationProps } from "semantic-ui-react/dist/commonjs/addons/Pagination/Pagination";
 
 export const BrowserDialog = () => {
   const visibility: boolean = useSelector(selectBrowserVisibility);
-  const browseDataList: BrowseData[] = useSelector(selectBrowseData);
+  const browseData: BrowseData = useSelector(selectBrowseData);
   const [curPage, setCurPage] = useState(1);
+
+  const pageSize = 10;
 
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    const pageSize = 10;
     dispatch(getBrowseData({
       offset: (curPage - 1) * pageSize,
       limit: pageSize
     }));
   }, [curPage, visibility])
+
+  const handlePageChange = (event: React.MouseEvent<HTMLAnchorElement>, data: PaginationProps) => {
+    setCurPage(data.activePage as number);
+    dispatch(getBrowseData({
+      offset: (data.activePage as number - 1) * pageSize,
+      limit: pageSize
+    }));
+  }
 
   return visibility ? (
     <Modal
@@ -42,7 +52,7 @@ export const BrowserDialog = () => {
           </Table.Header>
 
           <Table.Body>
-            {browseDataList.map(browseData =>
+            {browseData.reviewItems.map(browseData =>
               <Table.Row key={browseData.cardInstanceId}>
                 <Table.Cell>{browseData.firstFieldContents}</Table.Cell>
                 <Table.Cell>{browseData.word}</Table.Cell>
@@ -54,19 +64,11 @@ export const BrowserDialog = () => {
 
           <Table.Footer>
             <Table.Row>
-              <Table.HeaderCell colSpan='3'>
-                <Menu floated='right' pagination>
-                  <Menu.Item as='a' icon>
-                    <Icon name='chevron left' />
-                  </Menu.Item>
-                  <Menu.Item as='a'>1</Menu.Item>
-                  <Menu.Item as='a'>2</Menu.Item>
-                  <Menu.Item as='a'>3</Menu.Item>
-                  <Menu.Item as='a'>4</Menu.Item>
-                  <Menu.Item as='a' icon>
-                    <Icon name='chevron right' />
-                  </Menu.Item>
-                </Menu>
+              <Table.HeaderCell colSpan='4'>
+                <Pagination defaultActivePage={curPage}
+                            totalPages={Math.ceil(browseData.totalCount / pageSize)}
+                            onPageChange={handlePageChange}
+                />
               </Table.HeaderCell>
             </Table.Row>
           </Table.Footer>

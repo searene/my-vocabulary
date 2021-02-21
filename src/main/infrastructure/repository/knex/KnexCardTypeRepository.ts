@@ -8,6 +8,7 @@ import { RepositoryUtils } from "../RepositoryUtils";
 import { CardInstanceDO } from "../../do/CardInstanceDO";
 import { CardDO } from "../../do/CardDO";
 import { CardQuery } from "../../query/CardQuery";
+import { BookQuery } from "../../query/BookQuery";
 
 const knex = KnexFactory.knex;
 
@@ -86,6 +87,13 @@ export class KnexCardTypeRepository implements CardTypeRepository {
   }
   async delete(query: CardTypeQuery): Promise<number> {
     return await RepositoryUtils.delete(
+      KnexCardTypeRepository._CARD_TYPES,
+      query
+    );
+  }
+
+  async queryCount(query: CardTypeQuery): Promise<number> {
+    return await RepositoryUtils.queryCount(
       KnexCardTypeRepository._CARD_TYPES,
       query
     );

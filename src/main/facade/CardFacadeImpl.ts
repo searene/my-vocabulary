@@ -1,9 +1,9 @@
 import { injectable } from "@parisholley/inversify-async";
 import {
-    BrowseData,
+  BrowseData,
   CardFacade,
   CardInstanceVO,
-  FieldTypeVO,
+  FieldTypeVO, ReviewItem,
   ReviewRequest,
   SaveCardParam,
 } from "./CardFacade";
@@ -131,7 +131,7 @@ export class CardFacadeImpl implements CardFacade {
     });
   }
 
-  async getBrowseDataList(offset: number, limit: number): Promise<BrowseData[]> {
+  async getBrowseData(offset: number, limit: number): Promise<BrowseData> {
     const cardInstanceRepo = await container.getAsync<CardInstanceRepository>(types.CardInstanceRepository);
     const cardInstanceDOs = await cardInstanceRepo.query({}, { offset, limit });
     const cardRepo = await container.getAsync<CardRepository>(types.CardRepository);
@@ -140,7 +140,7 @@ export class CardFacadeImpl implements CardFacade {
     const bookDOs = await bookRepo.batchQueryByIds(cardDOs.map(cardDO => cardDO.bookId as number));
     const fieldRepo = await container.getAsync<FieldRepository>(types.FieldRepository);
     const fieldDOs: FieldDO[] = await fieldRepo.batchQueryByCardIds(cardDOs.map(cardDO => cardDO.id as number));
-    const result: BrowseData[] = [];
+    const reviewItems: ReviewItem[] = [];
     for (const cardInstanceDO of cardInstanceDOs) {
       const cardInstanceId = cardInstanceDO.id as number;
       const cardDO = cardDOs.filter(cardDO => cardDO.id === cardInstanceDO.cardId)[0];
@@ -150,8 +150,9 @@ export class CardFacadeImpl implements CardFacade {
       const firstFieldId = firstFieldDO.id as number;
       const firstFieldContents = firstFieldDO.contents as string;
       const dueTime = cardInstanceDO.dueTime as number;
-      result.push({ cardInstanceId, firstFieldId, firstFieldContents, word, bookName, dueTime });
+      reviewItems.push({ cardInstanceId, firstFieldId, firstFieldContents, word, bookName, dueTime });
     }
-    return result;
+    const totalCount = await cardInstanceRepo.queryCount({});
+    return { reviewItems, totalCount };
   }
 }

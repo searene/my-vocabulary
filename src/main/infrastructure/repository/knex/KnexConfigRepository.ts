@@ -11,6 +11,7 @@ import { CardDO } from "../../do/CardDO";
 import { CompositionQuery } from "../../query/CompositionQuery";
 import { CompositionDO } from "../../do/CompositionDO";
 import { CardQuery } from "../../query/CardQuery";
+import { BookQuery } from "../../query/BookQuery";
 
 @injectable()
 export class KnexConfigRepository implements ConfigRepository {
@@ -112,4 +113,10 @@ export class KnexConfigRepository implements ConfigRepository {
     );
   }
 
+  async queryCount(query: ConfigQuery): Promise<number> {
+    return await RepositoryUtils.queryCount(
+      KnexConfigRepository._CONFIGS,
+      query
+    );
+  }
 }
