@@ -4,6 +4,6 @@ export type CardInstanceDO = BaseDO & {
   id?: number;
   cardId?: number;
   compositionId?: number;
-  dueTime?: Date;
+  dueTime?: number;
   bookId?: number;
 };

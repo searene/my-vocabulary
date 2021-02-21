@@ -39,11 +39,12 @@ export type ReviewRequest = {
 };
 
 export type BrowseData = {
+  cardInstanceId: number;
   firstFieldId: number;
   firstFieldContents: string;
   word: string;
   bookName: string
-  dueTime: Date
+  dueTime: number
 };
 
 export interface CardFacade {
@@ -68,5 +69,5 @@ export interface CardFacade {
    */
   review(reviewRequest: ReviewRequest): Promise<void>;
 
-  getBrowseData(offset: number, limit: number): Promise<BrowseData>;
+  getBrowseDataList(offset: number, limit: number): Promise<BrowseData[]>;
 }

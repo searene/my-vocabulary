@@ -34,7 +34,7 @@ export class Review {
     return new Review(
       reviewDO.id as number,
       cardInstance,
-      reviewDO.reviewTime as Date,
+      new Date(reviewDO.reviewTime as number),
       reviewDO.level as Level,
       fromTimeIntervalStr(reviewDO.timeInterval as string)
     );

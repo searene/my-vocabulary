@@ -58,7 +58,7 @@ export class CardInstance {
       cardInstanceDO.id as number,
       composition,
       card,
-      cardInstanceDO.dueTime as Date,
+      new Date(cardInstanceDO.dueTime as number),
       cardInstanceDO.bookId as number
     );
   }

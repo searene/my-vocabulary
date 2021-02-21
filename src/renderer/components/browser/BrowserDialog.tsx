@@ -1,13 +1,26 @@
 import * as React from "react";
 import { useSelector } from "react-redux";
-import { selectBrowserVisibility, setBrowserVisibility } from "./browserSlice";
+import { getBrowseData, selectBrowseData, selectBrowserVisibility, setBrowserVisibility } from "./browserSlice";
 import { Icon, Label, Menu, Modal, Table } from "semantic-ui-react";
 import { useAppDispatch } from "../../redux/store";
+import { BrowseData } from "../../../main/facade/CardFacade";
+import { useEffect, useState } from "react";
+import { dateToYYYYMMDD } from "../../utils/DateUtils";
 
 export const BrowserDialog = () => {
   const visibility: boolean = useSelector(selectBrowserVisibility);
+  const browseDataList: BrowseData[] = useSelector(selectBrowseData);
+  const [curPage, setCurPage] = useState(1);
 
   const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    const pageSize = 10;
+    dispatch(getBrowseData({
+      offset: (curPage - 1) * pageSize,
+      limit: pageSize
+    }));
+  }, [curPage, visibility])
 
   return visibility ? (
     <Modal
@@ -29,23 +42,14 @@ export const BrowserDialog = () => {
           </Table.Header>
 
           <Table.Body>
-            <Table.Row>
-              <Table.Cell>
-                <Label ribbon>First</Label>
-              </Table.Cell>
-              <Table.Cell>Cell</Table.Cell>
-              <Table.Cell>Cell</Table.Cell>
-            </Table.Row>
-            <Table.Row>
-              <Table.Cell>Cell</Table.Cell>
-              <Table.Cell>Cell</Table.Cell>
-              <Table.Cell>Cell</Table.Cell>
-            </Table.Row>
-            <Table.Row>
-              <Table.Cell>Cell</Table.Cell>
-              <Table.Cell>Cell</Table.Cell>
-              <Table.Cell>Cell</Table.Cell>
-            </Table.Row>
+            {browseDataList.map(browseData =>
+              <Table.Row key={browseData.cardInstanceId}>
+                <Table.Cell>{browseData.firstFieldContents}</Table.Cell>
+                <Table.Cell>{browseData.word}</Table.Cell>
+                <Table.Cell>{dateToYYYYMMDD(new Date(browseData.dueTime))}</Table.Cell>
+                <Table.Cell>{browseData.bookName}</Table.Cell>
+              </Table.Row>
+            )}
           </Table.Body>
 
           <Table.Footer>

@@ -7,7 +7,6 @@ import { RepositoryUtils } from "../RepositoryUtils";
 import { knex } from "./KnexFactory";
 import { CardInstanceDO } from "../../do/CardInstanceDO";
 import { CardDO } from "../../do/CardDO";
-import { CardQuery } from "../../query/CardQuery";
 
 @injectable()
 export class KnexFieldRepository implements FieldRepository {
@@ -86,6 +85,13 @@ export class KnexFieldRepository implements FieldRepository {
       KnexFieldRepository._FIELDS,
       query
     );
+  }
+
+  async batchQueryByCardIds(cardIds: number[]): Promise<FieldDO[]> {
+    const queryBuilder = knex.from(KnexFieldRepository._FIELDS)
+      .select("*")
+      .whereIn("card_id", cardIds);
+    return (await queryBuilder) as FieldDO[];
   }
 
 }

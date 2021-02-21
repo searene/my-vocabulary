@@ -26,8 +26,7 @@ import {
 import { FieldRepository } from "../infrastructure/repository/FieldRepository";
 import { CardRepository } from "../infrastructure/repository/CardRepository";
 import { FieldDO } from "../infrastructure/do/FieldDO";
-import { Database } from "sqlite3";
-import { DatabaseService } from "../database/DatabaseService";
+import { BookRepository } from "../infrastructure/repository/BookRepository";
 
 @injectable()
 export class CardFacadeImpl implements CardFacade {
@@ -63,7 +62,7 @@ export class CardFacadeImpl implements CardFacade {
       return {
         cardId: card.id,
         compositionId: compositionDO.id,
-        dueTime: scheduler.getInitialReviewDate(),
+        dueTime: scheduler.getInitialReviewDate().getTime(),
         bookId: saveCardParam.bookId,
       };
     });
@@ -118,7 +117,7 @@ export class CardFacadeImpl implements CardFacade {
     );
     await reviewRepo.insert({
       cardInstanceId: reviewRequest.cardInstanceId,
-      reviewTime: new Date(),
+      reviewTime: new Date().getTime(),
       level: reviewRequest.level,
       timeInterval: convertTimeIntervalToString(reviewRequest.timeInterval),
     });
@@ -128,22 +127,31 @@ export class CardFacadeImpl implements CardFacade {
     );
     await cardInstanceRepo.updateById({
       id: reviewRequest.cardInstanceId,
-      dueTime: addTimeInterval(new Date(), reviewRequest.timeInterval),
+      dueTime: addTimeInterval(new Date(), reviewRequest.timeInterval).getTime(),
     });
   }
 
-  async getBrowseData(offset: number, limit: number): Promise<BrowseData> {
-    const fieldRepo = await container.getAsync<FieldRepository>(types.FieldRepository);
-    const fieldDOs = await fieldRepo.query({}, { offset, limit });
+  async getBrowseDataList(offset: number, limit: number): Promise<BrowseData[]> {
+    const cardInstanceRepo = await container.getAsync<CardInstanceRepository>(types.CardInstanceRepository);
+    const cardInstanceDOs = await cardInstanceRepo.query({}, { offset, limit });
     const cardRepo = await container.getAsync<CardRepository>(types.CardRepository);
-    const cardDOs = await cardRepo.batchQueryByIds(fieldDOs.map(fieldDO => fieldDO.cardId as number));
-    const databaseService = await container.getAsync<DatabaseService>(types.DatabaseService);
-    return {
-      firstFieldId: -1,
-      firstFieldContents: "mock",
-      word: "mock",
-      bookName: "mock",
-      dueTime: new Date(),
+    const cardDOs = await cardRepo.batchQueryByIds(cardInstanceDOs.map(cardInstanceDO => cardInstanceDO.cardId as number));
+    const bookRepo = await container.getAsync<BookRepository>(types.BookRepository);
+    const bookDOs = await bookRepo.batchQueryByIds(cardDOs.map(cardDO => cardDO.bookId as number));
+    const fieldRepo = await container.getAsync<FieldRepository>(types.FieldRepository);
+    const fieldDOs: FieldDO[] = await fieldRepo.batchQueryByCardIds(cardDOs.map(cardDO => cardDO.id as number));
+    const result: BrowseData[] = [];
+    for (const cardInstanceDO of cardInstanceDOs) {
+      const cardInstanceId = cardInstanceDO.id as number;
+      const cardDO = cardDOs.filter(cardDO => cardDO.id === cardInstanceDO.cardId)[0];
+      const word = cardDO.word as string;
+      const bookName = bookDOs.filter(bookDO => cardDO.bookId === bookDO.id)[0].name as string;
+      const firstFieldDO = fieldDOs.filter(fieldDO => fieldDO.cardId === cardDO.id)[0];
+      const firstFieldId = firstFieldDO.id as number;
+      const firstFieldContents = firstFieldDO.contents as string;
+      const dueTime = cardInstanceDO.dueTime as number;
+      result.push({ cardInstanceId, firstFieldId, firstFieldContents, word, bookName, dueTime });
     }
+    return result;
   }
 }
