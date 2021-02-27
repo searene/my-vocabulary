@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useSelector } from "react-redux";
 import { getBrowseData, selectBrowseData, selectBrowserVisibility, setBrowserVisibility } from "./browserSlice";
-import { Icon, Label, Menu, Modal, Pagination, Table } from "semantic-ui-react";
+import { Modal, Pagination, Table } from "semantic-ui-react";
 import { useAppDispatch } from "../../redux/store";
 import { BrowseData } from "../../../main/facade/CardFacade";
 import { useEffect, useState } from "react";
@@ -34,6 +34,15 @@ export const BrowserDialog = () => {
     }));
   }
 
+  const handleSearch = (searchContents: string) => {
+    setCurPage(1);
+    dispatch(getBrowseData({
+      searchContents,
+      offset: 0,
+      limit: pageSize
+    }));
+  }
+
   return visibility ? (
     <Modal
       onClose={() => dispatch(setBrowserVisibility(false))}
@@ -43,7 +52,7 @@ export const BrowserDialog = () => {
     >
       <Modal.Header>Browser</Modal.Header>
       <Modal.Content>
-        <BrowserDialogSearchInput value={inputValue} onValueChange={setInputValue} />
+        <BrowserDialogSearchInput onStartSearching={handleSearch} />
         <Table celled>
           <Table.Header>
             <Table.Row>

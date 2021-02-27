@@ -37,6 +37,10 @@ export class KnexCompositeRepository implements CompositeRepository {
     const reviewItems = await outerDataQuery as ReviewItem[];
     const totalCountQuery = knex(subQuery).count("* as cnt").first() as any;
     const totalCount = (await totalCountQuery)["cnt"];
-    return { reviewItems, totalCount };
+
+    // When totalCount == 0, reviewItems is an array one element, where each field is null.
+    // This is a problem of Sqlite3, haven't found a solution yet, let's just manually return
+    // empty array in this case.
+    return totalCount === 0 ? { reviewItems: [] , totalCount: 0 } : {reviewItems, totalCount};
   }
 }

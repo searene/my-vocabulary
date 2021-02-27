@@ -19,10 +19,11 @@ const initialState: BrowserState = {
 
 export const getBrowseData = createAsyncThunk<
   BrowseData,
-  { offset: number; limit: number },
+  { searchContents?: string, offset: number; limit: number },
   { state: State }
-  >("browser/getBrowseData", async ({ offset, limit }) => {
-  return await serviceProvider.cardFacade.getBrowseData({ offset, limit });
+  >("browser/getBrowseData", async ({ searchContents, offset, limit }) => {
+  return await serviceProvider.cardFacade.getBrowseData(
+    { searchContents, offset, limit });
 });
 
 const browserSlice = createSlice({
