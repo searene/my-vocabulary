@@ -20,10 +20,12 @@ export const BrowserDialog = () => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    dispatch(getBrowseData({
-      offset: (curPage - 1) * pageSize,
-      limit: pageSize
-    }));
+    if (visibility) {
+      dispatch(getBrowseData({
+        offset: (curPage - 1) * pageSize,
+        limit: pageSize
+      }));
+    }
   }, [curPage, visibility])
 
   const handlePageChange = (event: React.MouseEvent<HTMLAnchorElement>, data: PaginationProps) => {

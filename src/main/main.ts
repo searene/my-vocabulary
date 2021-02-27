@@ -14,7 +14,7 @@ import * as os from "os";
 import { DictService } from "./dict/DictService";
 import { CardType } from "./domain/card/CardType";
 import { CardTypeRepository } from "./infrastructure/repository/CardTypeRepository";
-import { FieldType } from "./domain/card/FieldType";
+import { FieldType } from "./domain/field/FieldType";
 import { FieldTypeRepository } from "./infrastructure/repository/FieldTypeRepository";
 import { CompositionRepository } from "./infrastructure/repository/CompositionRepository";
 

@@ -3,7 +3,7 @@ import { CompositionDO } from "../../infrastructure/do/CompositionDO";
 import { CardTypeRepository } from "../../infrastructure/repository/CardTypeRepository";
 import { container } from "../../config/inversify.config";
 import { types } from "../../config/types";
-import { FieldType } from "./FieldType";
+import { FieldType } from "../field/FieldType";
 import { FieldTypeRepository } from "../../infrastructure/repository/FieldTypeRepository";
 
 export class Composition {

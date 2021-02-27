@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import serviceProvider from "../../ServiceProvider";
+import { FieldContents } from "../../../main/domain/card/FieldContents";
 
 interface State {
   add: AddState;
@@ -8,7 +9,8 @@ export interface FieldVO {
   id: number;
   category: string;
   name: string;
-  contents: string;
+  originalContents: string;
+  plainTextContents: string;
 }
 interface AddState {
   fieldTypeIdToFieldVOMap: Record<number, FieldVO>; // fieldTypeId -> field contents
@@ -30,11 +32,14 @@ export const saveCard = createAsyncThunk<
   { state: State }
 >("add/saveCard", async ({ word, bookId }, { getState }) => {
   const fieldTypeIdToFieldVOMap = selectFieldTypeIdToFieldVOMap(getState());
-  const fieldContents: Record<number, string> = {};
+  const fieldContents: Record<number, FieldContents> = {};
   for (const [fieldTypeId, fieldVO] of Object.entries(
     fieldTypeIdToFieldVOMap
   )) {
-    fieldContents[parseInt(fieldTypeId)] = fieldVO.contents;
+    fieldContents[parseInt(fieldTypeId)] = {
+      originalContents: fieldVO.originalContents,
+      plainTextContents: fieldVO.plainTextContents,
+    };
   }
   await serviceProvider.cardFacade.saveCard({
     word,
@@ -47,10 +52,11 @@ const addSlice = createSlice({
   initialState: initialState,
   reducers: {
     changeFieldContents: (state, action) => {
-      const { fieldTypeId, contents } = action.payload;
+      const { fieldTypeId, originalContents, plainTextContents } = action.payload;
       state.fieldTypeIdToFieldVOMap[fieldTypeId] = {
         ...state.fieldTypeIdToFieldVOMap[fieldTypeId],
-        contents,
+        originalContents,
+        plainTextContents,
       };
     },
   },
@@ -60,7 +66,8 @@ const addSlice = createSlice({
         for (const fieldVO of action.payload) {
           state.fieldTypeIdToFieldVOMap[fieldVO.id] = {
             ...fieldVO,
-            contents: "",
+            originalContents: "",
+            plainTextContents: "",
           };
         }
       } catch (err) {

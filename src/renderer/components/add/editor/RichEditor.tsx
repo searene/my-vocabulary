@@ -2,8 +2,8 @@ import * as React from "react";
 import { createRef } from "react";
 
 interface RichEditorProps {
-  value: string;
-  onChange: (value: string) => void;
+  htmlContents: string;
+  onChange: (originalContents: string, plainTextContents: string) => void;
 }
 interface RichEditorStates {}
 
@@ -29,7 +29,7 @@ export class RichEditor extends React.Component<
   }
 
   shouldComponentUpdate(nextProps: RichEditorProps) {
-    return nextProps.value !== this.divComponent.current!.innerHTML;
+    return nextProps.htmlContents !== this.divComponent.current!.innerHTML;
   }
 
   getHtmlContents() {
@@ -39,7 +39,7 @@ export class RichEditor extends React.Component<
   private emitChange = () => {
     const currentValue = this.divComponent.current!.innerHTML;
     if (currentValue !== this.lastValue) {
-      this.props.onChange(currentValue);
+      this.props.onChange(currentValue, this.divComponent.current!.innerText);
     }
     this.lastValue = currentValue;
   };
@@ -55,7 +55,7 @@ export class RichEditor extends React.Component<
         style={{
           border: "1px solid black",
         }}
-      ></div>
+      />
     );
   }
 }

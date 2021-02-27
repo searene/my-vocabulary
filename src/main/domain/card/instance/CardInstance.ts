@@ -6,7 +6,7 @@ import { CompositionRepository } from "../../../infrastructure/repository/Compos
 import { CardRepository } from "../../../infrastructure/repository/CardRepository";
 import { Card } from "../Card";
 import { FieldRepository } from "../../../infrastructure/repository/FieldRepository";
-import { Field } from "../Field";
+import { Field } from "../../field/Field";
 
 export class CardInstance {
   constructor(
@@ -88,8 +88,8 @@ export class CardInstance {
       (field) => backFieldTypeIds.indexOf(field.fieldType.id) > -1
     );
     return [
-      frontFields.map((frontField) => frontField.contents).join("<br/>"),
-      backFields.map((backField) => backField.contents).join("<br/>"),
+      frontFields.map((frontField) => frontField.originalContents).join("<br/>"),
+      backFields.map((backField) => backField.originalContents).join("<br/>"),
     ];
   }
 }

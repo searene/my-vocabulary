@@ -1,5 +1,6 @@
 import { TimeInterval } from "../domain/time/TimeInterval";
 import { Level } from "../domain/card/Level";
+import { FieldContents } from "../domain/card/FieldContents";
 
 export type SaveCardParam = {
   word: string;
@@ -11,7 +12,7 @@ export type SaveCardParam = {
    */
   cardTypeId?: number;
 
-  fieldContents: Record<number, string>; // fieldTypeId -> fieldContents
+  fieldContents: Record<number, FieldContents>; // fieldTypeId -> fieldContents
 };
 export type FieldTypeVO = {
   id: number;

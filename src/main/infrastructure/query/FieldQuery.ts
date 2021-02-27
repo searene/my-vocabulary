@@ -2,6 +2,7 @@ import { BaseQuery } from "./BaseQuery";
 
 export type FieldQuery = BaseQuery & {
   fieldTypeId?: number;
-  contents?: string;
+  originalContents?: string;
+  plainTextContents?: string;
   cardId?: number;
 };

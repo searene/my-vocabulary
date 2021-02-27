@@ -2,7 +2,7 @@ import { container } from "../../../config/inversify.config";
 import { types } from "../../../config/types";
 import { CompositionRepository } from "../../../infrastructure/repository/CompositionRepository";
 import { Composition } from "../Composition";
-import { FieldType } from "../FieldType";
+import { FieldType } from "../../field/FieldType";
 
 export class CompositionFactory {
   private static _instance: CompositionFactory | undefined;

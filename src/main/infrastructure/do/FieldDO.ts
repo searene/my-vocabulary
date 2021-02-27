@@ -2,6 +2,7 @@ import { BaseDO } from "./BaseDO";
 
 export type FieldDO = BaseDO & {
   fieldTypeId?: number;
-  contents?: string;
+  originalContents?: string;
+  plainTextContents: string;
   cardId?: number;
 };

@@ -5,9 +5,6 @@ import { Options } from "../../query/Options";
 import { FieldRepository } from "../FieldRepository";
 import { RepositoryUtils } from "../RepositoryUtils";
 import { knex } from "./KnexFactory";
-import { CardInstanceDO } from "../../do/CardInstanceDO";
-import { CardDO } from "../../do/CardDO";
-import { BookQuery } from "../../query/BookQuery";
 
 @injectable()
 export class KnexFieldRepository implements FieldRepository {
@@ -26,7 +23,8 @@ export class KnexFieldRepository implements FieldRepository {
     if (!tablesExists) {
       await knex.schema.createTable(KnexFieldRepository._FIELDS, (table) => {
         table.increments();
-        table.string("contents");
+        table.string("original_contents");
+        table.string("plain_text_contents");
         table.integer("card_id");
         table.integer("field_type_id");
       });
@@ -58,11 +56,11 @@ export class KnexFieldRepository implements FieldRepository {
     );
   }
 
-  async queryById(id: number): Promise<CardInstanceDO | undefined> {
+  async queryById(id: number): Promise<FieldDO | undefined> {
     return await RepositoryUtils.queryById(KnexFieldRepository._FIELDS, id);
   }
 
-  async queryByIdOrThrow(id: number): Promise<CardDO> {
+  async queryByIdOrThrow(id: number): Promise<FieldDO> {
     return await RepositoryUtils.queryByIdOrThrow(
       KnexFieldRepository._FIELDS,
       id

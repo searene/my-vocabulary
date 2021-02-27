@@ -9,7 +9,6 @@ import {
 } from "./CardFacade";
 import { CardFactory } from "../domain/card/factory/CardFactory";
 import { FieldTypeFactory } from "../domain/card/factory/FieldTypeFactory";
-import { FieldFactory } from "../domain/card/factory/FieldFactory";
 import { types } from "../config/types";
 import { WordStatus } from "../enum/WordStatus";
 import { WordRepository } from "../infrastructure/repository/WordRepository";
@@ -28,12 +27,12 @@ import { CardRepository } from "../infrastructure/repository/CardRepository";
 import { FieldDO } from "../infrastructure/do/FieldDO";
 import { BookRepository } from "../infrastructure/repository/BookRepository";
 import { CompositeRepository } from "../infrastructure/repository/CompositeRepository";
+import { Field } from "../domain/field/Field";
 
 @injectable()
 export class CardFacadeImpl implements CardFacade {
   private _cardFactory = new CardFactory();
   private _fieldTypeFactory = FieldTypeFactory.get();
-  private _fieldFactory = FieldFactory.get();
 
   async getFieldTypes(cardTypeId?: number): Promise<FieldTypeVO[]> {
     const fieldTypes = await this._fieldTypeFactory.getFieldTypes(cardTypeId);
@@ -49,7 +48,7 @@ export class CardFacadeImpl implements CardFacade {
   async saveCard(saveCardParam: SaveCardParam): Promise<number> {
     const card = await this._cardFactory.createCard(saveCardParam.bookId,
       saveCardParam.word);
-    await this._fieldFactory.batchCreate(card.id, saveCardParam.fieldContents);
+    await Field.batchCreate(card.id, saveCardParam.fieldContents);
 
     // create card instances
     const compositionRepo = await container.getAsync<CompositionRepository>(

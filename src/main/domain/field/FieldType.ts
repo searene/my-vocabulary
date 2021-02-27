@@ -1,5 +1,5 @@
 import { FieldTypeCategory } from "../../infrastructure/common/FieldTypeCategory";
-import { CardType } from "./CardType";
+import { CardType } from "../card/CardType";
 import { FieldTypeDO } from "../../infrastructure/do/FieldTypeDO";
 import { container } from "../../config/inversify.config";
 import { types } from "../../config/types";

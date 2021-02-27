@@ -3,7 +3,7 @@ import { types } from "../../../config/types";
 import { FieldTypeCategory } from "../../../infrastructure/common/FieldTypeCategory";
 import { FieldTypeDO } from "../../../infrastructure/do/FieldTypeDO";
 import { FieldTypeRepository } from "../../../infrastructure/repository/FieldTypeRepository";
-import { FieldType } from "../FieldType";
+import { FieldType } from "../../field/FieldType";
 import { CardTypeFactory } from "./CardTypeFactory";
 
 export class FieldTypeFactory {

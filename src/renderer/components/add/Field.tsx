@@ -16,20 +16,21 @@ export const Field = (props: FieldProps) => {
 
   const dispatch = useAppDispatch();
 
-  const handleRichEditorChange = (value: string) => {
+  const handleRichEditorChange = (originalContents: string, plainTextContents: string) => {
     dispatch(
       changeFieldContents({
         fieldTypeId: props.fieldTypeId,
-        contents: value,
+        originalContents,
+        plainTextContents,
       })
     );
   };
 
   const getEditor = (fieldVO: FieldVO) => {
     if (fieldVO.category === "text") {
-      return <RichEditor value={fieldVO.contents} onChange={handleRichEditorChange} />;
+      return <RichEditor htmlContents={fieldVO.originalContents} onChange={handleRichEditorChange} />;
     } else if (fieldVO.category == "google-image") {
-      return <GoogleImageEditor word={props.word} onChange={handleRichEditorChange} />
+      return <GoogleImageEditor word={props.word} onChange={(value) => handleRichEditorChange(value, "")} />
     } else {
       throw new Error("Unsupported category: " + fieldVO.category);
     }

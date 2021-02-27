@@ -60,8 +60,8 @@ export class RepositoryUtils {
     return dataObjectWithId;
   }
 
-  static async queryById<D extends BaseDO>(tableName: string, id: number) {
-    const array = await RepositoryUtils.query(tableName, { id }, undefined);
+  static async queryById<D extends BaseDO>(tableName: string, id: number): Promise<D | undefined> {
+    const array: D[] = await RepositoryUtils.query(tableName, { id }, undefined);
     if (array.length > 1) {
       throw new Error(
         "array.length cannot be greater than 1, actual: " + array.length
@@ -76,8 +76,8 @@ export class RepositoryUtils {
   static async queryByIdOrThrow<D extends BaseDO>(
     tableName: string,
     id: number
-  ) {
-    const dataObject = await this.queryById(tableName, id);
+  ): Promise<D> {
+    const dataObject = await this.queryById<D>(tableName, id);
     if (dataObject == undefined) {
       throw new Error(`Invalid id ${id} for table ${tableName}`);
     }

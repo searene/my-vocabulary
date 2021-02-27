@@ -13,31 +13,34 @@ export class KnexCompositeRepository implements CompositeRepository {
       .select("card_instances.id as card_instance_id",
         "card_instances.due_time as due_time",
         "fields.id as field_id",
-        "fields.contents as field_contents",
+        "fields.plain_text_contents as field_contents",
         "cards.word as word",
-        "books.name as book_name"
-        )
-      .groupBy("card_instances.id");
+        "books.name as book_name",
+        knex.raw("ROW_NUMBER() OVER (PARTITION BY card_instances.id ORDER BY fields.field_type_id) as r")
+      );
 
     if (browseDataRequest.searchContents !== undefined) {
-      subQuery = subQuery.where("cards.word", "like", `%${browseDataRequest.searchContents}%`)
-        .orWhere("fields.contents", "like", `%${browseDataRequest.searchContents}%`);
+      subQuery = subQuery
+        .where("cards.word", "like", `%${browseDataRequest.searchContents}%`)
+        .orWhere("fields.original_contents", "like", `%${browseDataRequest.searchContents}%`);
     }
-    const outerDataQuery = knex(subQuery)
-      .select("card_instance_id")
-      .max({
-        due_time: "due_time",
-        field_id: "field_id",
-        field_contents: "field_contents",
-        word: "word",
-        book_name: "book_name"
-      })
+
+    const outerCommonQuery = knex(subQuery)
+      .where("r", "=", 1);
+    const outerDataQuery = outerCommonQuery
+      .select("card_instance_id",
+        "due_time",
+        "field_id as first_field_id",
+        "field_contents as first_field_contents",
+        "word",
+        "book_name")
       .limit(browseDataRequest.limit)
       .offset(browseDataRequest.offset)
     const reviewItems = await outerDataQuery as ReviewItem[];
-    const totalCountQuery = knex(subQuery).count("* as cnt").first() as any;
+    const totalCountQuery = outerCommonQuery.count("* as cnt").first() as any;
     const totalCount = (await totalCountQuery)["cnt"];
 
+    console.log(reviewItems);
     // When totalCount == 0, reviewItems is an array one element, where each field is null.
     // This is a problem of Sqlite3, haven't found a solution yet, let's just manually return
     // empty array in this case.
