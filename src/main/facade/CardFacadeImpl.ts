@@ -27,6 +27,7 @@ import { FieldRepository } from "../infrastructure/repository/FieldRepository";
 import { CardRepository } from "../infrastructure/repository/CardRepository";
 import { FieldDO } from "../infrastructure/do/FieldDO";
 import { BookRepository } from "../infrastructure/repository/BookRepository";
+import { CompositeRepository } from "../infrastructure/repository/CompositeRepository";
 
 @injectable()
 export class CardFacadeImpl implements CardFacade {
@@ -132,29 +133,7 @@ export class CardFacadeImpl implements CardFacade {
   }
 
   async getBrowseData(request: BrowseDataRequest): Promise<BrowseData> {
-    const cardInstanceRepo = await container.getAsync<CardInstanceRepository>(types.CardInstanceRepository);
-    const cardInstanceDOs = await cardInstanceRepo.query({}, {
-      offset: request.offset, limit: request.limit
-    });
-    const cardRepo = await container.getAsync<CardRepository>(types.CardRepository);
-    const cardDOs = await cardRepo.batchQueryByIds(cardInstanceDOs.map(cardInstanceDO => cardInstanceDO.cardId as number));
-    const bookRepo = await container.getAsync<BookRepository>(types.BookRepository);
-    const bookDOs = await bookRepo.batchQueryByIds(cardDOs.map(cardDO => cardDO.bookId as number));
-    const fieldRepo = await container.getAsync<FieldRepository>(types.FieldRepository);
-    const fieldDOs: FieldDO[] = await fieldRepo.batchQueryByCardIds(cardDOs.map(cardDO => cardDO.id as number));
-    const reviewItems: ReviewItem[] = [];
-    for (const cardInstanceDO of cardInstanceDOs) {
-      const cardInstanceId = cardInstanceDO.id as number;
-      const cardDO = cardDOs.filter(cardDO => cardDO.id === cardInstanceDO.cardId)[0];
-      const word = cardDO.word as string;
-      const bookName = bookDOs.filter(bookDO => cardDO.bookId === bookDO.id)[0].name as string;
-      const firstFieldDO = fieldDOs.filter(fieldDO => fieldDO.cardId === cardDO.id)[0];
-      const firstFieldId = firstFieldDO.id as number;
-      const firstFieldContents = firstFieldDO.contents as string;
-      const dueTime = cardInstanceDO.dueTime as number;
-      reviewItems.push({ cardInstanceId, firstFieldId, firstFieldContents, word, bookName, dueTime });
-    }
-    const totalCount = await cardInstanceRepo.queryCount({});
-    return { reviewItems, totalCount };
+    const compositeRepo = await container.getAsync<CompositeRepository>(types.CompositeRepository);
+    return compositeRepo.getBrowseData(request);
   }
 }

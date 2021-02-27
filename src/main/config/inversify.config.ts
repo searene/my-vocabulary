@@ -34,6 +34,8 @@ import { DefaultScheduler } from "../domain/scheduler/DefaultScheduler";
 import { BookRepository } from "../infrastructure/repository/BookRepository";
 import { KnexBookRepository } from "../infrastructure/repository/knex/KnexBookRepository";
 import { BookServiceImpl } from "../BookServiceImpl";
+import { CompositeRepository } from "../infrastructure/repository/CompositeRepository";
+import { KnexCompositeRepository } from "../infrastructure/repository/knex/KnexCompositeRepository";
 
 export const container = new Container({
   defaultScope: "Singleton",
@@ -118,4 +120,7 @@ container
     await bookRepo.init();
     return bookRepo;
   });
+container
+  .bind<CompositeRepository>(types.CompositeRepository)
+  .to(KnexCompositeRepository)
 container.bind<Scheduler>(types.Scheduler).to(DefaultScheduler);
