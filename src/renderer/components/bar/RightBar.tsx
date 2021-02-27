@@ -45,11 +45,11 @@ export const RightBar: FunctionComponent<RightBarProps> = function (props) {
   });
 
   return (
-    <div style={{ width: "50px", height: "100%", display: "flex" }}>
+    <div style={{ height: "100%", display: "flex" }}>
       {getBarItemComponent()}
       <div style={{ height: "100%", border: "1px solid black" }}>
         {barItemIcons}
       </div>
     </div>
   );
-};
+}

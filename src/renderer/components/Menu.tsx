@@ -89,7 +89,7 @@ export const Menu = function () {
           </HashRouter>
         </Segment>
       </Grid.Column>
-      <Grid.Column stretched width={2}>
+      <Grid.Column stretched width={6}>
         <RightBar>
           <BarItem icon={"book"} component={<Dictionary />} />
         </RightBar>

@@ -11,7 +11,11 @@ export const Dictionary = (props: DictionaryProps) => {
   const [word, setWord] = useState("");
 
   return (
-    <div>
+    <div style={{
+      height: "80vh",
+      display: "flex",
+      flexDirection: "column",
+    }}>
       <SearchInput
         value={searchValue}
         onChange={setSearchValue}

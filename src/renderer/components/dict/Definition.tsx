@@ -18,13 +18,14 @@ export const Definition = (props: DefinitionProps) => {
   }, [props.word]);
 
   return (
-    <div
-      style={{
-        border: "1px solid #ccc",
-      }}
+    <div style={{
+      border: "1px solid #ccc",
+      overflow: "auto",
+      flexGrow: 1,
+    }}
       dangerouslySetInnerHTML={{
         __html: html,
       }}
-    ></div>
+    />
   );
 };
