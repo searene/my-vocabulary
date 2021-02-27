@@ -22,7 +22,7 @@ export const getBrowseData = createAsyncThunk<
   { offset: number; limit: number },
   { state: State }
   >("browser/getBrowseData", async ({ offset, limit }) => {
-  return await serviceProvider.cardFacade.getBrowseData(offset, limit);
+  return await serviceProvider.cardFacade.getBrowseData({ offset, limit });
 });
 
 const browserSlice = createSlice({

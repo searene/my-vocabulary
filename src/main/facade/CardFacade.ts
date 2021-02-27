@@ -52,6 +52,17 @@ export type BrowseData = {
   totalCount: number;
 };
 
+export type BrowseDataRequest = {
+  searchContents?: string;
+
+  /**
+   * Start from 0
+   */
+  offset: number;
+
+  limit: number;
+}
+
 export interface CardFacade {
   /**
    * Get field types of the given cardType, if no cardType was given,
@@ -74,5 +85,5 @@ export interface CardFacade {
    */
   review(reviewRequest: ReviewRequest): Promise<void>;
 
-  getBrowseData(offset: number, limit: number): Promise<BrowseData>;
+  getBrowseData(browseDataRequest: BrowseDataRequest): Promise<BrowseData>;
 }

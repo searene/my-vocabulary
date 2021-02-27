@@ -1,6 +1,6 @@
 import { injectable } from "@parisholley/inversify-async";
 import {
-  BrowseData,
+  BrowseData, BrowseDataRequest,
   CardFacade,
   CardInstanceVO,
   FieldTypeVO, ReviewItem,
@@ -131,9 +131,11 @@ export class CardFacadeImpl implements CardFacade {
     });
   }
 
-  async getBrowseData(offset: number, limit: number): Promise<BrowseData> {
+  async getBrowseData(request: BrowseDataRequest): Promise<BrowseData> {
     const cardInstanceRepo = await container.getAsync<CardInstanceRepository>(types.CardInstanceRepository);
-    const cardInstanceDOs = await cardInstanceRepo.query({}, { offset, limit });
+    const cardInstanceDOs = await cardInstanceRepo.query({}, {
+      offset: request.offset, limit: request.limit
+    });
     const cardRepo = await container.getAsync<CardRepository>(types.CardRepository);
     const cardDOs = await cardRepo.batchQueryByIds(cardInstanceDOs.map(cardInstanceDO => cardInstanceDO.cardId as number));
     const bookRepo = await container.getAsync<BookRepository>(types.BookRepository);

@@ -7,11 +7,13 @@ import { BrowseData } from "../../../main/facade/CardFacade";
 import { useEffect, useState } from "react";
 import { dateToYYYYMMDD } from "../../utils/DateUtils";
 import { PaginationProps } from "semantic-ui-react/dist/commonjs/addons/Pagination/Pagination";
+import { BrowserDialogSearchInput } from "./BrowserDialogSearchInput";
 
 export const BrowserDialog = () => {
   const visibility: boolean = useSelector(selectBrowserVisibility);
   const browseData: BrowseData = useSelector(selectBrowseData);
   const [curPage, setCurPage] = useState(1);
+  const [inputValue, setInputValue] = useState("");
 
   const pageSize = 10;
 
@@ -41,6 +43,7 @@ export const BrowserDialog = () => {
     >
       <Modal.Header>Browser</Modal.Header>
       <Modal.Content>
+        <BrowserDialogSearchInput value={inputValue} onValueChange={setInputValue} />
         <Table celled>
           <Table.Header>
             <Table.Row>
