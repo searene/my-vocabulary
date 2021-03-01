@@ -1,5 +1,4 @@
 import { injectable } from "@parisholley/inversify-async";
-import { WatchDog } from "../../../WatchDog";
 import { WordDO } from "../../do/WordDO";
 import { Options } from "../../query/Options";
 import { WordQuery } from "../../query/WordQuery";
@@ -8,10 +7,6 @@ import { WordRepository } from "../WordRepository";
 import { knex } from "./KnexFactory";
 import { CardInstanceDO } from "../../do/CardInstanceDO";
 import { CardDO } from "../../do/CardDO";
-import { ReviewQuery } from "../../query/ReviewQuery";
-import { ReviewDO } from "../../do/ReviewDO";
-import { CardQuery } from "../../query/CardQuery";
-import { BookQuery } from "../../query/BookQuery";
 
 @injectable()
 export class KnexWordRepository implements WordRepository {

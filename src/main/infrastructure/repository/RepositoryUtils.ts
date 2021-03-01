@@ -4,6 +4,7 @@ import { BaseQuery } from "../query/BaseQuery";
 import { Options } from "../query/Options";
 import { knex } from "./knex/KnexFactory";
 import { CardInstanceDO } from "../do/CardInstanceDO";
+import { removeUndefinedKeys } from "../../utils/ObjectUtils";
 
 export class RepositoryUtils {
   static async batchInsert<D extends BaseDO>(
@@ -33,8 +34,7 @@ export class RepositoryUtils {
         queryInterface.limit(options.limit);
       }
     }
-    queryInterface.where(query);
-    // this.addQueryConditions(wordQuery, queryInterface);
+    queryInterface.where(removeUndefinedKeys(query)).orderBy("id");
     const rows = await queryInterface;
     return rows as D[];
   }
@@ -43,7 +43,7 @@ export class RepositoryUtils {
     const queryInterface = knex
       .from(tableName)
       .count("*", {as: "cnt"})
-      .where(query);
+      .where(removeUndefinedKeys(query));
     const rows = await queryInterface;
     if (rows.length !== 1) {
       throw new Error("The size of rows must be 1, actual rows: " + rows);
@@ -61,7 +61,7 @@ export class RepositoryUtils {
   }
 
   static async queryById<D extends BaseDO>(tableName: string, id: number): Promise<D | undefined> {
-    const array: D[] = await RepositoryUtils.query(tableName, { id }, undefined);
+    const array: D[] = await RepositoryUtils.query(tableName, { id });
     if (array.length > 1) {
       throw new Error(
         "array.length cannot be greater than 1, actual: " + array.length
@@ -98,7 +98,9 @@ export class RepositoryUtils {
     table: string,
     ids: number[]
   ): Promise<D[]> {
-    const queryBuilder = knex.from(table).select("*").whereIn("id", ids);
+    const queryBuilder = knex.from(table).select("*")
+      .whereIn("id", ids)
+      .orderBy("id");
     return (await queryBuilder) as D[];
   }
 
@@ -106,7 +108,7 @@ export class RepositoryUtils {
     table: string,
     dataObject: D
   ): Promise<void> {
-    await knex(table).where("id", dataObject.id).update(dataObject);
+    await knex(table).where("id", dataObject.id).update(removeUndefinedKeys(dataObject));
   }
 
   static async deleteById<D extends BaseDO>(
@@ -120,6 +122,6 @@ export class RepositoryUtils {
     table: string,
     query: Q
   ): Promise<number> {
-    return knex(table).where(query).delete();
+    return knex(table).where(removeUndefinedKeys(query)).delete();
   }
 }

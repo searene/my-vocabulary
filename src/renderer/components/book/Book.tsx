@@ -17,6 +17,9 @@ import { WordCount } from "../../../main/domain/WordCount";
 import { SearchWordInput } from "../SearchWordInput";
 import history from "../../route/History";
 import { addItemToArray } from "../../utils/ImmutableUtils";
+import { container } from "../../../main/config/inversify.config";
+import { WordRepository } from "../../../main/infrastructure/repository/WordRepository";
+import { types } from "../../../main/config/types";
 
 interface MatchParams {
   bookId: string;

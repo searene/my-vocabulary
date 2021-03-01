@@ -23,3 +23,7 @@ export type WordDO = BaseDO & {
    */
   status?: number;
 };
+
+export function getPositionsAsNumberArray(positions: string): number[] {
+  return positions.split(",").map(pos => parseInt(pos));
+}
