@@ -41,8 +41,8 @@ export class Field {
     const fieldType = await FieldType.fromFieldTypeDO(fieldTypeDO);
     return new Field(
       fieldDO.id as number,
-      fieldDO.plainTextContents as string,
       fieldDO.originalContents as string,
+      fieldDO.plainTextContents as string,
       fieldType,
       fieldDO.cardId as number
     );

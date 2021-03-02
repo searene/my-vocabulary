@@ -13,11 +13,11 @@ const initialState: ReviewState = {
   reviewCard: undefined,
 };
 
-export const getNextReviewCard = createAsyncThunk<
+export const useNextReviewCard = createAsyncThunk<
   CardInstanceVO | undefined,
   { bookId: number },
   { state: State }
->("review/getNextReviewCard", async ({ bookId }) => {
+>("review/useNextReviewCard", async ({ bookId }) => {
   return await serviceProvider.cardFacade.getNextReviewCardInstanceByBookId(
     bookId
   );
@@ -28,12 +28,12 @@ const reviewSlice = createSlice({
   initialState: initialState,
   reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(getNextReviewCard.fulfilled, (state, action) => {
+    builder.addCase(useNextReviewCard.fulfilled, (state, action) => {
       state.reviewCard = action.payload;
     });
-    builder.addCase(getNextReviewCard.rejected, (state, action) => {
+    builder.addCase(useNextReviewCard.rejected, (state, action) => {
       console.error(
-        "Error in getNextReviewCard, reason: " + action.error.message
+        "Error in useNextReviewCard, reason: " + action.error.message
       );
     });
   },
