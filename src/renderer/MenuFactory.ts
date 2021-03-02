@@ -13,5 +13,11 @@ export const menu = remote.Menu.buildFromTemplate([
       label: "Browser",
       click: () => store.dispatch(setBrowserVisibility(true)),
     }],
+  }, {
+    label: "Develop",
+    submenu: [{
+      label: "Toggle Dev Tools",
+      click: () => remote.getCurrentWebContents().toggleDevTools(),
+    }]
   }
 ]);
