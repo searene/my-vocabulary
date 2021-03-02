@@ -7,6 +7,8 @@ import { WordRepository } from "../WordRepository";
 import { knex } from "./KnexFactory";
 import { CardInstanceDO } from "../../do/CardInstanceDO";
 import { CardDO } from "../../do/CardDO";
+import { WordCount } from "../../../domain/WordCount";
+import { WordStatus } from "../../../enum/WordStatus";
 
 @injectable()
 export class KnexWordRepository implements WordRepository {
@@ -108,5 +110,25 @@ export class KnexWordRepository implements WordRepository {
       KnexWordRepository._WORDS,
       query
     );
+  }
+
+  async getWordCount(bookId: number): Promise<WordCount> {
+    const rows = await knex(KnexWordRepository._WORDS)
+      .select("status", "COUNT(*) AS cnt")
+      .where({bookId})
+      .groupBy("status");
+    const wordCount: WordCount = {
+      unknown: 0,
+      known: 0,
+    };
+    for (const row of rows) {
+      if (row.status === WordStatus.Unknown) {
+        wordCount.unknown = row.cnt;
+      } else if (row.status === WordStatus.Known) {
+        wordCount.known = row.cnt;
+      }
+    }
+    console.log(wordCount);
+    return wordCount;
   }
 }

@@ -1,6 +1,5 @@
 import { WordVO } from "./database/WordVO";
-import { inject, injectable } from "@parisholley/inversify-async";
-import { DatabaseService } from "./database/DatabaseService";
+import { injectable } from "@parisholley/inversify-async";
 import { WordStatus } from "./enum/WordStatus";
 import { types } from "./config/types";
 import { WordService } from "./WordService";
@@ -14,9 +13,6 @@ import { getPositionsAsNumberArray, WordDO } from "./infrastructure/do/WordDO";
 
 @injectable()
 export class WordServiceImpl implements WordService {
-  constructor(
-    @inject(types.DatabaseService) private databaseService: DatabaseService
-  ) {}
 
   async getWords(
     bookId: number,
@@ -61,6 +57,7 @@ export class WordServiceImpl implements WordService {
   }
 
   async getWordCount(bookId: number): Promise<WordCount> {
-    return await this.databaseService.getWordCount(bookId);
+    const wordRepo = await container.getAsync<WordRepository>(types.WordRepository);
+    return await wordRepo.getWordCount(bookId);
   }
 }

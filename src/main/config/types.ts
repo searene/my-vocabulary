@@ -1,6 +1,5 @@
 import { CardFacade } from "../facade/CardFacade";
 export const types = {
-  DatabaseService: Symbol.for("DatabaseService"),
   BookService: Symbol.for("BookService"),
   WordService: Symbol.for("WordService"),
   RepositoryFactory: Symbol.for("RepositoryFactory"),

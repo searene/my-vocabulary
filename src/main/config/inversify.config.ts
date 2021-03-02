@@ -2,8 +2,6 @@ import "reflect-metadata";
 import { CardFacade } from "../facade/CardFacade";
 import { Container } from "@parisholley/inversify-async";
 import { WordFormReader } from "../WordFormReader";
-import { SqliteDatabaseService } from "../database/SqliteDatabaseService";
-import { DatabaseService } from "../database/DatabaseService";
 import { ConfigReader } from "../ConfigReader";
 import { WordServiceImpl } from "../WordServiceImpl";
 import { types } from "./types";
@@ -44,9 +42,6 @@ export const container = new Container({
 container.bind<WordService>(types.WordService).to(WordServiceImpl);
 container.bind(types.DictService).to(DictService);
 container.bind(WordFormReader).to(WordFormReader);
-container
-  .bind<DatabaseService>(types.DatabaseService)
-  .to(SqliteDatabaseService);
 container.bind(ConfigReader).to(ConfigReader);
 container.bind<BookService>(types.BookService).to(BookServiceImpl);
 container.bind<CardFacade>(types.CardFacade).to(CardFacadeImpl);
