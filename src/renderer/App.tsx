@@ -22,7 +22,7 @@ ReactDOM.render(
   <AppContainer>
     <Provider store={store}>
       {hot(
-        <Container style={{ marginTop: "50px" }}>
+      <Container style={{ marginTop: "50px" }}>
         <Menu />
         <SettingsDialog />
         <BrowserDialog />

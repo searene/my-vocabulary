@@ -6,15 +6,10 @@ import { EPubBookReader } from "./EPubBookReader";
 import { EBookReadAgent } from "./EBookReadAgent";
 import { types } from "./config/types";
 import { PlainTextBookReader } from "./PlainTextBookReader";
-import { FieldTypeFactory } from "./domain/card/factory/FieldTypeFactory";
 import { ConfigRepository } from "./infrastructure/repository/ConfigRepository";
-import { CardTypeFactory } from "./domain/card/factory/CardTypeFactory";
-import { CompositionFactory } from "./domain/card/factory/CompositionFactory";
 import * as os from "os";
 import { DictService } from "./dict/DictService";
-import { CardType } from "./domain/card/CardType";
 import { CardTypeRepository } from "./infrastructure/repository/CardTypeRepository";
-import { FieldType } from "./domain/field/FieldType";
 import { FieldTypeRepository } from "./infrastructure/repository/FieldTypeRepository";
 import { CompositionRepository } from "./infrastructure/repository/CompositionRepository";
 
