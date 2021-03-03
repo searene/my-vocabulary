@@ -6,13 +6,13 @@ import { BookRepository } from "./infrastructure/repository/BookRepository";
 import { EBookReadAgent } from "./EBookReadAgent";
 import * as path from "path";
 import { WordFactory } from "./domain/card/factory/WordFactory";
-import { BookDO } from "./infrastructure/do/BookDO";
+import { BookDO, BookType } from "./infrastructure/do/BookDO";
 import { WordRepository } from "./infrastructure/repository/WordRepository";
 import { injectable } from "@parisholley/inversify-async";
 
 @injectable()
 export class BookServiceImpl implements BookService {
-  async addBook(filePath: string): Promise<BookVO> {
+  async addBook(filePath: string, type: BookType): Promise<BookVO> {
     const contents = await EBookReadAgent.readAllContents(filePath);
     if (contents == undefined) {
       throw new Error("plainContents not available");
@@ -21,7 +21,8 @@ export class BookServiceImpl implements BookService {
     const bookRepo = await container.getAsync<BookRepository>(types.BookRepository);
     const bookDO: BookDO = await bookRepo.insert({
       name: path.parse(filePath).name,
-      contents
+      contents,
+      type
     });
     const wordToPositionsMap = await EBookReadAgent.readAllWords(filePath);
     for (const [word, positions] of wordToPositionsMap) {
@@ -36,15 +37,15 @@ export class BookServiceImpl implements BookService {
     return convertBookDOToBookVO(bookDO);
   }
 
-  async getBooks(): Promise<BookVO[]> {
+  async getNormalBooks(): Promise<BookVO[]> {
     const bookRepo = await container.getAsync<BookRepository>(types.BookRepository);
-    const bookDOs = await bookRepo.query({});
+    const bookDOs = await bookRepo.query({ type: "normal" });
     return bookDOs.map(bookDO => convertBookDOToBookVO(bookDO));
   }
 
-  async getFirstBook(): Promise<BookVO | undefined> {
+  async getFirstNormalBook(): Promise<BookVO | undefined> {
     const bookRepo = await container.getAsync<BookRepository>(types.BookRepository);
-    const bookDOs = await bookRepo.query({}, {offset: 0, limit: 1});
+    const bookDOs = await bookRepo.query({type: "normal"}, {offset: 0, limit: 1});
     if (bookDOs.length == 0) {
       return undefined;
     }

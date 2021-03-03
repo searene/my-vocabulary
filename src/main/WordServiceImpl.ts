@@ -1,24 +1,19 @@
 import { WordVO } from "./database/WordVO";
-import { inject, injectable } from "@parisholley/inversify-async";
-import { DatabaseService } from "./database/DatabaseService";
+import { injectable } from "@parisholley/inversify-async";
 import { WordStatus } from "./enum/WordStatus";
-import { BookStatus } from "./enum/BookStatus";
 import { types } from "./config/types";
 import { WordService } from "./WordService";
-import { WordQuery } from "./domain/WordQuery";
 import { WordCount } from "./domain/WordCount";
 import { WordContextService } from "./WordContextService";
 import { WordContextStep } from "./domain/WordContextStep";
-import { WordDO } from "./domain/WordDO";
 import { container } from "./config/inversify.config";
 import { BookRepository } from "./infrastructure/repository/BookRepository";
-import { BookDO } from "./infrastructure/do/BookDO";
+import { WordRepository } from "./infrastructure/repository/WordRepository";
+import { getPositionsAsNumberArray, WordDO } from "./infrastructure/do/WordDO";
+import { ImportKnownWordsService } from "./import/ImportKnownWordsService";
 
 @injectable()
 export class WordServiceImpl implements WordService {
-  constructor(
-    @inject(types.DatabaseService) private databaseService: DatabaseService
-  ) {}
 
   async getWords(
     bookId: number,
@@ -31,39 +26,44 @@ export class WordServiceImpl implements WordService {
   ): Promise<WordVO[]> {
     const bookRepo = await container.getAsync<BookRepository>(types.BookRepository);
     const bookDO = await bookRepo.queryByIdOrThrow(bookId);
-    let wordQuery: WordQuery = {
-      bookId: bookId,
+    const wordRepo = await container.getAsync<WordRepository>(types.WordRepository);
+    const wordDOList = await wordRepo.query({
+      bookId,
       status: wordStatus,
-      pageNo: pageNo,
-      word: word,
-      pageSize: pageSize,
-    };
-    const wordDOList = await this.databaseService.queryWords(wordQuery);
+      word,
+    }, {
+      offset: (pageNo - 1) * pageSize,
+      limit: pageSize
+    })
     return wordDOList.map((wordDO) => {
       return {
-        id: wordDO.id,
-        word: wordDO.word,
-        originalWord: wordDO.originalWord,
+        id: wordDO.id as number,
+        word: wordDO.word as string,
+        originalWord: wordDO.originalWord as string,
         contextList: WordContextService.getContextList(
-          wordDO.word,
-          wordDO.positions,
+          wordDO.word as string,
+          getPositionsAsNumberArray(wordDO.positions as string),
           bookDO.contents as string,
           contextStep,
           contextLimit
         ),
-        status: wordDO.status,
+        status: wordDO.status as WordStatus,
       };
     });
   }
 
   async updateWord(wordDO: WordDO): Promise<void> {
-    const updatedRecords = await this.databaseService.updateWord(wordDO);
-    if (updatedRecords === 0) {
-      console.error("Nothing was updated");
-    }
+    const wordRepo = await container.getAsync<WordRepository>(types.WordRepository);
+    await wordRepo.updateById(wordDO);
   }
 
   async getWordCount(bookId: number): Promise<WordCount> {
-    return await this.databaseService.getWordCount(bookId);
+    const wordRepo = await container.getAsync<WordRepository>(types.WordRepository);
+    return await wordRepo.getWordCount(bookId);
+  }
+
+  async importKnownWords(words: string[]): Promise<void> {
+    const importKnownWordService = container.get<ImportKnownWordsService>(types.ImportKnownWordsService);
+    return importKnownWordService.import(words);
   }
 }

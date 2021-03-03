@@ -2,11 +2,8 @@ import { IEBookReader } from "./IEBookReader";
 import * as fs from "fs-extra";
 
 export class PlainTextBookReader implements IEBookReader {
-  private filePath: string;
 
-  constructor(filePath: string) {
-    this.filePath = filePath;
-  }
+  constructor(private readonly filePath: string) { }
 
   init(): Promise<void> {
     return Promise.resolve();

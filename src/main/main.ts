@@ -2,19 +2,14 @@ import { app, BrowserWindow, HeadersReceivedResponse, OnHeadersReceivedListenerD
 import * as path from "path";
 import * as url from "url";
 import { container } from "./config/inversify.config";
-import { EPubBookReader } from "./EPubBookReader";
+import { EPubBookReader } from "./reader/EPubBookReader";
 import { EBookReadAgent } from "./EBookReadAgent";
 import { types } from "./config/types";
-import { PlainTextBookReader } from "./PlainTextBookReader";
-import { FieldTypeFactory } from "./domain/card/factory/FieldTypeFactory";
+import { PlainTextBookReader } from "./reader/PlainTextBookReader";
 import { ConfigRepository } from "./infrastructure/repository/ConfigRepository";
-import { CardTypeFactory } from "./domain/card/factory/CardTypeFactory";
-import { CompositionFactory } from "./domain/card/factory/CompositionFactory";
 import * as os from "os";
 import { DictService } from "./dict/DictService";
-import { CardType } from "./domain/card/CardType";
 import { CardTypeRepository } from "./infrastructure/repository/CardTypeRepository";
-import { FieldType } from "./domain/field/FieldType";
 import { FieldTypeRepository } from "./infrastructure/repository/FieldTypeRepository";
 import { CompositionRepository } from "./infrastructure/repository/CompositionRepository";
 
@@ -99,16 +94,16 @@ const installExtensions = async () => {
   ses?.loadExtension(
     path.join(
       os.homedir(),
-      ".config/google-chrome/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/4.10.0_0"
+      ".config/google-chrome/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/4.10.1_0"
     )
   );
   // redux dev tools
-  ses?.loadExtension(
-    path.join(
-      os.homedir(),
-      ".config/google-chrome/Default/Extensions/lmhkpmbekcpmknklioeibfkpmmfibljd/2.17.0_0"
-    )
-  );
+  // ses?.loadExtension(
+  //   path.join(
+  //     os.homedir(),
+  //     ".config/google-chrome/Default/Extensions/lmhkpmbekcpmknklioeibfkpmmfibljd/2.17.0_0"
+  //   )
+  // );
 };
 
 const createWindow = async () => {
@@ -208,6 +203,7 @@ app.whenReady().then(() => {
     }
   );
 });
+
 
 exports.bookService = container.get(types.BookService);
 exports.wordService = container.get(types.WordService);

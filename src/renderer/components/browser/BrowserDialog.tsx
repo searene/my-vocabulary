@@ -13,7 +13,6 @@ export const BrowserDialog = () => {
   const visibility: boolean = useSelector(selectBrowserVisibility);
   const browseData: BrowseData = useSelector(selectBrowseData);
   const [curPage, setCurPage] = useState(1);
-  const [inputValue, setInputValue] = useState("");
 
   const pageSize = 10;
 
@@ -26,7 +25,7 @@ export const BrowserDialog = () => {
         limit: pageSize
       }));
     }
-  }, [curPage, visibility])
+  }, [curPage, visibility]);
 
   const handlePageChange = (event: React.MouseEvent<HTMLAnchorElement>, data: PaginationProps) => {
     setCurPage(data.activePage as number);

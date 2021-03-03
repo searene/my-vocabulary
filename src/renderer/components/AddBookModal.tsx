@@ -86,7 +86,7 @@ export class AddBookModal extends React.Component<
       loading: true,
     });
     const bookVO = await serviceProvider.bookService.addBook(
-      this.state.bookFilePath
+      this.state.bookFilePath, "normal"
     );
     this.setState({
       loading: false,

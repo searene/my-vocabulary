@@ -1,6 +1,6 @@
 import { RouteComponentProps } from "react-router";
 import { useSelector } from "react-redux";
-import { getNextReviewCard, selectReviewCard } from "./reviewSlice";
+import { useNextReviewCard, selectReviewCard } from "./reviewSlice";
 import { CardInstanceVO } from "../../../main/facade/CardFacade";
 import { useEffect, useState } from "react";
 import * as React from "react";
@@ -31,7 +31,7 @@ export function Review(props: ReviewProps) {
   const dispatch = useAppDispatch();
   useEffect(() => {
     if (!initiated) {
-      dispatch(getNextReviewCard({ bookId }));
+      dispatch(useNextReviewCard({ bookId }));
       setInitiated(true);
     }
   }, [initiated]);
@@ -45,7 +45,7 @@ export function Review(props: ReviewProps) {
       level,
       timeInterval,
     });
-    dispatch(getNextReviewCard({ bookId }));
+    dispatch(useNextReviewCard({ bookId }));
     setShowBack(false);
   };
 

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import serviceProvider from "../../ServiceProvider";
 
 interface DefinitionProps {
@@ -8,11 +8,13 @@ interface DefinitionProps {
 
 export const Definition = (props: DefinitionProps) => {
   const [html, setHtml] = useState("");
+  const definitionDisplayDiv = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     async function fetchHtml() {
       const fetchedHtml = await serviceProvider.dictService.getHtml(props.word);
       setHtml(fetchedHtml);
+      definitionDisplayDiv.current?.scrollTo(0, 0);
     }
     fetchHtml();
   }, [props.word]);
@@ -26,6 +28,7 @@ export const Definition = (props: DefinitionProps) => {
       dangerouslySetInnerHTML={{
         __html: html,
       }}
+      ref={definitionDisplayDiv}
     />
   );
 };

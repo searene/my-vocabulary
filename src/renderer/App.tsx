@@ -12,6 +12,7 @@ import { Container, Modal } from "semantic-ui-react";
 import { Menu } from "./components/Menu";
 import { SettingsDialog } from "./components/settings/SettingsDialog";
 import { BrowserDialog } from "./components/browser/BrowserDialog";
+import { ImportDialog } from "./components/import/ImportDialog";
 
 // Create main element
 const mainElement = document.createElement("div");
@@ -22,10 +23,11 @@ ReactDOM.render(
   <AppContainer>
     <Provider store={store}>
       {hot(
-        <Container style={{ marginTop: "50px" }}>
+      <Container style={{ marginTop: "50px" }}>
         <Menu />
         <SettingsDialog />
         <BrowserDialog />
+        <ImportDialog />
       </Container>
       )}
     </Provider>

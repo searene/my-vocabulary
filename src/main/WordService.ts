@@ -19,4 +19,6 @@ export interface WordService {
   updateWord(wordQuery: WordQuery): Promise<void>;
 
   getWordCount(bookId: number): Promise<WordCount>;
+
+  importKnownWords(words: string[]): Promise<void>;
 }
