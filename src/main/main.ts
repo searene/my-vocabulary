@@ -94,16 +94,16 @@ const installExtensions = async () => {
   ses?.loadExtension(
     path.join(
       os.homedir(),
-      ".config/google-chrome/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/4.10.0_0"
+      ".config/google-chrome/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/4.10.1_0"
     )
   );
   // redux dev tools
-  ses?.loadExtension(
-    path.join(
-      os.homedir(),
-      ".config/google-chrome/Default/Extensions/lmhkpmbekcpmknklioeibfkpmmfibljd/2.17.0_0"
-    )
-  );
+  // ses?.loadExtension(
+  //   path.join(
+  //     os.homedir(),
+  //     ".config/google-chrome/Default/Extensions/lmhkpmbekcpmknklioeibfkpmmfibljd/2.17.0_0"
+  //   )
+  // );
 };
 
 const createWindow = async () => {
@@ -203,6 +203,7 @@ app.whenReady().then(() => {
     }
   );
 });
+
 
 exports.bookService = container.get(types.BookService);
 exports.wordService = container.get(types.WordService);

@@ -10,6 +10,7 @@ import { container } from "./config/inversify.config";
 import { BookRepository } from "./infrastructure/repository/BookRepository";
 import { WordRepository } from "./infrastructure/repository/WordRepository";
 import { getPositionsAsNumberArray, WordDO } from "./infrastructure/do/WordDO";
+import { ImportKnownWordsService } from "./import/ImportKnownWordsService";
 
 @injectable()
 export class WordServiceImpl implements WordService {
@@ -59,5 +60,10 @@ export class WordServiceImpl implements WordService {
   async getWordCount(bookId: number): Promise<WordCount> {
     const wordRepo = await container.getAsync<WordRepository>(types.WordRepository);
     return await wordRepo.getWordCount(bookId);
+  }
+
+  async importKnownWords(words: string[]): Promise<void> {
+    const importKnownWordService = container.get<ImportKnownWordsService>(types.ImportKnownWordsService);
+    return importKnownWordService.import(words);
   }
 }

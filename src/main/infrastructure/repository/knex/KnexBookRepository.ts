@@ -31,6 +31,7 @@ export class KnexBookRepository implements BookRepository {
         table.increments();
         table.integer("name");
         table.integer("contents");
+        table.string("type");
       });
     }
   }

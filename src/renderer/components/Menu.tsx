@@ -23,7 +23,7 @@ export const Menu = function () {
 
   useEffect(() => {
     async function innerFunction() {
-      const firstBook = await serviceProvider.bookService.getFirstBook();
+      const firstBook = await serviceProvider.bookService.getFirstNormalBook();
       const firstBookId = firstBook == undefined ? undefined : firstBook.id;
       setBookId(firstBookId);
       setInitiated(true);

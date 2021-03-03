@@ -22,10 +22,6 @@ import {
   addTimeInterval,
   convertTimeIntervalToString,
 } from "../domain/time/TimeInterval";
-import { FieldRepository } from "../infrastructure/repository/FieldRepository";
-import { CardRepository } from "../infrastructure/repository/CardRepository";
-import { FieldDO } from "../infrastructure/do/FieldDO";
-import { BookRepository } from "../infrastructure/repository/BookRepository";
 import { CompositeRepository } from "../infrastructure/repository/CompositeRepository";
 import { Field } from "../domain/field/Field";
 

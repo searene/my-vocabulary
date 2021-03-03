@@ -36,7 +36,7 @@ export function Library(props: LibraryProps) {
   };
 
   const initBooks = async () => {
-    const books = await serviceProvider.bookService.getBooks();
+    const books = await serviceProvider.bookService.getNormalBooks();
     setBooks(books);
   };
 

@@ -2,6 +2,9 @@ import { CompositeRepository } from "../CompositeRepository";
 import { BrowseData, BrowseDataRequest, ReviewItem } from "../../../facade/CardFacade";
 import { knex } from "./KnexFactory";
 import { injectable } from "@parisholley/inversify-async";
+import { CardInstance } from "../../../domain/card/instance/CardInstance";
+import { container } from "../../../config/inversify.config";
+import { types } from "../../../config/types";
 
 @injectable()
 export class KnexCompositeRepository implements CompositeRepository {
@@ -45,5 +48,13 @@ export class KnexCompositeRepository implements CompositeRepository {
     // This is a problem of Sqlite3, haven't found a solution yet, let's just manually return
     // empty array in this case.
     return totalCount === 0 ? { reviewItems: [] , totalCount: 0 } : {reviewItems, totalCount};
+  }
+
+  async init(): Promise<void> {
+    // container will invoke respective init(), which would enable respective createTableIfNotExists
+    await container.getAsync(types.CardInstanceRepository);
+    await container.getAsync(types.CardRepository);
+    await container.getAsync(types.FieldRepository);
+    await container.getAsync(types.BookRepository);
   }
 }
