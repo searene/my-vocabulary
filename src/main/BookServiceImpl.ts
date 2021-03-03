@@ -28,7 +28,6 @@ export class BookServiceImpl implements BookService {
     for (const [word, positions] of wordToPositionsMap) {
       await WordFactory.get().createWord(bookDO.id as number, word, positions);
     }
-    console.log(wordToPositionsMap);
     return convertBookDOToBookVO(bookDO);
   }
 

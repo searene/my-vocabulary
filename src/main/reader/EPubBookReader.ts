@@ -1,6 +1,6 @@
 import * as EPub from "epub";
 import { IEBookReader } from "./IEBookReader";
-import { HtmlToText } from "./HtmlToText";
+import { HtmlToText } from "../HtmlToText";
 
 export class EPubBookReader implements IEBookReader {
   private filePath: string;

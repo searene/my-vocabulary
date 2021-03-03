@@ -1,5 +1,4 @@
-import { IEBookReader } from "./IEBookReader";
-import { Optional } from "typescript-optional";
+import { IEBookReader } from "./reader/IEBookReader";
 import { extname } from "path";
 import { WordExtractor } from "./WordExtractor";
 
@@ -25,8 +24,7 @@ export class EBookReadAgent {
     }
     const reader = new Reader(filePath);
     await reader.init();
-    const contents = await reader.readAll();
-    return contents;
+    return await reader.readAll();
   }
 
   static async readAllWords(filePath: string): Promise<Map<string, number[]>> {

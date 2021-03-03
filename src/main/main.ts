@@ -2,10 +2,10 @@ import { app, BrowserWindow, HeadersReceivedResponse, OnHeadersReceivedListenerD
 import * as path from "path";
 import * as url from "url";
 import { container } from "./config/inversify.config";
-import { EPubBookReader } from "./EPubBookReader";
+import { EPubBookReader } from "./reader/EPubBookReader";
 import { EBookReadAgent } from "./EBookReadAgent";
 import { types } from "./config/types";
-import { PlainTextBookReader } from "./PlainTextBookReader";
+import { PlainTextBookReader } from "./reader/PlainTextBookReader";
 import { ConfigRepository } from "./infrastructure/repository/ConfigRepository";
 import * as os from "os";
 import { DictService } from "./dict/DictService";
