@@ -1,26 +1,17 @@
 import * as React from "react";
-import {
-  Button,
-  Dropdown,
-  DropdownItemProps,
-  DropdownProps,
-  Grid,
-  Modal,
-} from "semantic-ui-react";
+import { useEffect, useState } from "react";
+import { Button, Dropdown, DropdownItemProps, DropdownProps, Grid, Modal } from "semantic-ui-react";
 import { WordStatus } from "../../../main/enum/WordStatus";
 import { RouteComponentProps } from "react-router";
 import serviceProvider from "../../ServiceProvider";
 import { WordVO } from "../../../main/database/WordVO";
-import { Link } from "react-router-dom";
-import { Optional } from "typescript-optional";
 import { WordCount } from "../../../main/domain/WordCount";
 import { SearchWordInput } from "../SearchWordInput";
 import history from "../../route/History";
 import { addItemToArray } from "../../utils/ImmutableUtils";
-import { container } from "../../../main/config/inversify.config";
-import { WordRepository } from "../../../main/infrastructure/repository/WordRepository";
-import { types } from "../../../main/config/types";
 import { GoBack } from "../back/GoBack";
+import { useSelector } from "react-redux";
+import { selectGlobalShortcutEnabled } from "../shortcut/shortcutSlice";
 
 interface MatchParams {
   bookId: string;
@@ -28,200 +19,56 @@ interface MatchParams {
 
 interface BookProps extends RouteComponentProps<MatchParams> {}
 
-interface BookStates {
-  /**
-   * Is the initialization completed.
-   */
-  initiated: boolean;
+export const Book = (props: BookProps) => {
 
-  /**
-   * The name of the current book.
-   */
-  bookName: string;
-
-  /**
-   * Which kinds of word does the user want to see, unknown or known?
-   */
-  wordStatus: WordStatus;
-
-  /**
-   * The page number, starting from 1.
-   */
-  pageNo: Map<WordStatus, number>;
-
-  /**
-   * The current word.
-   */
-  wordVO: WordVO | undefined;
-
-  /**
-   * The count of known words, unknown words, etc.
-   */
-  wordCount: WordCount;
-
-  /**
-   * The index of the clicked context, used to show the long context modal.
-   */
-  longWordContextModalIndex: Optional<number>;
-
-  needRefresh: boolean;
-
-  /**
-   * Word ids that are marked as known by the user.
-   */
-  markedKnownWords: number[];
-}
-
-export class Book extends React.Component<BookProps, BookStates> {
-  constructor(props: BookProps) {
-    super(props);
+  const initPageNo = (): Map<WordStatus, number> => {
     const pageNo = new Map<WordStatus, number>();
     for (const wordStatus in WordStatus) {
       if (!isNaN(Number(wordStatus))) {
         pageNo.set(Number(wordStatus), 1);
       }
     }
-    this.state = {
-      initiated: false,
-      bookName: "",
-      wordStatus: WordStatus.Unknown,
-      pageNo: pageNo,
-      wordVO: undefined,
-      wordCount: { unknown: 0, known: 0 },
-      longWordContextModalIndex: Optional.empty(),
-      needRefresh: true,
-      markedKnownWords: [],
-    };
+    return pageNo;
   }
+  const bookId = parseInt(props.match.params.bookId);
+  /**
+   * The page number, starting from 1.
+   */
+  const [pageNo, setPageNo] = useState<Map<WordStatus, number>>(initPageNo());
+  const [initiated, setInitiated] = useState(false);
+  const [bookName, setBookName] = useState("");
+  const [wordStatus, setWordStatus] = useState(WordStatus.Unknown);
+  /**
+   * The current word.
+   */
+  const [wordVO, setWordVO] = useState<WordVO | undefined>(undefined);
 
-  async componentDidMount() {
-    await this.refresh();
-    this.bindShortcuts();
-    this.setState({
-      markedKnownWords: [],
-    });
-  }
+  /**
+   * The index of the clicked context, used to show the long context modal.
+   */
+  const [longWordContextModalIndex, setLongWordContextModalIndex] = useState<number | undefined>(undefined);
+  const [needRefresh, setNeedRefresh] = useState(true);
+  /**
+   * Word ids that are marked as known by the user.
+   */
+  const [markedKnownWords, setMarkedKnownWords] = useState<number[]>([]);
+  const [wordCount, setWordCount] = useState<WordCount | undefined>();
+  const globalShortcutEnabled = useSelector(selectGlobalShortcutEnabled);
 
-  async componentDidUpdate() {
-    await this.refresh();
-  }
-
-  render(): React.ReactNode {
-    if (!this.state.initiated) {
-      return <></>;
+  const refresh = async (): Promise<void> => {
+    if (needRefresh) {
+      const bookName = await getBookName(bookId);
+      const wordVO = await getCurrentWord(bookId, getPageNo());
+      const wordCount = await serviceProvider.wordService.getWordCount(bookId);
+      setBookName(bookName);
+      setWordVO(wordVO);
+      setWordCount(wordCount);
+      setNeedRefresh(false);
+      setInitiated(true);
     }
-    return (
-      <Grid>
-        <Grid.Row>
-          <Grid.Column width={4}>
-            <GoBack />
-          </Grid.Column>
-          <Grid.Column width={4}>Book: {this.state.bookName}</Grid.Column>
-          <Grid.Column width={4}>
-            <SearchWordInput onSearch={(word) => this.handleSearch(word)} />
-          </Grid.Column>
-          <Grid.Column width={4}>
-            <Dropdown
-              fluid
-              selection
-              placeholder={"Status"}
-              options={Book.getWordStatusArray()}
-              value={this.state.wordStatus}
-              onChange={this.handleStatusChange}
-            />
-          </Grid.Column>
-          <Grid.Column width={4}>
-            Known: {this.state.wordCount.known} / Unknown:{" "}
-            {this.state.wordCount.unknown}
-          </Grid.Column>
-        </Grid.Row>
-        {this.state.wordVO == undefined ? (
-          <div>No more words.</div>
-        ) : (
-          <>
-            <Grid.Row><Grid.Column>Word: {this.state.wordVO.word}</Grid.Column></Grid.Row>
-            <Grid.Row><Grid.Column>Original Word: {this.state.wordVO.originalWord}</Grid.Column></Grid.Row>
-            <Grid.Row><Grid.Column>Status: {WordStatus[this.state.wordVO.status]}</Grid.Column></Grid.Row>
-            <Grid.Row><Grid.Column>
-              <Grid.Row><Grid.Column>Context:</Grid.Column></Grid.Row>
-              {this.state.wordVO.contextList.map((context, i) => (
-                <Modal
-                  key={i}
-                  trigger={
-                    <Grid.Row
-                      className={"hover-link"}
-                      dangerouslySetInnerHTML={{
-                        __html: context.short.htmlContents,
-                      }}
-                    />
-                  }
-                  onClose={() =>
-                    this.setState({
-                      longWordContextModalIndex: Optional.empty(),
-                    })
-                  }
-                  onOpen={() =>
-                    this.setState({
-                      longWordContextModalIndex: Optional.of(i),
-                    })
-                  }
-                  open={this.state.longWordContextModalIndex.isPresent()}
-                >
-                  <Modal.Header>Context</Modal.Header>
-                  <Modal.Content
-                    dangerouslySetInnerHTML={{
-                      __html: this.state.longWordContextModalIndex.isPresent()
-                        ? this.state.wordVO!.contextList[
-                            this.state.longWordContextModalIndex.get()
-                          ].long.htmlContents
-                        : "",
-                    }}
-                  />
-                  <Modal.Actions>
-                    <Button
-                      onClick={() =>
-                        this.setState({
-                          longWordContextModalIndex: Optional.empty(),
-                        })
-                      }
-                    >
-                      Close
-                    </Button>
-                  </Modal.Actions>
-                </Modal>
-              ))}
-            </Grid.Column>
-            </Grid.Row>
-          </>
-        )}
-        <Grid.Row>
-          <Grid.Column width={16} textAlign={"left"}>
-            <Button
-              disabled={this.state.pageNo.get(this.state.wordStatus) === 1}
-              onClick={this.handlePrevious}
-            >
-              Previous (p)
-            </Button>
-            <Button
-              disabled={this.state.wordVO == undefined}
-              onClick={this.handleKnowAndNext}
-            >
-              Know and Next (k)
-            </Button>
-            <Button
-              disabled={this.state.wordVO == undefined}
-              onClick={this.handleNext}
-            >
-              Next (n)
-            </Button>
-            <Button onClick={this.handleAdd}>Add (a)</Button>
-          </Grid.Column>
-        </Grid.Row>
-      </Grid>
-    );
-  }
+  };
 
-  private static getWordStatusArray(): DropdownItemProps[] {
+  const getWordStatusArray = (): DropdownItemProps[] => {
     const result = [];
     for (const key in WordStatus) {
       if (isNaN(Number(key))) {
@@ -235,17 +82,17 @@ export class Book extends React.Component<BookProps, BookStates> {
     return result;
   }
 
-  private static async getBookName(bookId: number): Promise<string> {
+  const getBookName = async (bookId: number): Promise<string> => {
     const bookVO = await serviceProvider.bookService.getBook(bookId);
     return bookVO.name;
   }
 
-  private async handleSearch(word: string): Promise<void> {
-    const bookId = parseInt(this.props.match.params.bookId);
+  const handleSearch = async (word: string): Promise<void> => {
+    const bookId = parseInt(props.match.params.bookId);
     const wordVOArray = await serviceProvider.wordService.getWords(
       bookId,
       word,
-      this.state.wordStatus,
+      wordStatus,
       1,
       1,
       {
@@ -258,19 +105,14 @@ export class Book extends React.Component<BookProps, BookStates> {
       // FIXED later
       console.log("Nothing is found.");
     }
-    this.setState({
-      wordVO: wordVOArray[0],
-    });
-  }
+    setWordVO(wordVOArray[0]);
+}
 
-  private async getCurrentWord(
-    bookId: number,
-    pageNo: number
-  ): Promise<WordVO | undefined> {
+  const getCurrentWord = async (bookId: number, pageNo: number): Promise<WordVO | undefined> => {
     const wordVOArray = await serviceProvider.wordService.getWords(
       bookId,
       undefined,
-      this.state.wordStatus,
+      wordStatus,
       pageNo,
       1,
       {
@@ -285,139 +127,205 @@ export class Book extends React.Component<BookProps, BookStates> {
     return wordVOArray[0];
   }
 
-  private handleStatusChange = (
+  const handleStatusChange = (
     event: React.SyntheticEvent<HTMLElement>,
     data: DropdownProps
   ): void => {
-    this.setState({
-      needRefresh: true,
-      wordStatus: data.value as number,
-    });
+    setNeedRefresh(true);
+    setWordStatus(data.value as number);
   };
 
-  private handleKnowAndNext = async (): Promise<void> => {
+  const handleKnowAndNext = async (): Promise<void> => {
     await serviceProvider.wordService.updateWord({
-      id: this.state.wordVO!.id,
+      id: wordVO!.id,
       status: WordStatus.Known,
     });
-    const wordVO = await this.getCurrentWord(
-      parseInt(this.props.match.params.bookId),
-      this.getPageNo()
+    const newWord = await getCurrentWord(
+      parseInt(props.match.params.bookId),
+      getPageNo()
     );
-    this.setState({
-      needRefresh: true,
-      wordVO,
-      markedKnownWords: addItemToArray(
-        this.state.markedKnownWords,
-        this.state.wordVO!.id
-      ),
-    });
+    setWordVO(newWord);
+    setMarkedKnownWords(addItemToArray(markedKnownWords, wordVO!.id));
+    setNeedRefresh(true);
   };
 
-  private handleNext = async (): Promise<void> => {
-    const wordVO = await this.getCurrentWord(
-      parseInt(this.props.match.params.bookId),
-      this.getPageNo() + 1
+  const handleNext = async (): Promise<void> => {
+    const wordVO = await getCurrentWord(
+      parseInt(props.match.params.bookId),
+      getPageNo() + 1
     );
-    const newPageNo = new Map<WordStatus, number>(this.state.pageNo);
-    newPageNo.set(this.state.wordStatus, this.getPageNo() + 1);
-    this.setState({
-      needRefresh: true,
-      wordVO,
-      pageNo: newPageNo,
-    });
+    const newPageNo = new Map<WordStatus, number>(pageNo);
+    newPageNo.set(wordStatus, getPageNo() + 1);
+    setWordVO(wordVO);
+    console.log("next")
+    setPageNo(newPageNo);
+    setNeedRefresh(true);
   };
 
-  private handleAdd = async (): Promise<void> => {
-    const bookId = parseInt(this.props.match.params.bookId);
+  const handleAdd = async (): Promise<void> => {
+    const bookId = parseInt(props.match.params.bookId);
     const urlSearchParams = new URLSearchParams();
-    urlSearchParams.set("word", this.state.wordVO!.word);
+    urlSearchParams.set("word", wordVO!.word);
     history.push(`/add/${bookId}?${urlSearchParams.toString()}`);
   };
 
-  private refresh = async (): Promise<void> => {
-    const bookId = parseInt(this.props.match.params.bookId);
-    const bookName = await Book.getBookName(bookId);
-    const wordVO = await this.getCurrentWord(bookId, this.getPageNo());
-    const wordCount = await serviceProvider.wordService.getWordCount(bookId);
-    if (this.state.needRefresh) {
-      this.setState({
-        initiated: true,
-        bookName,
-        wordVO,
-        wordCount,
-        needRefresh: false,
-      });
+
+  const getPageNo = (): number => {
+    console.log(pageNo.get(WordStatus.Unknown));
+    return pageNo.get(wordStatus) as number;
+  }
+
+  const keyboardEventListener = async (e: KeyboardEvent) => {
+    if (e.key === "k") {
+      await handleKnowAndNext();
+    } else if (e.key === "n") {
+      await handleNext();
+    } else if (e.key === "p") {
+      await handlePrevious();
+    } else if (e.ctrlKey && e.key === "z") {
+      await undo();
     }
+  }
+
+  const bindShortcuts = () => {
+    console.log("bind");
+    document.addEventListener("keydown", keyboardEventListener);
+  }
+
+  const unbindShortcuts = () => {
+    console.log("unbind");
+    document.removeEventListener("keydown", keyboardEventListener);
+  }
+
+  const handlePrevious = async (): Promise<void> => {
+    const wordVO = await getCurrentWord(
+      parseInt(props.match.params.bookId),
+      getPageNo() - 1
+    );
+    const newPageNo = new Map<WordStatus, number>(pageNo);
+    newPageNo.set(wordStatus, getPageNo() - 1);
+    setWordVO(wordVO);
+    setPageNo(newPageNo);
+    setNeedRefresh(true);
   };
 
-  private getPageNo(): number {
-    return this.state.pageNo.get(this.state.wordStatus) as number;
-  }
-
-  /**
-   * Check if wordVO is changed
-   */
-  private isWordVOChanged(wordVO: Optional<WordVO>) {
-    if (wordVO.isEmpty() && this.state.wordVO == undefined) {
-      return false;
-    }
-    return !(
-      wordVO.isPresent() &&
-      this.state.wordVO != undefined &&
-      wordVO.get().id === this.state.wordVO.id
-    );
-  }
-
-  private isWordCountChanged(wordCount: WordCount) {
-    return (
-      wordCount.known !== this.state.wordCount.known ||
-      wordCount.unknown !== this.state.wordCount.unknown
-    );
-  }
-
-  private bindShortcuts() {
-    document.addEventListener("keyup", async (e) => {
-      if (e.key === "k") {
-        await this.handleKnowAndNext();
-      } else if (e.key === "n") {
-        await this.handleNext();
-      } else if (e.key === "p") {
-        await this.handlePrevious();
-      }
-    });
-    document.addEventListener("keydown", async (event) => {
-      if (event.ctrlKey && event.key === "z") {
-        await this.undo();
-      }
-    });
-  }
-
-  private handlePrevious = async (): Promise<void> => {
-    const wordVO = await this.getCurrentWord(
-      parseInt(this.props.match.params.bookId),
-      this.getPageNo() - 1
-    );
-    const newPageNo = new Map<WordStatus, number>(this.state.pageNo);
-    newPageNo.set(this.state.wordStatus, this.getPageNo() - 1);
-    this.setState({
-      needRefresh: true,
-      wordVO,
-      pageNo: newPageNo,
-    });
-  };
-
-  private async undo(): Promise<void> {
-    const newMarkedKnownWords = [...this.state.markedKnownWords];
+ const undo = async (): Promise<void> => {
+    const newMarkedKnownWords = [...markedKnownWords];
     const lastKnownWordId = newMarkedKnownWords.pop();
     await serviceProvider.wordService.updateWord({
       id: lastKnownWordId,
       status: WordStatus.Unknown,
     });
-    this.setState({
-      needRefresh: true,
-      markedKnownWords: newMarkedKnownWords,
-    });
-    await this.refresh();
-  }
+    setMarkedKnownWords(newMarkedKnownWords);
+    setNeedRefresh(true);
+ }
+  useEffect(() => {
+    (async function() {
+      await refresh();
+    })();
+  }, [needRefresh]);
+
+  useEffect(() => {
+    if (globalShortcutEnabled) {
+      bindShortcuts();
+    } else {
+      unbindShortcuts();
+    }
+  }, [globalShortcutEnabled]);
+
+  return initiated ? (
+    <Grid>
+      <Grid.Row>
+        <Grid.Column width={4}>
+          <GoBack />
+        </Grid.Column>
+        <Grid.Column width={4}>Book: {bookName}</Grid.Column>
+        <Grid.Column width={4}>
+          <SearchWordInput onSearch={(word) => handleSearch(word)} />
+        </Grid.Column>
+        <Grid.Column width={4}>
+          <Dropdown
+            fluid
+            selection
+            placeholder={"Status"}
+            options={getWordStatusArray()}
+            value={wordStatus}
+            onChange={handleStatusChange}
+          />
+        </Grid.Column>
+        <Grid.Column width={4}>
+          Known: {wordCount!.known} / Unknown:{" "}
+          {wordCount!.unknown}
+        </Grid.Column>
+      </Grid.Row>
+      {wordVO == undefined ? (
+        <div>No more words.</div>
+      ) : (
+        <>
+          <Grid.Row><Grid.Column>Word: {wordVO!.word}</Grid.Column></Grid.Row>
+          <Grid.Row><Grid.Column>Original Word: {wordVO!.originalWord}</Grid.Column></Grid.Row>
+          <Grid.Row><Grid.Column>Status: {WordStatus[wordVO!.status]}</Grid.Column></Grid.Row>
+          <Grid.Row><Grid.Column>
+            <Grid.Row><Grid.Column>Context:</Grid.Column></Grid.Row>
+            {wordVO!.contextList.map((context, i) => (
+              <Modal
+                key={i}
+                trigger={
+                  <Grid.Row
+                    className={"hover-link"}
+                    dangerouslySetInnerHTML={{
+                      __html: context.short.htmlContents,
+                    }}
+                  />
+                }
+                onClose={() => setLongWordContextModalIndex(undefined)}
+                onOpen={() => setLongWordContextModalIndex(i)}
+                open={longWordContextModalIndex !== undefined}
+              >
+                <Modal.Header>Context</Modal.Header>
+                <Modal.Content
+                  dangerouslySetInnerHTML={{
+                    __html: longWordContextModalIndex !== undefined
+                      ? wordVO!.contextList[longWordContextModalIndex].long.htmlContents
+                      : "",
+                  }}
+                />
+                <Modal.Actions>
+                  <Button
+                    onClick={() => setLongWordContextModalIndex(undefined)}
+                  >
+                    Close
+                  </Button>
+                </Modal.Actions>
+              </Modal>
+            ))}
+          </Grid.Column>
+          </Grid.Row>
+        </>
+      )}
+      <Grid.Row>
+        <Grid.Column width={16} textAlign={"left"}>
+          <Button
+            disabled={pageNo.get(wordStatus) === 1}
+            onClick={handlePrevious}
+          >
+            Previous (p)
+          </Button>
+          <Button
+            disabled={wordVO == undefined}
+            onClick={handleKnowAndNext}
+          >
+            Know and Next (k)
+          </Button>
+          <Button
+            disabled={wordVO == undefined}
+            onClick={handleNext}
+          >
+            Next (n)
+          </Button>
+          <Button onClick={handleAdd}>Add (a)</Button>
+        </Grid.Column>
+      </Grid.Row>
+    </Grid>
+  ) : <></>;
 }
