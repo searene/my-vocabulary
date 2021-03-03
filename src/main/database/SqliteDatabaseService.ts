@@ -22,7 +22,7 @@ export class SqliteDatabaseService implements DatabaseService {
   private initiated = false;
 
   constructor(@inject(WordFormReader) private wordFormReader: WordFormReader) {
-    const dir = join(os.homedir(), ".my-vocabulary-dev");
+    const dir = join(os.homedir(), ".my-vocabulary-release");
     if (!existsSync(dir)) {
       mkdirSync(dir);
     }
@@ -149,9 +149,8 @@ export class SqliteDatabaseService implements DatabaseService {
     const sqlSuffix: string[] = [];
     for (const [word, posList] of wordAndPosListMap) {
       const originalWord = await this.wordFormReader.getOriginalWord(word);
-      sqlSuffix.push(`(${bookId}, "${word}", "${
-        originalWord.isPresent() ? originalWord.get() : ""
-      }",
+      sqlSuffix.push(`(${bookId}, "${word}", "${originalWord.isPresent() ? originalWord.get() : ""
+        }",
         "${posList.join(",")}", ${WordStatus.Unknown})`);
     }
 
@@ -197,7 +196,7 @@ export class SqliteDatabaseService implements DatabaseService {
   private async run(sql: string, params?: any): Promise<RunResult> {
     const watchDog = new WatchDog(sql + ", params: " + JSON.stringify(params));
     return new Promise<RunResult>((resolve, reject) => {
-      this.db.run(sql, params, function (err) {
+      this.db.run(sql, params, function(err) {
         if (err != null) {
           reject(err);
         } else {
@@ -225,8 +224,7 @@ export class SqliteDatabaseService implements DatabaseService {
   private static getLimitExpression(baseQuery: BaseQuery): Optional<string> {
     if (baseQuery.pageNo != undefined && baseQuery.pageSize != undefined) {
       return Optional.of(
-        ` LIMIT ${baseQuery.pageSize * baseQuery.pageNo - 1}, ${
-          baseQuery.pageSize
+        ` LIMIT ${baseQuery.pageSize * baseQuery.pageNo - 1}, ${baseQuery.pageSize
         }`
       );
     }
