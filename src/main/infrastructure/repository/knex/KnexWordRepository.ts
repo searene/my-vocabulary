@@ -114,7 +114,8 @@ export class KnexWordRepository implements WordRepository {
 
   async getWordCount(bookId: number): Promise<WordCount> {
     const rows = await knex(KnexWordRepository._WORDS)
-      .select("status", "COUNT(*) AS cnt")
+      .select("status")
+      .count("* AS cnt")
       .where({bookId})
       .groupBy("status");
     const wordCount: WordCount = {
@@ -123,12 +124,11 @@ export class KnexWordRepository implements WordRepository {
     };
     for (const row of rows) {
       if (row.status === WordStatus.Unknown) {
-        wordCount.unknown = row.cnt;
+        wordCount.unknown = row.cnt as number;
       } else if (row.status === WordStatus.Known) {
-        wordCount.known = row.cnt;
+        wordCount.known = row.cnt as number;
       }
     }
-    console.log(wordCount);
     return wordCount;
   }
 }

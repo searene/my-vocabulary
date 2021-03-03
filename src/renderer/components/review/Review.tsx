@@ -12,6 +12,7 @@ import {
 } from "../../../main/domain/time/TimeInterval";
 import { Level } from "../../../main/domain/card/Level";
 import serviceProvider from "../../ServiceProvider";
+import { GoBack } from "../back/GoBack";
 
 interface MatchParams {
   bookId: string;
@@ -52,7 +53,7 @@ export function Review(props: ReviewProps) {
   if (!initiated) {
     return <></>;
   } else if (cardInstanceVO == undefined) {
-    return <div>No more review cards.</div>;
+    return <div><GoBack /> No more review cards.</div>;
   } else {
     return (
       <div>

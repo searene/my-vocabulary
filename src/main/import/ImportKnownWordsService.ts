@@ -23,7 +23,6 @@ export class ImportKnownWordsService {
     });
     const bookRepo = await container.getAsync<BookRepository>(types.BookRepository);
     const bookDO = await bookRepo.queryOne({ type: "import" });
-    console.log(bookDO);
     const bookService = await container.getAsync<BookService>(types.BookService);
     if (bookDO !== undefined) {
       await bookService.removeBook(bookDO.id as number);

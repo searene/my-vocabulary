@@ -23,6 +23,9 @@ export const menu = remote.Menu.buildFromTemplate([
     submenu: [{
       label: "Toggle Dev Tools",
       click: () => remote.getCurrentWebContents().toggleDevTools(),
+    }, {
+      label: "Refresh",
+      click: () => remote.getCurrentWindow().reload(),
     }]
   }
 ]);

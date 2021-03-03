@@ -20,6 +20,7 @@ import { addItemToArray } from "../../utils/ImmutableUtils";
 import { container } from "../../../main/config/inversify.config";
 import { WordRepository } from "../../../main/infrastructure/repository/WordRepository";
 import { types } from "../../../main/config/types";
+import { GoBack } from "../back/GoBack";
 
 interface MatchParams {
   bookId: string;
@@ -113,7 +114,7 @@ export class Book extends React.Component<BookProps, BookStates> {
       <Grid>
         <Grid.Row>
           <Grid.Column width={4}>
-            <Link to={"/"}>Back to Library</Link>
+            <GoBack />
           </Grid.Column>
           <Grid.Column width={4}>Book: {this.state.bookName}</Grid.Column>
           <Grid.Column width={4}>
@@ -138,11 +139,11 @@ export class Book extends React.Component<BookProps, BookStates> {
           <div>No more words.</div>
         ) : (
           <>
-            <Grid.Row>Word: {this.state.wordVO.word}</Grid.Row>
-            <Grid.Row>Original Word: {this.state.wordVO.originalWord}</Grid.Row>
-            <Grid.Row>Status: {WordStatus[this.state.wordVO.status]}</Grid.Row>
-            <Grid.Row>
-              <Grid.Row>Context:</Grid.Row>
+            <Grid.Row><Grid.Column>Word: {this.state.wordVO.word}</Grid.Column></Grid.Row>
+            <Grid.Row><Grid.Column>Original Word: {this.state.wordVO.originalWord}</Grid.Column></Grid.Row>
+            <Grid.Row><Grid.Column>Status: {WordStatus[this.state.wordVO.status]}</Grid.Column></Grid.Row>
+            <Grid.Row><Grid.Column>
+              <Grid.Row><Grid.Column>Context:</Grid.Column></Grid.Row>
               {this.state.wordVO.contextList.map((context, i) => (
                 <Modal
                   key={i}
@@ -189,35 +190,32 @@ export class Book extends React.Component<BookProps, BookStates> {
                   </Modal.Actions>
                 </Modal>
               ))}
+            </Grid.Column>
             </Grid.Row>
           </>
         )}
         <Grid.Row>
-          <Grid>
-            <Grid.Row>
-              <Grid.Column width={16} textAlign={"right"}>
-                <Button
-                  disabled={this.state.pageNo.get(this.state.wordStatus) === 1}
-                  onClick={this.handlePrevious}
-                >
-                  Previous (p)
-                </Button>
-                <Button
-                  disabled={this.state.wordVO == undefined}
-                  onClick={this.handleKnowAndNext}
-                >
-                  Know and Next (k)
-                </Button>
-                <Button
-                  disabled={this.state.wordVO == undefined}
-                  onClick={this.handleNext}
-                >
-                  Next (n)
-                </Button>
-                <Button onClick={this.handleAdd}>Add (a)</Button>
-              </Grid.Column>
-            </Grid.Row>
-          </Grid>
+          <Grid.Column width={16} textAlign={"left"}>
+            <Button
+              disabled={this.state.pageNo.get(this.state.wordStatus) === 1}
+              onClick={this.handlePrevious}
+            >
+              Previous (p)
+            </Button>
+            <Button
+              disabled={this.state.wordVO == undefined}
+              onClick={this.handleKnowAndNext}
+            >
+              Know and Next (k)
+            </Button>
+            <Button
+              disabled={this.state.wordVO == undefined}
+              onClick={this.handleNext}
+            >
+              Next (n)
+            </Button>
+            <Button onClick={this.handleAdd}>Add (a)</Button>
+          </Grid.Column>
         </Grid.Row>
       </Grid>
     );
