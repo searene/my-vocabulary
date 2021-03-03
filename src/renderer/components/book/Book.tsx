@@ -139,11 +139,11 @@ export class Book extends React.Component<BookProps, BookStates> {
           <div>No more words.</div>
         ) : (
           <>
-            <Grid.Row>Word: {this.state.wordVO.word}</Grid.Row>
-            <Grid.Row>Original Word: {this.state.wordVO.originalWord}</Grid.Row>
-            <Grid.Row>Status: {WordStatus[this.state.wordVO.status]}</Grid.Row>
-            <Grid.Row>
-              <Grid.Row>Context:</Grid.Row>
+            <Grid.Row><Grid.Column>Word: {this.state.wordVO.word}</Grid.Column></Grid.Row>
+            <Grid.Row><Grid.Column>Original Word: {this.state.wordVO.originalWord}</Grid.Column></Grid.Row>
+            <Grid.Row><Grid.Column>Status: {WordStatus[this.state.wordVO.status]}</Grid.Column></Grid.Row>
+            <Grid.Row><Grid.Column>
+              <Grid.Row><Grid.Column>Context:</Grid.Column></Grid.Row>
               {this.state.wordVO.contextList.map((context, i) => (
                 <Modal
                   key={i}
@@ -190,6 +190,7 @@ export class Book extends React.Component<BookProps, BookStates> {
                   </Modal.Actions>
                 </Modal>
               ))}
+            </Grid.Column>
             </Grid.Row>
           </>
         )}
