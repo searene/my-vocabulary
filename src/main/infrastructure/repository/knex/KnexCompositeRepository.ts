@@ -43,7 +43,6 @@ export class KnexCompositeRepository implements CompositeRepository {
     const totalCountQuery = outerCommonQuery.count("* as cnt").first() as any;
     const totalCount = (await totalCountQuery)["cnt"];
 
-    console.log(reviewItems);
     // When totalCount == 0, reviewItems is an array one element, where each field is null.
     // This is a problem of Sqlite3, haven't found a solution yet, let's just manually return
     // empty array in this case.

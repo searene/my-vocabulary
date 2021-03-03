@@ -17,8 +17,6 @@ export const Field = (props: FieldProps) => {
   const dispatch = useAppDispatch();
 
   const handleRichEditorChange = (originalContents: string, plainTextContents: string) => {
-    console.log("originalContents: " + originalContents);
-    console.log("plainTextContents: " + plainTextContents);
     dispatch(
       changeFieldContents({
         fieldTypeId: props.fieldTypeId,

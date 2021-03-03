@@ -12,6 +12,7 @@ import { Field } from "./Field";
 import { BookName } from "../bookName/BookName";
 import { useAppDispatch } from "../../redux/store";
 import { Router } from "../../route/Router";
+import { GoBack } from "../back/GoBack";
 
 interface MatchParams {
   bookId: string;
@@ -61,7 +62,7 @@ export function Add(props: AddProps) {
     <Grid divided={"vertically"}>
       <Grid.Row columns={1}>
         <Grid.Column>
-          Book: <BookName bookId={bookId} />
+          <GoBack/>Book: <BookName bookId={bookId} />
         </Grid.Column>
       </Grid.Row>
       <Grid.Row>
