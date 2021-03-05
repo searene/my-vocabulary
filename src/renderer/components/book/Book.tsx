@@ -18,7 +18,8 @@ interface MatchParams {
   bookId: string;
 }
 
-interface BookProps extends RouteComponentProps<MatchParams> {}
+interface BookProps extends RouteComponentProps<MatchParams> {
+}
 
 export const Book = (props: BookProps) => {
 
@@ -30,7 +31,7 @@ export const Book = (props: BookProps) => {
       }
     }
     return pageNo;
-  }
+  };
   const bookId = parseInt(props.match.params.bookId);
   /**
    * The page number, starting from 1.
@@ -49,7 +50,7 @@ export const Book = (props: BookProps) => {
   const setWordStatus = (wordStatus: WordStatus) => {
     wordStatusRef.current = wordStatus;
     _setWordStatus(wordStatus);
-  }
+  };
   /**
    * The current word.
    */
@@ -58,7 +59,7 @@ export const Book = (props: BookProps) => {
   const setWordVO = (wordVO: WordVO | undefined) => {
     wordVORef.current = wordVO;
     _setWordVO(wordVO);
-  }
+  };
 
   const [needRefresh, setNeedRefresh] = useState(true);
   /**
@@ -69,7 +70,7 @@ export const Book = (props: BookProps) => {
   const setMarkedKnownWords = (markedKnownWords: number[]) => {
     markedKnownWordsRef.current = markedKnownWords;
     _setMarkedKnownWords(markedKnownWords);
-  }
+  };
   const [wordCount, setWordCount] = useState<WordCount | undefined>();
   const globalShortcutEnabled = useSelector(selectGlobalShortcutEnabled);
 
@@ -98,12 +99,12 @@ export const Book = (props: BookProps) => {
       }
     }
     return result;
-  }
+  };
 
   const getBookName = async (bookId: number): Promise<string> => {
     const bookVO = await serviceProvider.bookService.getBook(bookId);
     return bookVO.name;
-  }
+  };
 
   const handleSearch = async (word: string): Promise<void> => {
     const bookId = parseInt(props.match.params.bookId);
@@ -117,14 +118,14 @@ export const Book = (props: BookProps) => {
         short: 100,
         long: 500,
       },
-      5
+      5,
     );
     if (wordVOArray.length === 0) {
       // FIXED later
       console.log("Nothing is found.");
     }
     setWordVO(wordVOArray[0]);
-}
+  };
 
   const getCurrentWord = async (bookId: number, pageNo: number): Promise<WordVO | undefined> => {
     const wordVOArray = await serviceProvider.wordService.getWords(
@@ -137,17 +138,17 @@ export const Book = (props: BookProps) => {
         short: 100,
         long: 500,
       },
-      5
+      5,
     );
     if (wordVOArray.length === 0) {
       return undefined;
     }
     return wordVOArray[0];
-  }
+  };
 
   const handleStatusChange = (
     event: React.SyntheticEvent<HTMLElement>,
-    data: DropdownProps
+    data: DropdownProps,
   ): void => {
     setNeedRefresh(true);
     setWordStatus(data.value as number);
@@ -160,10 +161,10 @@ export const Book = (props: BookProps) => {
     });
     const newWord = await getCurrentWord(
       parseInt(props.match.params.bookId),
-      getPageNo()
+      getPageNo(),
     );
-    setWordVO(newWord);
     setMarkedKnownWords(addItemToArray(markedKnownWordsRef.current, wordVORef.current!.id));
+    setWordVO(newWord);
     setNeedRefresh(true);
   };
 
@@ -184,7 +185,7 @@ export const Book = (props: BookProps) => {
 
   const getPageNo = (): number => {
     return pageNoRef.current.get(wordStatus) as number;
-  }
+  };
 
   const keyboardEventListener = async (e: KeyboardEvent) => {
     if (e.key === "k") {
@@ -196,20 +197,20 @@ export const Book = (props: BookProps) => {
     } else if (e.ctrlKey && e.key === "z") {
       await undo();
     }
-  }
+  };
 
   const bindShortcuts = () => {
     document.addEventListener("keydown", keyboardEventListener);
-  }
+  };
 
   const unbindShortcuts = () => {
     document.removeEventListener("keydown", keyboardEventListener);
-  }
+  };
 
   const handlePrevious = async (): Promise<void> => {
     const wordVO = await getCurrentWord(
       parseInt(props.match.params.bookId),
-      getPageNo() - 1
+      getPageNo() - 1,
     );
     const newPageNo = new Map<WordStatus, number>(pageNo);
     newPageNo.set(wordStatus, getPageNo() - 1);
@@ -218,7 +219,10 @@ export const Book = (props: BookProps) => {
     setNeedRefresh(true);
   };
 
- const undo = async (): Promise<void> => {
+  const undo = async (): Promise<void> => {
+    if (markedKnownWordsRef.current.length === 0) {
+      return;
+    }
     const newMarkedKnownWords = [...markedKnownWordsRef.current];
     const lastKnownWordId = newMarkedKnownWords.pop();
     await serviceProvider.wordService.updateWord({
@@ -227,7 +231,7 @@ export const Book = (props: BookProps) => {
     });
     setMarkedKnownWords(newMarkedKnownWords);
     setNeedRefresh(true);
- }
+  };
   useEffect(() => {
     (async function() {
       await refresh();
@@ -245,11 +249,11 @@ export const Book = (props: BookProps) => {
     <Grid>
       <Grid.Row>
         <Grid.Column width={4}>
-          <GoBack />
+          <GoBack/>
         </Grid.Column>
         <Grid.Column width={4}>Book: {bookName}</Grid.Column>
         <Grid.Column width={4}>
-          <SearchWordInput onSearch={(word) => handleSearch(word)} />
+          <SearchWordInput onSearch={(word) => handleSearch(word)}/>
         </Grid.Column>
         <Grid.Column width={4}>
           <Dropdown
@@ -276,7 +280,7 @@ export const Book = (props: BookProps) => {
           <Grid.Row><Grid.Column>
             <Grid.Row><Grid.Column>Context:</Grid.Column></Grid.Row>
             {wordVO!.contextList.map((context, i) =>
-              <ContextItem key={i} short={context.short} long={context.long} />
+              <ContextItem key={i} short={context.short} long={context.long}/>,
             )}
           </Grid.Column>
           </Grid.Row>
@@ -307,4 +311,4 @@ export const Book = (props: BookProps) => {
       </Grid.Row>
     </Grid>
   ) : <></>;
-}
+};
