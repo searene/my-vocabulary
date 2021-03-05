@@ -202,12 +202,10 @@ export const Book = (props: BookProps) => {
   }
 
   const bindShortcuts = () => {
-    console.log("bind");
     document.addEventListener("keydown", keyboardEventListener);
   }
 
   const unbindShortcuts = () => {
-    console.log("unbind");
     document.removeEventListener("keydown", keyboardEventListener);
   }
 
@@ -242,9 +240,8 @@ export const Book = (props: BookProps) => {
   useEffect(() => {
     if (globalShortcutEnabled) {
       bindShortcuts();
-    } else {
-      unbindShortcuts();
     }
+    return unbindShortcuts;
   }, [globalShortcutEnabled]);
 
   return initiated ? (
