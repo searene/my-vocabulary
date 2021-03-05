@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button, Dropdown, DropdownItemProps, DropdownProps, Grid, Modal } from "semantic-ui-react";
 import { WordStatus } from "../../../main/enum/WordStatus";
 import { RouteComponentProps } from "react-router";
@@ -34,14 +34,30 @@ export const Book = (props: BookProps) => {
   /**
    * The page number, starting from 1.
    */
-  const [pageNo, setPageNo] = useState<Map<WordStatus, number>>(initPageNo());
+  const [pageNo, _setPageNo] = useState(initPageNo());
+  const pageNoRef = useRef(pageNo);
+  const setPageNo = (pageNo: Map<WordStatus, number>) => {
+    pageNoRef.current = pageNo;
+    _setPageNo(pageNo);
+  };
+
   const [initiated, setInitiated] = useState(false);
   const [bookName, setBookName] = useState("");
-  const [wordStatus, setWordStatus] = useState(WordStatus.Unknown);
+  const [wordStatus, _setWordStatus] = useState(WordStatus.Unknown);
+  const wordStatusRef = useRef(wordStatus);
+  const setWordStatus = (wordStatus: WordStatus) => {
+    wordStatusRef.current = wordStatus;
+    _setWordStatus(wordStatus);
+  }
   /**
    * The current word.
    */
-  const [wordVO, setWordVO] = useState<WordVO | undefined>(undefined);
+  const [wordVO, _setWordVO] = useState<WordVO | undefined>(undefined);
+  const wordVORef = useRef(wordVO);
+  const setWordVO = (wordVO: WordVO | undefined) => {
+    wordVORef.current = wordVO;
+    _setWordVO(wordVO);
+  }
 
   /**
    * The index of the clicked context, used to show the long context modal.
@@ -51,7 +67,12 @@ export const Book = (props: BookProps) => {
   /**
    * Word ids that are marked as known by the user.
    */
-  const [markedKnownWords, setMarkedKnownWords] = useState<number[]>([]);
+  const [markedKnownWords, _setMarkedKnownWords] = useState<number[]>([]);
+  const markedKnownWordsRef = useRef(markedKnownWords);
+  const setMarkedKnownWords = (markedKnownWords: number[]) => {
+    markedKnownWordsRef.current = markedKnownWords;
+    _setMarkedKnownWords(markedKnownWords);
+  }
   const [wordCount, setWordCount] = useState<WordCount | undefined>();
   const globalShortcutEnabled = useSelector(selectGlobalShortcutEnabled);
 
@@ -112,7 +133,7 @@ export const Book = (props: BookProps) => {
     const wordVOArray = await serviceProvider.wordService.getWords(
       bookId,
       undefined,
-      wordStatus,
+      wordStatusRef.current,
       pageNo,
       1,
       {
@@ -137,7 +158,7 @@ export const Book = (props: BookProps) => {
 
   const handleKnowAndNext = async (): Promise<void> => {
     await serviceProvider.wordService.updateWord({
-      id: wordVO!.id,
+      id: wordVORef.current!.id,
       status: WordStatus.Known,
     });
     const newWord = await getCurrentWord(
@@ -145,19 +166,13 @@ export const Book = (props: BookProps) => {
       getPageNo()
     );
     setWordVO(newWord);
-    setMarkedKnownWords(addItemToArray(markedKnownWords, wordVO!.id));
+    setMarkedKnownWords(addItemToArray(markedKnownWordsRef.current, wordVORef.current!.id));
     setNeedRefresh(true);
   };
 
   const handleNext = async (): Promise<void> => {
-    const wordVO = await getCurrentWord(
-      parseInt(props.match.params.bookId),
-      getPageNo() + 1
-    );
-    const newPageNo = new Map<WordStatus, number>(pageNo);
+    const newPageNo = new Map<WordStatus, number>(pageNoRef.current);
     newPageNo.set(wordStatus, getPageNo() + 1);
-    setWordVO(wordVO);
-    console.log("next")
     setPageNo(newPageNo);
     setNeedRefresh(true);
   };
@@ -165,14 +180,13 @@ export const Book = (props: BookProps) => {
   const handleAdd = async (): Promise<void> => {
     const bookId = parseInt(props.match.params.bookId);
     const urlSearchParams = new URLSearchParams();
-    urlSearchParams.set("word", wordVO!.word);
+    urlSearchParams.set("word", wordVORef.current!.word);
     history.push(`/add/${bookId}?${urlSearchParams.toString()}`);
   };
 
 
   const getPageNo = (): number => {
-    console.log(pageNo.get(WordStatus.Unknown));
-    return pageNo.get(wordStatus) as number;
+    return pageNoRef.current.get(wordStatus) as number;
   }
 
   const keyboardEventListener = async (e: KeyboardEvent) => {
@@ -210,7 +224,7 @@ export const Book = (props: BookProps) => {
   };
 
  const undo = async (): Promise<void> => {
-    const newMarkedKnownWords = [...markedKnownWords];
+    const newMarkedKnownWords = [...markedKnownWordsRef.current];
     const lastKnownWordId = newMarkedKnownWords.pop();
     await serviceProvider.wordService.updateWord({
       id: lastKnownWordId,
