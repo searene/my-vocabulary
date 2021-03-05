@@ -1,11 +1,12 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { WordVO } from "../../../main/database/WordVO";
 
 interface State {
   book: BookState;
 }
 
 interface BookState {
-  currentWord: string | undefined;
+  currentWord: WordVO | undefined;
   markedKnownWordIds: number[];
 }
 

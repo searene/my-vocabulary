@@ -6,6 +6,7 @@ import { settingsReducer } from "../components/settings/settingsSlice";
 import { browserReducer } from "../components/browser/browserSlice";
 import { importReducer } from "../components/import/importSlice";
 import { shortcutReducer } from "../components/shortcut/shortcutSlice";
+import { bookReducer } from "../components/book/bookSlice";
 
 const store = configureStore({
   reducer: {
@@ -15,6 +16,7 @@ const store = configureStore({
     browser: browserReducer,
     import: importReducer,
     shortcut: shortcutReducer,
+    book: bookReducer,
   },
 });
 

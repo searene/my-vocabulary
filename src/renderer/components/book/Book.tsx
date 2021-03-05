@@ -13,6 +13,8 @@ import { GoBack } from "../back/GoBack";
 import { useSelector } from "react-redux";
 import { selectGlobalShortcutEnabled } from "../shortcut/shortcutSlice";
 import { ContextItem } from "./ContextItem";
+import { selectCurrentWord, setCurrentWord } from "./bookSlice";
+import { useAppDispatch } from "../../redux/store";
 
 interface MatchParams {
   bookId: string;
@@ -22,6 +24,8 @@ interface BookProps extends RouteComponentProps<MatchParams> {
 }
 
 export const Book = (props: BookProps) => {
+
+  const dispatch = useAppDispatch();
 
   const initPageNo = (): Map<WordStatus, number> => {
     const pageNo = new Map<WordStatus, number>();
@@ -44,7 +48,7 @@ export const Book = (props: BookProps) => {
   /**
    * The current word.
    */
-  const [wordVO, setWordVO] = useState<WordVO | undefined>(undefined);
+  const wordVO = useSelector(selectCurrentWord);
 
   const [needRefresh, setNeedRefresh] = useState(true);
   /**
@@ -60,7 +64,7 @@ export const Book = (props: BookProps) => {
       const wordVO = await getCurrentWord(bookId, getPageNo());
       const wordCount = await serviceProvider.wordService.getWordCount(bookId);
       setBookName(bookName);
-      setWordVO(wordVO);
+      dispatch(setCurrentWord(wordVO));
       setWordCount(wordCount);
       setNeedRefresh(false);
       setInitiated(true);
@@ -104,7 +108,7 @@ export const Book = (props: BookProps) => {
       // FIXED later
       console.log("Nothing is found.");
     }
-    setWordVO(wordVOArray[0]);
+    dispatch(setCurrentWord(wordVOArray[0]));
   };
 
   const getCurrentWord = async (bookId: number, pageNo: number): Promise<WordVO | undefined> => {
@@ -144,7 +148,7 @@ export const Book = (props: BookProps) => {
       getPageNo(),
     );
     setMarkedKnownWords(addItemToArray(markedKnownWords, wordVO!.id));
-    setWordVO(newWord);
+    dispatch(setCurrentWord(newWord));
     setNeedRefresh(true);
   };
 
@@ -200,7 +204,7 @@ export const Book = (props: BookProps) => {
     );
     const newPageNo = new Map<WordStatus, number>(pageNo);
     newPageNo.set(wordStatus, getPageNo() - 1);
-    setWordVO(wordVO);
+    dispatch(setCurrentWord(wordVO));
     setPageNo(newPageNo);
     setNeedRefresh(true);
   };
