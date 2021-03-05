@@ -12,6 +12,7 @@ import { addItemToArray } from "../../utils/ImmutableUtils";
 import { GoBack } from "../back/GoBack";
 import { useSelector } from "react-redux";
 import { selectGlobalShortcutEnabled } from "../shortcut/shortcutSlice";
+import { ContextItem } from "./ContextItem";
 
 interface MatchParams {
   bookId: string;
@@ -59,10 +60,6 @@ export const Book = (props: BookProps) => {
     _setWordVO(wordVO);
   }
 
-  /**
-   * The index of the clicked context, used to show the long context modal.
-   */
-  const [longWordContextModalIndex, setLongWordContextModalIndex] = useState<number | undefined>(undefined);
   const [needRefresh, setNeedRefresh] = useState(true);
   /**
    * Word ids that are marked as known by the user.
@@ -278,38 +275,9 @@ export const Book = (props: BookProps) => {
           <Grid.Row><Grid.Column>Status: {WordStatus[wordVO!.status]}</Grid.Column></Grid.Row>
           <Grid.Row><Grid.Column>
             <Grid.Row><Grid.Column>Context:</Grid.Column></Grid.Row>
-            {wordVO!.contextList.map((context, i) => (
-              <Modal
-                key={i}
-                trigger={
-                  <Grid.Row
-                    className={"hover-link"}
-                    dangerouslySetInnerHTML={{
-                      __html: context.short.htmlContents,
-                    }}
-                  />
-                }
-                onClose={() => setLongWordContextModalIndex(undefined)}
-                onOpen={() => setLongWordContextModalIndex(i)}
-                open={longWordContextModalIndex !== undefined}
-              >
-                <Modal.Header>Context</Modal.Header>
-                <Modal.Content
-                  dangerouslySetInnerHTML={{
-                    __html: longWordContextModalIndex !== undefined
-                      ? wordVO!.contextList[longWordContextModalIndex].long.htmlContents
-                      : "",
-                  }}
-                />
-                <Modal.Actions>
-                  <Button
-                    onClick={() => setLongWordContextModalIndex(undefined)}
-                  >
-                    Close
-                  </Button>
-                </Modal.Actions>
-              </Modal>
-            ))}
+            {wordVO!.contextList.map((context, i) =>
+              <ContextItem key={i} short={context.short} long={context.long} />
+            )}
           </Grid.Column>
           </Grid.Row>
         </>
