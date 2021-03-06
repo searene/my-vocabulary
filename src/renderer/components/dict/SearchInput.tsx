@@ -1,7 +1,12 @@
 import * as React from "react";
 import * as Autosuggest from "react-autosuggest";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import serviceProvider from "../../ServiceProvider";
+import { useAppDispatch } from "../../redux/store";
+import { BlurEvent, ShouldRenderReasons } from "react-autosuggest";
+import { disableGlobalShortcut, enableGlobalShortcut } from "../shortcut/shortcutSlice";
+import { selectCurrentWord } from "../book/bookSlice";
+import { useSelector } from "react-redux";
 
 interface SearchInputProps {
   value: string;
@@ -9,8 +14,11 @@ interface SearchInputProps {
   onSearch: (word: string) => void;
 }
 export const SearchInput = (props: SearchInputProps) => {
+
   const [value, setValue] = useState("");
+
   const [suggestions, setSuggestions] = useState<string[]>([]);
+  const dispatch = useAppDispatch();
 
   const getSuggestionValue = (suggestion: string) => suggestion;
 
@@ -49,6 +57,15 @@ export const SearchInput = (props: SearchInputProps) => {
     }
   };
 
+  const handleShouldRenderSuggestions = (value: string, reason: ShouldRenderReasons) => {
+    if (reason === "input-focused") {
+      dispatch(disableGlobalShortcut());
+    } else if (reason === "input-blurred") {
+      dispatch(enableGlobalShortcut());
+    }
+    return true;
+  }
+
   return (
     <Autosuggest
       suggestions={suggestions}
@@ -57,6 +74,7 @@ export const SearchInput = (props: SearchInputProps) => {
       getSuggestionValue={getSuggestionValue}
       renderSuggestion={renderSuggestion}
       onSuggestionSelected={onSuggestionSelected}
+      shouldRenderSuggestions={handleShouldRenderSuggestions}
       inputProps={{
         placeholder: "Please input a word...",
         value,
