@@ -1,24 +1,24 @@
 import { ipcRenderer } from "electron";
 
 function initContextMenu() {
-  const images = document.getElementsByTagName("img");
-  for (let i = 0; i < images.length; i++) {
-    const img = images[i];
-    img.addEventListener("contextmenu",function(event){
-      event.preventDefault();
-      const ctxMenu = document.getElementById("ctxMenu") as HTMLMenuElement;
-      ctxMenu.style.display = "block";
-      ctxMenu.style.left = event.pageX + "px";
-      ctxMenu.style.top = event.pageY + "px";
-      ctxMenu.setAttribute("src", img.src);
 
-      ctxMenu.addEventListener("click", (event) => {
-        const ctxMenuElement = (event.target as HTMLMenuElement).parentElement as HTMLMenuElement;
-        const src = ctxMenuElement.getAttribute("src") as string;
-        ipcRenderer.sendToHost(src);
-      });
-    },false);
-  }
+  document.addEventListener("contextmenu", (event) => {
+    if (!(event.target instanceof HTMLImageElement)) {
+      return;
+    }
+    event.preventDefault();
+    const ctxMenu = document.getElementById("ctxMenu") as HTMLMenuElement;
+    ctxMenu.style.display = "block";
+    ctxMenu.style.left = event.pageX + "px";
+    ctxMenu.style.top = event.pageY + "px";
+    ctxMenu.setAttribute("src", event.target.src);
+
+    ctxMenu.addEventListener("click", (event) => {
+      const ctxMenuElement = (event.target as HTMLMenuElement).parentElement as HTMLMenuElement;
+      const src = ctxMenuElement.getAttribute("src") as string;
+      ipcRenderer.sendToHost(src);
+    });
+  });
 }
 
 function create(htmlStr: string) {
