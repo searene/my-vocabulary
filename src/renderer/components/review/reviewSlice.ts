@@ -1,6 +1,5 @@
 import { CardInstanceVO } from "../../../main/facade/CardFacade";
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import serviceProvider from "../../ServiceProvider";
+import { createSlice } from "@reduxjs/toolkit";
 
 interface State {
   review: ReviewState;

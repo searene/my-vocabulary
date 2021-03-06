@@ -7,7 +7,7 @@ import { WordRepository } from "../WordRepository";
 import { knex } from "./KnexFactory";
 import { CardInstanceDO } from "../../do/CardInstanceDO";
 import { CardDO } from "../../do/CardDO";
-import { WordCount } from "../../../domain/WordCount";
+import { ALL_ZEROS_WORD_COUNT, WordCount } from "../../../domain/WordCount";
 import { WordStatus } from "../../../enum/WordStatus";
 
 @injectable()
@@ -118,15 +118,16 @@ export class KnexWordRepository implements WordRepository {
       .count("* AS cnt")
       .where({bookId})
       .groupBy("status");
-    const wordCount: WordCount = {
-      unknown: 0,
-      known: 0,
+    const wordCount = {
+      ...ALL_ZEROS_WORD_COUNT
     };
     for (const row of rows) {
-      if (row.status === WordStatus.Unknown) {
+      if (row.status === WordStatus.UNKNOWN) {
         wordCount.unknown = row.cnt as number;
-      } else if (row.status === WordStatus.Known) {
+      } else if (row.status === WordStatus.KNOWN) {
         wordCount.known = row.cnt as number;
+      } else if (row.status === WordStatus.SKIPPED) {
+        wordCount.skipped = row.cnt as number;
       }
     }
     return wordCount;

@@ -1,12 +1,10 @@
 import * as React from "react";
 import * as Autosuggest from "react-autosuggest";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import serviceProvider from "../../ServiceProvider";
 import { useAppDispatch } from "../../redux/store";
-import { BlurEvent, ShouldRenderReasons } from "react-autosuggest";
+import { ShouldRenderReasons } from "react-autosuggest";
 import { disableGlobalShortcut, enableGlobalShortcut } from "../shortcut/shortcutSlice";
-import { selectCurrentWord } from "../book/bookSlice";
-import { useSelector } from "react-redux";
 
 interface SearchInputProps {
   value: string;
@@ -14,8 +12,6 @@ interface SearchInputProps {
   onSearch: (word: string) => void;
 }
 export const SearchInput = (props: SearchInputProps) => {
-
-  const [value, setValue] = useState("");
 
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const dispatch = useAppDispatch();
@@ -28,7 +24,7 @@ export const SearchInput = (props: SearchInputProps) => {
     event: React.FormEvent,
     { newValue }: Autosuggest.ChangeEvent
   ) => {
-    setValue(newValue);
+    props.onChange(newValue);
   };
 
   const onSuggestionsFetchRequested = async ({ value }: { value: string }) => {
@@ -53,7 +49,7 @@ export const SearchInput = (props: SearchInputProps) => {
     event
   ) => {
     if (event.key === "Enter") {
-      props.onSearch(value);
+      props.onSearch(props.value);
     }
   };
 
@@ -77,7 +73,7 @@ export const SearchInput = (props: SearchInputProps) => {
       shouldRenderSuggestions={handleShouldRenderSuggestions}
       inputProps={{
         placeholder: "Please input a word...",
-        value,
+        value: props.value,
         onChange,
         onKeyDown: onInputKeyDown,
       }}

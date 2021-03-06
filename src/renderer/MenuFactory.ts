@@ -15,7 +15,7 @@ export const menu = remote.Menu.buildFromTemplate([
       label: "Browser",
       click: () => store.dispatch(setBrowserVisibility(true)),
     }, {
-      label: "Import Known Words",
+      label: "Import KNOWN Words",
       click: () => store.dispatch(setImportDialogVisibility(true)),
     }],
   }, {
