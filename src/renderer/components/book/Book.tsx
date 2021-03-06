@@ -48,7 +48,11 @@ export const Book = (props: BookProps) => {
   /**
    * The current word.
    */
-  const wordVO = useSelector(selectCurrentWord);
+  const [wordVO, _setWordVO] = useState<WordVO | undefined>(undefined);
+  const setWordVO = (wordVO: WordVO | undefined): void => {
+    dispatch(setCurrentWord(wordVO === undefined ? "" : wordVO.word))
+    _setWordVO(wordVO);
+  }
 
   const [needRefresh, setNeedRefresh] = useState(true);
   /**
@@ -64,7 +68,7 @@ export const Book = (props: BookProps) => {
       const wordVO = await getCurrentWord(bookId, getPageNo());
       const wordCount = await serviceProvider.wordService.getWordCount(bookId);
       setBookName(bookName);
-      dispatch(setCurrentWord(wordVO));
+      setWordVO(wordVO);
       setWordCount(wordCount);
       setNeedRefresh(false);
       setInitiated(true);
@@ -108,7 +112,7 @@ export const Book = (props: BookProps) => {
       // FIXED later
       console.log("Nothing is found.");
     }
-    dispatch(setCurrentWord(wordVOArray[0]));
+    setWordVO(wordVOArray[0]);
   };
 
   const getCurrentWord = async (bookId: number, pageNo: number): Promise<WordVO | undefined> => {
@@ -148,7 +152,7 @@ export const Book = (props: BookProps) => {
       getPageNo(),
     );
     setMarkedKnownWords(addItemToArray(markedKnownWords, wordVO!.id));
-    dispatch(setCurrentWord(newWord));
+    setWordVO(newWord);
     setNeedRefresh(true);
   };
 
@@ -204,7 +208,7 @@ export const Book = (props: BookProps) => {
     );
     const newPageNo = new Map<WordStatus, number>(pageNo);
     newPageNo.set(wordStatus, getPageNo() - 1);
-    dispatch(setCurrentWord(wordVO));
+    setWordVO(wordVO);
     setPageNo(newPageNo);
     setNeedRefresh(true);
   };

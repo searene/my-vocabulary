@@ -1,10 +1,12 @@
 import * as React from "react";
 import * as Autosuggest from "react-autosuggest";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import serviceProvider from "../../ServiceProvider";
 import { useAppDispatch } from "../../redux/store";
 import { BlurEvent, ShouldRenderReasons } from "react-autosuggest";
 import { disableGlobalShortcut, enableGlobalShortcut } from "../shortcut/shortcutSlice";
+import { selectCurrentWord } from "../book/bookSlice";
+import { useSelector } from "react-redux";
 
 interface SearchInputProps {
   value: string;
@@ -12,7 +14,9 @@ interface SearchInputProps {
   onSearch: (word: string) => void;
 }
 export const SearchInput = (props: SearchInputProps) => {
+
   const [value, setValue] = useState("");
+
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const dispatch = useAppDispatch();
 

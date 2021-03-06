@@ -6,12 +6,12 @@ interface State {
 }
 
 interface BookState {
-  currentWord: WordVO | undefined;
+  currentWord: string;
   markedKnownWordIds: number[];
 }
 
 const initialState: BookState = {
-  currentWord: undefined,
+  currentWord: "",
   markedKnownWordIds: [],
 };
 
