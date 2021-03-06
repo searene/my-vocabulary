@@ -1,6 +1,6 @@
 import { RouteComponentProps } from "react-router";
 import { useSelector } from "react-redux";
-import { useNextReviewCard, selectReviewCard } from "./reviewSlice";
+import { selectReviewCard } from "./reviewSlice";
 import { CardInstanceVO } from "../../../main/facade/CardFacade";
 import { useEffect, useState } from "react";
 import * as React from "react";
@@ -25,46 +25,56 @@ export function Review(props: ReviewProps) {
   const [initiated, setInitiated] = useState(false);
   const [showBack, setShowBack] = useState(false);
 
-  const cardInstanceVO: CardInstanceVO | undefined = useSelector(
-    selectReviewCard
-  );
+  const [reviewCard, setReviewCard] = useState<CardInstanceVO | undefined>(undefined);
 
   const dispatch = useAppDispatch();
   useEffect(() => {
-    if (!initiated) {
-      dispatch(useNextReviewCard({ bookId }));
-      setInitiated(true);
+    async function inner() {
+      if (!initiated) {
+        const reviewCard = await serviceProvider.cardFacade.getNextReviewCardInstanceByBookId(
+          bookId
+        );
+        setReviewCard(reviewCard);
+        setInitiated(true);
+      }
     }
-  }, [initiated]);
+    inner();
+  }, []);
 
   const doReview = async function (
     level: Level,
     timeInterval: TimeInterval
   ): Promise<void> {
     await serviceProvider.cardFacade.review({
-      cardInstanceId: cardInstanceVO!.id,
+      cardInstanceId: reviewCard!.id,
       level,
       timeInterval,
     });
-    dispatch(useNextReviewCard({ bookId }));
+    const nextReviewCard = await serviceProvider.cardFacade.getNextReviewCardInstanceByBookId(
+      bookId
+    );
+    setReviewCard(nextReviewCard);
     setShowBack(false);
   };
 
   if (!initiated) {
     return <></>;
-  } else if (cardInstanceVO == undefined) {
+  } else if (reviewCard == undefined) {
     return <div><GoBack /> No more review cards.</div>;
   } else {
     return (
       <div>
-        <div dangerouslySetInnerHTML={{ __html: cardInstanceVO.front }} />
+        <GoBack/>
+        <div dangerouslySetInnerHTML={{ __html: reviewCard.front }} style={{
+          marginTop: "20px"
+        }}/>
         <hr />
         {showBack ? (
           <>
-            <div dangerouslySetInnerHTML={{ __html: cardInstanceVO.back }} />
+            <div dangerouslySetInnerHTML={{ __html: reviewCard.back }} />
             <hr />
             <div>
-              {Object.entries(cardInstanceVO.reviewTimeRecord).map(
+              {Object.entries(reviewCard.reviewTimeRecord).map(
                 ([level, timeInterval]) => (
                   <Button
                     key={level}
