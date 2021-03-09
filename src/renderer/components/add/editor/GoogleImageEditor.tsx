@@ -35,7 +35,14 @@ export function GoogleImageEditor(props: GoogleImageProps) {
         width: "100%",
         height: "100%",
       }}
-      trigger={<div style={{border: "1px solid black", minHeight: "50px", color: "gray"}}>
+      trigger={<div style={{
+        border: "1px solid black",
+        minHeight: "50px",
+        color: "gray",
+        width: "100%",
+        maxHeight: "300px",
+        overflow: "auto",
+      }}>
         {imgSrc == undefined ? "Click here to select images..." :
           <img src={imgSrc} alt={props.word} />
         }
