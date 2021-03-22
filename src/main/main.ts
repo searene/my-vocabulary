@@ -12,6 +12,16 @@ import { DictService } from "./dict/DictService";
 import { CardTypeRepository } from "./infrastructure/repository/CardTypeRepository";
 import { FieldTypeRepository } from "./infrastructure/repository/FieldTypeRepository";
 import { CompositionRepository } from "./infrastructure/repository/CompositionRepository";
+import { UrlUtils } from "./utils/UrlUtils";
+import { ResourceService } from "./resource/ResourceService";
+import { MimeType } from "./resource/MimeType";
+import { FileUtils } from "./utils/FileUtils";
+
+exports.bookService = container.get(types.BookService);
+exports.wordService = container.get(types.WordService);
+exports.cardFacade = container.get(types.CardFacade);
+exports.dictService = container.get<DictService>(types.DictService);
+exports.resourceService = container.get(types.ResourceService);
 
 async function createSimpleCard(): Promise<void> {
   const cardTypeRepo = await container.getAsync<CardTypeRepository>(types.CardTypeRepository);
@@ -143,7 +153,7 @@ const createWindow = async () => {
   });
 
   win.webContents.session.setProxy({
-    proxyRules: "http://127.0.0.1:3128"
+    proxyRules: "http://127.0.0.1:7890"
   });
 
   const onHeadersReceived=(details: OnHeadersReceivedListenerDetails, callback: (headersReceivedResponse: HeadersReceivedResponse) => void)=>{
@@ -202,10 +212,13 @@ app.whenReady().then(() => {
         });
     }
   );
+  protocol.registerBufferProtocol(UrlUtils.getInternalImageLinkProtocol(), async (request, callback) => {
+    const resourceService = container.get<ResourceService>(types.ResourceService);
+    const fileBuffer = await resourceService.getImageAsBuffer(request.url);
+    const mimeType = MimeType.buildImageTypeFromInternalResourceLink(request.url);
+    callback({
+      mimeType: mimeType.toString(),
+      data: fileBuffer
+    });
+  });
 });
-
-
-exports.bookService = container.get(types.BookService);
-exports.wordService = container.get(types.WordService);
-exports.cardFacade = container.get(types.CardFacade);
-exports.dictService = dictService;

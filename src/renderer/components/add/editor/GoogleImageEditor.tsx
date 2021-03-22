@@ -2,6 +2,7 @@ import * as React from "react";
 import { Modal } from "semantic-ui-react";
 import { useEffect, useRef } from "react";
 import { ConsoleMessageEvent, IpcMessageEvent } from "electron";
+import serviceProvider from "../../../ServiceProvider";
 
 interface GoogleImageProps {
   word: string;
@@ -17,8 +18,15 @@ export function GoogleImageEditor(props: GoogleImageProps) {
     webviewRef.current?.addEventListener("console-message", (e) => {
       console.log("WEBVIEW", (e as ConsoleMessageEvent).message);
     });
-    webviewRef.current?.addEventListener("ipc-message", (event) => {
-      const imageSrc = (event as IpcMessageEvent).channel;
+    webviewRef.current?.addEventListener("ipc-message", async (event) => {
+      let imageSrc = (event as IpcMessageEvent).channel;
+      if (imageSrc === undefined) {
+        return;
+      }
+      if (imageSrc.startsWith("http") || imageSrc.startsWith("https")) {
+        const imageInfo = await serviceProvider.resourceService.saveImage(imageSrc);
+        imageSrc = imageInfo.internalLink;
+      }
       setImgSrc(imageSrc);
       props.onChange(`<img src="${imageSrc}" alt="${props.word}"/>`)
       setShowModal(false);

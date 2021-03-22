@@ -18,4 +18,5 @@ export const types = {
   DictService: Symbol.for("DictService"),
   Scheduler: Symbol.for("Scheduler"),
   ImportKnownWordsService: Symbol.for("ImportKnownWordsService"),
+  ResourceService: Symbol.for("ResourceService"),
 };
