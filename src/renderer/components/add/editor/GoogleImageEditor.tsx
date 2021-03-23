@@ -28,7 +28,7 @@ export function GoogleImageEditor(props: GoogleImageProps) {
         imageSrc = imageInfo.internalLink;
       }
       setImgSrc(imageSrc);
-      props.onChange(`<img src="${imageSrc}" alt="${props.word}"/>`)
+      props.onChange(`<img src="${imageSrc}" alt="${props.word}" class="card-img" />`)
       setShowModal(false);
     });
   }, [showModal]);
@@ -49,10 +49,12 @@ export function GoogleImageEditor(props: GoogleImageProps) {
         color: "gray",
         width: "100%",
         maxHeight: "300px",
-        overflow: "auto",
+        overflow: "hidden",
       }}>
         {imgSrc == undefined ? "Click here to select images..." :
-          <img src={imgSrc} alt={props.word} />
+          <img src={imgSrc} alt={props.word} className="card-img" style={{
+            height: "300px",
+          }}/>
         }
       </div>}>
       <Modal.Header>Select an image</Modal.Header>
