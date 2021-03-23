@@ -6,8 +6,8 @@ import { BookService } from "../BookService";
 import { types } from "../config/types";
 import { BookRepository } from "../infrastructure/repository/BookRepository";
 import { injectable } from "@parisholley/inversify-async";
-import { FileUtils } from "../../renderer/utils/FileUtils";
 import { Configs } from "../config/Configs";
+import { FileUtils } from "../utils/FileUtils";
 
 @injectable()
 export class ImportKnownWordsService {

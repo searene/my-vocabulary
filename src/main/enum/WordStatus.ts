@@ -1,4 +1,5 @@
 export enum WordStatus {
-  Unknown = 0,
-  Known = 1,
+  UNKNOWN = 0,
+  KNOWN = 1,
+  SKIPPED = 2,
 }

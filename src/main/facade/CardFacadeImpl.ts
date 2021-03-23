@@ -70,7 +70,7 @@ export class CardFacadeImpl implements CardFacade {
     const wordRepository = await this.getWordRepository();
     await wordRepository.updateByWord({
       word: saveCardParam.word,
-      status: WordStatus.Known,
+      status: WordStatus.KNOWN,
     });
     return card.id;
   }

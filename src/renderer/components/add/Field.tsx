@@ -37,7 +37,7 @@ export const Field = (props: FieldProps) => {
   }
 
   return (
-    <div>
+    <div style={{width: "100%", marginLeft: "5px", marginRight: "5px"}}>
       <span>{props.fieldName}: </span>
       {getEditor(fieldVO)}
     </div>

@@ -35,6 +35,7 @@ import { BookServiceImpl } from "../BookServiceImpl";
 import { CompositeRepository } from "../infrastructure/repository/CompositeRepository";
 import { KnexCompositeRepository } from "../infrastructure/repository/knex/KnexCompositeRepository";
 import { ImportKnownWordsService } from "../import/ImportKnownWordsService";
+import { ResourceService } from "../resource/ResourceService";
 
 export const container = new Container({
   defaultScope: "Singleton",
@@ -122,6 +123,7 @@ container
   .onActivation(async (_, compositeRepo) => {
     await compositeRepo.init();
     return compositeRepo;
-  })
+  });
 container.bind<Scheduler>(types.Scheduler).to(DefaultScheduler);
 container.bind<ImportKnownWordsService>(types.ImportKnownWordsService).to(ImportKnownWordsService)
+container.bind<ResourceService>(types.ResourceService).to(ResourceService);

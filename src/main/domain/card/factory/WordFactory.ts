@@ -31,12 +31,12 @@ export class WordFactory {
     const wordDOs = await wordRepository.query(
       {
         word: word,
-        status: WordStatus.Known,
+        status: WordStatus.KNOWN,
       },
       { limit: 1 }
     );
     const statusOfNewWord =
-      wordDOs.length > 0 ? WordStatus.Known : WordStatus.Unknown;
+      wordDOs.length > 0 ? WordStatus.KNOWN : WordStatus.UNKNOWN;
     const originalWord = await this._wordFormReader.getOriginalWord(word);
     const wordDO = await wordRepository.insert({
       bookId: bookId,

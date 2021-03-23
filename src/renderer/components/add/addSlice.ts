@@ -18,9 +18,6 @@ interface AddState {
 const initialState: AddState = {
   fieldTypeIdToFieldVOMap: {},
 };
-export type CreateCardParam = {
-  bookId: number;
-};
 
 export const getFieldTypes = createAsyncThunk("add/getFieldTypes", async () => {
   return await serviceProvider.cardFacade.getFieldTypes();

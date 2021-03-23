@@ -1,23 +1,18 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import serviceProvider from "../../ServiceProvider";
+import { refreshBookName, selectBookName } from "../book/bookSlice";
 
 interface BookNameProps {
   bookId: number;
 }
 export const BookName = (props: BookNameProps) => {
-  const [bookName, setBookName] = useState("");
+  const bookName = useSelector(selectBookName);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    async function fetchBookName() {
-      if (bookName === "") {
-        const bookVO = await serviceProvider.bookService.getBook(props.bookId);
-        setBookName(bookVO.name);
-      }
-    }
-    fetchBookName();
+    dispatch(refreshBookName());
   }, [props.bookId, dispatch]);
 
   return <span>{bookName}</span>;
