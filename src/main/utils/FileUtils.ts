@@ -1,18 +1,24 @@
 import * as fs from "fs-extra";
-import axios from "axios";
+import fetch from 'electron-fetch';
+import { Readable } from 'stream'
 
 export class FileUtils {
   static async download(url: string, filePath: string): Promise<void> {
-    return axios({ url, responseType: "stream" }).then(
-      (response) =>
-        new Promise<void>((resolve, reject) => {
-          response.data
-            .pipe(fs.createWriteStream(filePath))
-            .on("finish", () => resolve())
-            .on("error", (e: Error) => reject(e));
-        })
-    );
+
+    const res = await fetch(url);
+    const fileStream = fs.createWriteStream(filePath);
+    await new Promise((resolve, reject) => {
+      if (typeof res.body === "string") {
+        fileStream.write(res.body);
+        fileStream.end();
+      }
+      const readableResponse = res.body as Readable;
+      readableResponse.pipe(fileStream);
+      readableResponse.on("error", reject);
+      fileStream.on("finish", resolve);
+    });
   }
+
   static async exists(filePath: string): Promise<boolean> {
     try {
       await fs.stat(filePath);

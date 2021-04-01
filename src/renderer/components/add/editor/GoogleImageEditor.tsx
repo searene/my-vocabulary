@@ -24,7 +24,9 @@ export function GoogleImageEditor(props: GoogleImageProps) {
         return;
       }
       if (imageSrc.startsWith("http") || imageSrc.startsWith("https")) {
+        console.log("before saving images");
         const imageInfo = await serviceProvider.resourceService.saveImage(imageSrc);
+        console.log("after saving images");
         imageSrc = imageInfo.internalLink;
       }
       setImgSrc(imageSrc);
