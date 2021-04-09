@@ -24,7 +24,7 @@ exports.resourceService = container.get(types.ResourceService);
 
 async function createSimpleCard(): Promise<void> {
   const cardTypeRepo = await container.getAsync<CardTypeRepository>(types.CardTypeRepository);
-  const cardTypeDO = await cardTypeRepo.insert({name: "simple"});
+  const cardTypeDO = await cardTypeRepo.insert({ name: "simple" });
 
   const fieldTypeRepo = await container.getAsync<FieldTypeRepository>(types.FieldTypeRepository);
   const frontFieldTypeDO = await fieldTypeRepo.insert({
@@ -49,7 +49,7 @@ async function createSimpleCard(): Promise<void> {
 
 async function createStandardCard(): Promise<void> {
   const cardTypeRepo = await container.getAsync<CardTypeRepository>(types.CardTypeRepository);
-  const cardTypeDO = await cardTypeRepo.insert({name: "standard"});
+  const cardTypeDO = await cardTypeRepo.insert({ name: "standard" });
 
   const fieldTypeRepo = await container.getAsync<FieldTypeRepository>(types.FieldTypeRepository);
   const frontFieldTypeDO = await fieldTypeRepo.insert({
@@ -78,7 +78,7 @@ async function createStandardCard(): Promise<void> {
 
   const configRepo = await container.getAsync<ConfigRepository>(types.ConfigRepository);
   await configRepo.insert({
-    defaultCardTypeId: cardTypeDO.id
+    defaultCardTypeId: cardTypeDO.id,
   });
 }
 
@@ -155,14 +155,14 @@ const createWindow = async () => {
     proxyRules: "http://127.0.0.1:7890"
   });
 
-  const onHeadersReceived=(details: OnHeadersReceivedListenerDetails, callback: (headersReceivedResponse: HeadersReceivedResponse) => void)=>{
+  const onHeadersReceived = (details: OnHeadersReceivedListenerDetails, callback: (headersReceivedResponse: HeadersReceivedResponse) => void) => {
     const responseHeaders = details.responseHeaders;
-    if(responseHeaders != undefined && responseHeaders['x-frame-options']){
+    if (responseHeaders != undefined && responseHeaders['x-frame-options']) {
       delete responseHeaders['x-frame-options'];
     }
-    callback({cancel: false, responseHeaders: responseHeaders});
+    callback({ cancel: false, responseHeaders: responseHeaders });
   }
-  win.webContents.session.webRequest.onHeadersReceived({urls: []}, onHeadersReceived);
+  win.webContents.session.webRequest.onHeadersReceived({ urls: [] }, onHeadersReceived);
 };
 
 app.commandLine.appendSwitch("proxy-server", "127.0.0.1:3128");

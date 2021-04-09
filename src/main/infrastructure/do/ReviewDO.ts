@@ -7,4 +7,5 @@ export type ReviewDO = BaseDO & {
   reviewTime?: number;
   level?: Level;
   timeInterval?: string;
+  easinessFactor?: number;
 };

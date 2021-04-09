@@ -1,10 +1,8 @@
 import { RouteComponentProps } from "react-router";
 import { useSelector } from "react-redux";
-import { selectReviewCard } from "./reviewSlice";
 import { CardInstanceVO } from "../../../main/facade/CardFacade";
 import { useEffect, useState } from "react";
 import * as React from "react";
-import { useAppDispatch } from "../../redux/store";
 import { Button } from "semantic-ui-react";
 import {
   convertTimeIntervalToString,
@@ -13,6 +11,8 @@ import {
 import { Level } from "../../../main/domain/card/Level";
 import serviceProvider from "../../ServiceProvider";
 import { GoBack } from "../back/GoBack";
+import { ReviewElement } from "./ReviewElement";
+import { selectGlobalShortcutEnabled } from "../shortcut/shortcutSlice";
 
 interface MatchParams {
   bookId: string;
@@ -24,10 +24,10 @@ export function Review(props: ReviewProps) {
   const bookId = parseInt(props.match.params.bookId);
   const [initiated, setInitiated] = useState(false);
   const [showBack, setShowBack] = useState(false);
+  const globalShortcutEnabled = useSelector(selectGlobalShortcutEnabled);
 
   const [reviewCard, setReviewCard] = useState<CardInstanceVO | undefined>(undefined);
 
-  const dispatch = useAppDispatch();
   useEffect(() => {
     async function inner() {
       if (!initiated) {
@@ -40,6 +40,29 @@ export function Review(props: ReviewProps) {
     }
     inner();
   }, []);
+
+  useEffect(() => {
+    if (globalShortcutEnabled) {
+      bindShortcuts();
+    }
+    return unbindShortcuts;
+  });
+
+  const bindShortcuts = function() {
+    document.addEventListener("keydown", keyboardEventListener);
+  }
+
+  const unbindShortcuts = function() {
+    document.removeEventListener("keydown", keyboardEventListener);
+  }
+
+  const keyboardEventListener = async function(e: KeyboardEvent) {
+    for (const reviewElement of ReviewElement.buildReviewElementArray(reviewCard!.reviewTimeRecord)) {
+      if (e.key === reviewElement.getShortcut()) {
+        await doReview(reviewElement.level, reviewElement.timeInterval);
+      }
+    }
+  }
 
   const doReview = async function (
     level: Level,
@@ -80,7 +103,7 @@ export function Review(props: ReviewProps) {
                     key={level}
                     onClick={() => doReview(level as Level, timeInterval)}
                   >
-                    {level}({convertTimeIntervalToString(timeInterval)})
+                    {level} - {convertTimeIntervalToString(timeInterval)} ({ReviewElement.getShortcutFromLevel(level as Level)})
                   </Button>
                 )
               )}

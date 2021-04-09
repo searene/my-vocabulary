@@ -26,6 +26,11 @@ export function now(): TimeInterval {
   };
 }
 
+export function equals(timeInterval1: TimeInterval, timeInterval2: TimeInterval): boolean {
+  return timeInterval1.timeUnit === timeInterval2.timeUnit
+      && timeInterval1.value === timeInterval2.value;
+}
+
 /**
  * @param timeIntervalStr example: 10 min, 1 day, etc.
  */
