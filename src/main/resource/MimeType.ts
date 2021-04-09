@@ -1,4 +1,4 @@
-import fetch from "node-fetch";
+import fetch from "electron-fetch";
 import { FileUtils } from "../utils/FileUtils";
 
 export class MimeType {
@@ -45,8 +45,14 @@ export class MimeType {
   }
   
   static async buildImageMimeTypeFromUrl(url: string): Promise<MimeType> {
-    const blobType = (await (await fetch(url)).blob()).type;
-    const blobTypeSplit = blobType.split("/");
+    let blobType = null;
+    try {
+      blobType = (await (await fetch(url)).blob()).type;
+    } catch (e) {
+      console.log("Got an error");
+      console.error(e)
+    }
+    const blobTypeSplit = blobType!.split("/");
     if (blobTypeSplit.length !== 2) {
       throw new Error("blobTypeSplit.length should be 2, actual blobType: " + blobType);
     }

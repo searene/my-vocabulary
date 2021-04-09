@@ -8,4 +8,6 @@ export interface Scheduler {
   ): Promise<Record<Level, TimeInterval>>;
 
   getInitialReviewDate(): Date;
+
+  processAfterAnswer(cardInstanceId: number, level: Level): Promise<void>;
 }

@@ -35,6 +35,7 @@ export class KnexReviewRepository implements ReviewRepository {
         table.dateTime("review_time");
         table.string("level");
         table.string("time_interval");
+        table.double("easiness_factor");
       });
     }
   }

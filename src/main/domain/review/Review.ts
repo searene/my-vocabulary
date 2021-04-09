@@ -1,17 +1,8 @@
 import { ReviewDO } from "../../infrastructure/do/ReviewDO";
-import { CardInstanceRepository } from "../../infrastructure/repository/CardInstanceRepository";
-import { container } from "../../config/inversify.config";
 import { CardInstance } from "../card/instance/CardInstance";
 import { CardInstanceFactory } from "../card/instance/CardInstanceFactory";
-import {
-  addTimeInterval,
-  convertTimeIntervalToString,
-  fromTimeIntervalStr,
-  TimeInterval,
-} from "../time/TimeInterval";
+import { fromTimeIntervalStr, TimeInterval } from "../time/TimeInterval";
 import { Level } from "../card/Level";
-import { ReviewRepository } from "../../infrastructure/repository/ReviewRepository";
-import { types } from "../../config/types";
 
 export class Review {
   constructor(
@@ -19,8 +10,9 @@ export class Review {
     private readonly _cardInstance: CardInstance,
     private readonly _reviewTime: Date,
     private _level: Level,
-    private _timeInterval: TimeInterval
-  ) {}
+    private _timeInterval: TimeInterval,
+    private _easinessFactor: number,
+  ) { }
 
   static async fromReviewDO(reviewDO: ReviewDO): Promise<Review> {
     const cardInstance = await CardInstanceFactory.queryById(
@@ -36,7 +28,8 @@ export class Review {
       cardInstance,
       new Date(reviewDO.reviewTime as number),
       reviewDO.level as Level,
-      fromTimeIntervalStr(reviewDO.timeInterval as string)
+      fromTimeIntervalStr(reviewDO.timeInterval as string),
+      reviewDO!.easinessFactor as number,
     );
   }
 
@@ -58,5 +51,9 @@ export class Review {
 
   get timeInterval(): TimeInterval {
     return this._timeInterval;
+  }
+
+  get easinessFactor(): number {
+    return this._easinessFactor;
   }
 }

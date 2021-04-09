@@ -8,10 +8,6 @@ import { RepositoryUtils } from "../RepositoryUtils";
 import { assert } from "../../../utils/Assert";
 import { CardInstanceDO } from "../../do/CardInstanceDO";
 import { CardDO } from "../../do/CardDO";
-import { CompositionQuery } from "../../query/CompositionQuery";
-import { CompositionDO } from "../../do/CompositionDO";
-import { CardQuery } from "../../query/CardQuery";
-import { BookQuery } from "../../query/BookQuery";
 
 @injectable()
 export class KnexConfigRepository implements ConfigRepository {
@@ -118,5 +114,19 @@ export class KnexConfigRepository implements ConfigRepository {
       KnexConfigRepository._CONFIGS,
       query
     );
+  }
+
+  async updateTheOnlyConfig(configDO: ConfigDO): Promise<void> {
+    const originalConfigDO = await this.queryOneOrThrowError();
+    const updateConfigDO = { id: originalConfigDO!.id, ...configDO };
+    await this.updateById(updateConfigDO);
+  }
+
+  async queryOneOrThrowError(): Promise<ConfigDO> {
+    const result = await this.queryOne({});
+    if (result === undefined) {
+      throw new Error("Config is not available.");
+    }
+    return result;
   }
 }

@@ -9,4 +9,12 @@ export interface ConfigRepository
   setDefaultCardTypeId(defaultCardTypeId: number): Promise<void>;
 
   getConfig(): Promise<ConfigDO | undefined>;
+
+  /**
+   * Update the config in the table.
+   * @param configDO config that needs to be updated to. configDO.id is not required.
+   */
+  updateTheOnlyConfig(configDO: ConfigDO): Promise<void>;
+
+  queryOneOrThrowError(): Promise<ConfigDO>;
 }

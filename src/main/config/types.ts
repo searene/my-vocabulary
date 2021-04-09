@@ -17,6 +17,7 @@ export const types = {
   CardFacade: Symbol.for("CardFacade"),
   DictService: Symbol.for("DictService"),
   Scheduler: Symbol.for("Scheduler"),
+  DefaultScheduler: Symbol.for("DefaultScheduler"),
   ImportKnownWordsService: Symbol.for("ImportKnownWordsService"),
   ResourceService: Symbol.for("ResourceService"),
 };

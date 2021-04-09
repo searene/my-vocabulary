@@ -13,15 +13,20 @@ export class ResourceService {
    * Save the image and return the image internal link.
    */
   async saveImage(imageSrc: string): Promise<ImageInfo> {
+    console.log("a")
     if (!imageSrc.startsWith("http") || !imageSrc.startsWith("https")) {
       throw new Error("Invalid image src: " + imageSrc);
     }
+    console.log("b")
     const ext = await this.getImageExt(imageSrc);
+    console.log("c")
     const imgFilePath =
       path.join(Configs.get().getResourceDir(), Date.now().toString()) +
       "." +
       ext;
+    console.log("d")
     await FileUtils.download(imageSrc, imgFilePath);
+    console.log("e")
     return new ImageInfo(await UrlUtils.getInternalImageLink(imgFilePath));
   }
 

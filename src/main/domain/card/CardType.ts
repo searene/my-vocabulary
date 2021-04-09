@@ -10,7 +10,7 @@ export class CardType {
     private readonly _id: number,
     // CardType name
     private readonly _name: string
-  ) {}
+  ) { }
 
   static get(id: number, name: string): CardType {
     return new CardType(id, name);
@@ -30,7 +30,7 @@ export class CardType {
 
   static async createSimpleCardType(): Promise<CardType> {
     const cardTypeRepo = await container.getAsync<CardTypeRepository>(types.CardTypeRepository);
-    const simpleCardTypeDO = await cardTypeRepo.queryOne({name: "simple"});
+    const simpleCardTypeDO = await cardTypeRepo.queryOne({ name: "simple" });
     if (simpleCardTypeDO !== undefined) {
       return CardType.fromCardTypeDO(simpleCardTypeDO);
     }
@@ -44,7 +44,7 @@ export class CardType {
 
   static async createStandardCardType(): Promise<CardType> {
     const cardTypeRepo = await container.getAsync<CardTypeRepository>(types.CardTypeRepository);
-    const standardCardDO = await cardTypeRepo.queryOne({name: "standard"});
+    const standardCardDO = await cardTypeRepo.queryOne({ name: "standard" });
     if (standardCardDO !== undefined) {
       return CardType.fromCardTypeDO(standardCardDO);
     }

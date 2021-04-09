@@ -125,5 +125,6 @@ container
     return compositeRepo;
   });
 container.bind<Scheduler>(types.Scheduler).to(DefaultScheduler);
+container.bind<DefaultScheduler>(types.DefaultScheduler).to(DefaultScheduler);
 container.bind<ImportKnownWordsService>(types.ImportKnownWordsService).to(ImportKnownWordsService)
 container.bind<ResourceService>(types.ResourceService).to(ResourceService);

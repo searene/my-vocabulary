@@ -125,6 +125,8 @@ export class CardFacadeImpl implements CardFacade {
       id: reviewRequest.cardInstanceId,
       dueTime: addTimeInterval(new Date(), reviewRequest.timeInterval).getTime(),
     });
+    const scheduler = await container.getAsync<Scheduler>(types.Scheduler);
+    await scheduler.processAfterAnswer(reviewRequest.cardInstanceId, reviewRequest.level);
   }
 
   async getBrowseData(request: BrowseDataRequest): Promise<BrowseData> {

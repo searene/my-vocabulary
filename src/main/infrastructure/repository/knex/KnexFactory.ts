@@ -9,5 +9,6 @@ export const knex = knexFunc(
     connection: {
       filename: path.join(Configs.get().getConfDir(), "vocabulary.db"),
     },
+    useNullAsDefault: true,
   })
 );
