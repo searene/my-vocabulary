@@ -5,7 +5,6 @@ import { CardInstanceQuery } from "../../query/CardInstanceQuery";
 import { injectable } from "@parisholley/inversify-async";
 import { Options } from "../../query/Options";
 import { RepositoryUtils } from "../RepositoryUtils";
-import { BookQuery } from "../../query/BookQuery";
 
 const knex = KnexFactory.knex;
 
@@ -120,5 +119,18 @@ export class KnexCardInstanceRepository implements CardInstanceRepository {
       KnexCardInstanceRepository._CARD_INSTANCES,
       query
     );
+  }
+
+  async queryDueCardInstanceCount(bookId: number): Promise<number> {
+    const queryInterface = knex
+      .from(KnexCardInstanceRepository._CARD_INSTANCES)
+      .count("*", {as: "cnt"})
+      .where({ bookId })
+      .andWhere("due_time", "<=", Date.now());
+    const rows = await queryInterface;
+    if (rows.length !== 1) {
+      throw new Error("The size of rows must be 1, actual rows: " + rows);
+    }
+    return rows[0].cnt as number;
   }
 }
