@@ -83,6 +83,7 @@ export function Library(props: LibraryProps) {
           <Table.Row>
             <Table.HeaderCell>Name</Table.HeaderCell>
             <Table.HeaderCell>Total Word Count</Table.HeaderCell>
+            <Table.HeaderCell>To Be Reviewed</Table.HeaderCell>
           </Table.Row>
         </Table.Header>
         <Table.Body>
@@ -95,6 +96,7 @@ export function Library(props: LibraryProps) {
                 {book.name}
               </Table.Cell>
               <Table.Cell>{book.totalWordCount}</Table.Cell>
+              <Table.Cell>{book.dueCardInstanceCount}</Table.Cell>
               <Modal
                 closeIcon
                 open={showRemoveBookModal}

@@ -28,19 +28,19 @@ export class BookServiceImpl implements BookService {
     for (const [word, positions] of wordToPositionsMap) {
       await WordFactory.get().createWord(bookDO.id as number, word, positions);
     }
-    return convertBookDOToBookVO(bookDO);
+    return await convertBookDOToBookVO(bookDO);
   }
 
   async getBook(bookId: number): Promise<BookVO> {
     const bookRepo = await container.getAsync<BookRepository>(types.BookRepository);
     const bookDO = await bookRepo.queryByIdOrThrow(bookId);
-    return convertBookDOToBookVO(bookDO);
+    return await convertBookDOToBookVO(bookDO);
   }
 
   async getNormalBooks(): Promise<BookVO[]> {
     const bookRepo = await container.getAsync<BookRepository>(types.BookRepository);
     const bookDOs = await bookRepo.query({ type: "normal" });
-    return bookDOs.map(bookDO => convertBookDOToBookVO(bookDO));
+    return Promise.all(bookDOs.map(async bookDO => await convertBookDOToBookVO(bookDO)));
   }
 
   async getFirstNormalBook(): Promise<BookVO | undefined> {
@@ -49,7 +49,7 @@ export class BookServiceImpl implements BookService {
     if (bookDOs.length == 0) {
       return undefined;
     }
-    return convertBookDOToBookVO(bookDOs[0]);
+    return await convertBookDOToBookVO(bookDOs[0]);
   }
 
   async removeBook(bookId: number): Promise<void> {
