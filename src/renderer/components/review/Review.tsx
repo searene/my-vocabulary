@@ -28,6 +28,15 @@ export function Review(props: ReviewProps) {
 
   const [reviewCard, setReviewCard] = useState<CardInstanceVO | undefined>(undefined);
 
+  const pronounce = function(html: string) {
+    const el = document.createElement('html');
+    el.innerHTML = html;
+    const imgs = el.getElementsByTagName("img");
+    for (let i = 0; i < imgs.length; i++) {
+      imgs[i].click();
+    }
+  }
+
   useEffect(() => {
     async function inner() {
       if (!initiated) {
@@ -35,11 +44,17 @@ export function Review(props: ReviewProps) {
           bookId
         );
         setReviewCard(reviewCard);
+        pronounce(reviewCard!.front);
         setInitiated(true);
       }
     }
     inner();
   }, []);
+
+  useEffect(() => {
+    bindShowAnswerShortcut();
+    return unbindShowAnswerShortcut;
+  });
 
   useEffect(() => {
     if (globalShortcutEnabled) {
@@ -54,6 +69,18 @@ export function Review(props: ReviewProps) {
 
   const unbindShortcuts = function() {
     document.removeEventListener("keydown", keyboardEventListener);
+  }
+
+  const bindShowAnswerShortcut = function() {
+    document.addEventListener("keydown", showAnswerKeyboardEventListener);
+  }
+
+  const unbindShowAnswerShortcut = function() {
+    document.removeEventListener("keydown", showAnswerKeyboardEventListener);
+  }
+
+  const showAnswerKeyboardEventListener = function(e: KeyboardEvent) {
+    handleShowAnswer();
   }
 
   const keyboardEventListener = async function(e: KeyboardEvent) {
@@ -79,6 +106,15 @@ export function Review(props: ReviewProps) {
     setReviewCard(nextReviewCard);
     setShowBack(false);
   };
+
+  const handleShowAnswer = function() {
+    if (showBack) {
+      return;
+    }
+    setShowBack(true);
+    pronounce(reviewCard!.back);
+    unbindShowAnswerShortcut();
+  }
 
   if (!initiated) {
     return <></>;
@@ -110,7 +146,7 @@ export function Review(props: ReviewProps) {
             </div>
           </>
         ) : (
-          <Button onClick={() => setShowBack(true)}>Show Answer</Button>
+          <Button onClick={handleShowAnswer}>Show Answer (SPACE)</Button>
         )}
       </div>
     );

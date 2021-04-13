@@ -20,12 +20,14 @@ export class ConfigReader {
   }
 
   async getString(key: string): Promise<Optional<string>> {
-    await this.init();
     return Optional.ofNullable(this.config[key]);
   }
 
+  async getBoolean(key: string): Promise<boolean> {
+    return this.config[key];
+  }
+
   async getPath(key: string): Promise<Optional<string>> {
-    await this.init();
     const value = await this.getString(key);
     if (value.isEmpty()) {
       return Optional.empty();

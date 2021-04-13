@@ -21,6 +21,7 @@ exports.wordService = container.get(types.WordService);
 exports.cardFacade = container.get(types.CardFacade);
 exports.dictService = container.get<DictService>(types.DictService);
 exports.resourceService = container.get(types.ResourceService);
+exports.configService = container.get(types.ConfigService);
 
 async function createSimpleCard(): Promise<void> {
   const cardTypeRepo = await container.getAsync<CardTypeRepository>(types.CardTypeRepository);

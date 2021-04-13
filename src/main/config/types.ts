@@ -1,4 +1,3 @@
-import { CardFacade } from "../facade/CardFacade";
 export const types = {
   BookService: Symbol.for("BookService"),
   WordService: Symbol.for("WordService"),
@@ -20,4 +19,5 @@ export const types = {
   DefaultScheduler: Symbol.for("DefaultScheduler"),
   ImportKnownWordsService: Symbol.for("ImportKnownWordsService"),
   ResourceService: Symbol.for("ResourceService"),
+  ConfigService: Symbol.for("ConfigService"),
 };

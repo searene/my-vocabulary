@@ -1,6 +1,8 @@
+import { useState, KeyboardEvent } from "react";
 import * as React from "react";
 import { Input } from "semantic-ui-react";
-import { SyntheticEvent } from "react";
+import { disableGlobalShortcut, enableGlobalShortcut } from "./shortcut/shortcutSlice";
+import { useAppDispatch } from "../redux/store";
 
 interface SearchWordInputProps {
   /**
@@ -9,40 +11,33 @@ interface SearchWordInputProps {
   onSearch: (word: string) => Promise<void>;
 }
 
-interface SearchWordInputStates {
-  /**
-   * Search value
-   */
-  searchValue: string;
-}
-
-export class SearchWordInput extends React.Component<
-  SearchWordInputProps,
-  SearchWordInputStates
-> {
-  constructor(props: SearchWordInputProps) {
-    super(props);
-    this.state = {
-      searchValue: "",
-    };
-  }
-
-  private handleKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
+export const SearchWordInput = (props: SearchWordInputProps) => {
+  const [searchValue, setSearchValue] = useState("");
+  const dispatch = useAppDispatch();
+  const handleKeyDown = async (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
-      await this.props.onSearch(this.state.searchValue);
+      await props.onSearch(searchValue);
     }
   };
 
-  render() {
-    return (
-      <Input
-        placeholder={"Search..."}
-        value={this.state.searchValue}
-        onChange={(e, data) => {
-          this.setState({ searchValue: data.value });
-        }}
-        onKeyDown={this.handleKeyDown}
-      />
-    );
+  const handleFocus = () => {
+    dispatch(disableGlobalShortcut());
   }
+
+  const handleBlur = () => {
+    dispatch(enableGlobalShortcut());
+  }
+
+  return (
+    <Input
+      placeholder={"Search..."}
+      value={searchValue}
+      onFocus={handleFocus}
+      onBlur={handleBlur}
+      onChange={(e, data) => {
+        setSearchValue(data.value);
+      }}
+      onKeyDown={handleKeyDown}
+    />
+  );
 }
