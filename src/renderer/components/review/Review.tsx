@@ -52,6 +52,11 @@ export function Review(props: ReviewProps) {
   }, []);
 
   useEffect(() => {
+    bindShowAnswerShortcut();
+    return unbindShowAnswerShortcut;
+  });
+
+  useEffect(() => {
     if (globalShortcutEnabled) {
       bindShortcuts();
     }
@@ -64,6 +69,18 @@ export function Review(props: ReviewProps) {
 
   const unbindShortcuts = function() {
     document.removeEventListener("keydown", keyboardEventListener);
+  }
+
+  const bindShowAnswerShortcut = function() {
+    document.addEventListener("keydown", showAnswerKeyboardEventListener);
+  }
+
+  const unbindShowAnswerShortcut = function() {
+    document.removeEventListener("keydown", showAnswerKeyboardEventListener);
+  }
+
+  const showAnswerKeyboardEventListener = function(e: KeyboardEvent) {
+    handleShowAnswer();
   }
 
   const keyboardEventListener = async function(e: KeyboardEvent) {
@@ -90,9 +107,13 @@ export function Review(props: ReviewProps) {
     setShowBack(false);
   };
 
-  const showAnswerHandler = function() {
+  const handleShowAnswer = function() {
+    if (showBack) {
+      return;
+    }
     setShowBack(true);
     pronounce(reviewCard!.back);
+    unbindShowAnswerShortcut();
   }
 
   if (!initiated) {
@@ -125,7 +146,7 @@ export function Review(props: ReviewProps) {
             </div>
           </>
         ) : (
-          <Button onClick={showAnswerHandler}>Show Answer</Button>
+          <Button onClick={handleShowAnswer}>Show Answer (SPACE)</Button>
         )}
       </div>
     );
