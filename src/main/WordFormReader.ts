@@ -5,6 +5,7 @@ import { WordFormLine } from "./domain/WordFormLine";
 import { inject, injectable } from "@parisholley/inversify-async";
 import { ConfigReader } from "./ConfigReader";
 import { WatchDog } from "./WatchDog";
+import { container } from "./config/inversify.config";
 
 @injectable()
 export class WordFormReader {
@@ -13,10 +14,6 @@ export class WordFormReader {
   private initiated = false;
 
   private readlineInterface?: Interface;
-
-  public constructor(
-    @inject(ConfigReader) private configReader: ConfigReader
-  ) {}
 
   async getOriginalWord(changedWord: string): Promise<Optional<string>> {
     await this.init();
@@ -32,7 +29,8 @@ export class WordFormReader {
     if (this.initiated) {
       return;
     }
-    const formsENPath = await this.configReader.getPath("formsENPath");
+    const configReader = await container.getAsync(ConfigReader);
+    const formsENPath = await configReader.getPath("formsENPath");
     if (formsENPath.isEmpty()) {
       throw new Error("formsENPath config is not available");
     }

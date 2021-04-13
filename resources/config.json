@@ -1,3 +1,4 @@
 {
-  "formsENPath": "../resources/forms-EN.txt"
+  "formsENPath": "../resources/forms-EN.txt",
+  "autoPronunciation": true
 }

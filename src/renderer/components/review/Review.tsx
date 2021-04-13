@@ -28,6 +28,15 @@ export function Review(props: ReviewProps) {
 
   const [reviewCard, setReviewCard] = useState<CardInstanceVO | undefined>(undefined);
 
+  const pronounce = function(html: string) {
+    const el = document.createElement('html');
+    el.innerHTML = html;
+    const imgs = el.getElementsByTagName("img");
+    for (let i = 0; i < imgs.length; i++) {
+      imgs[i].click();
+    }
+  }
+
   useEffect(() => {
     async function inner() {
       if (!initiated) {
@@ -35,6 +44,7 @@ export function Review(props: ReviewProps) {
           bookId
         );
         setReviewCard(reviewCard);
+        pronounce(reviewCard!.front);
         setInitiated(true);
       }
     }
@@ -80,6 +90,11 @@ export function Review(props: ReviewProps) {
     setShowBack(false);
   };
 
+  const showAnswerHandler = function() {
+    setShowBack(true);
+    pronounce(reviewCard!.back);
+  }
+
   if (!initiated) {
     return <></>;
   } else if (reviewCard == undefined) {
@@ -110,7 +125,7 @@ export function Review(props: ReviewProps) {
             </div>
           </>
         ) : (
-          <Button onClick={() => setShowBack(true)}>Show Answer</Button>
+          <Button onClick={showAnswerHandler}>Show Answer</Button>
         )}
       </div>
     );

@@ -36,6 +36,8 @@ import { CompositeRepository } from "../infrastructure/repository/CompositeRepos
 import { KnexCompositeRepository } from "../infrastructure/repository/knex/KnexCompositeRepository";
 import { ImportKnownWordsService } from "../import/ImportKnownWordsService";
 import { ResourceService } from "../resource/ResourceService";
+import { ConfigServiceImpl } from "../facade/ConfigServiceImpl";
+import { ConfigService } from "../facade/ConfigService";
 
 export const container = new Container({
   defaultScope: "Singleton",
@@ -44,7 +46,6 @@ export const container = new Container({
 container.bind<WordService>(types.WordService).to(WordServiceImpl);
 container.bind(types.DictService).to(DictService);
 container.bind(WordFormReader).to(WordFormReader);
-container.bind(ConfigReader).to(ConfigReader);
 container.bind<BookService>(types.BookService).to(BookServiceImpl);
 container.bind<CardFacade>(types.CardFacade).to(CardFacadeImpl);
 container
@@ -124,7 +125,15 @@ container
     await compositeRepo.init();
     return compositeRepo;
   });
+container
+  .bind<ConfigReader>(ConfigReader)
+  .to(ConfigReader)
+  .onActivation(async (_, configReader) => {
+    await configReader.init();
+    return configReader;
+  });
 container.bind<Scheduler>(types.Scheduler).to(DefaultScheduler);
 container.bind<DefaultScheduler>(types.DefaultScheduler).to(DefaultScheduler);
 container.bind<ImportKnownWordsService>(types.ImportKnownWordsService).to(ImportKnownWordsService)
 container.bind<ResourceService>(types.ResourceService).to(ResourceService);
+container.bind<ConfigService>(types.ConfigService).to(ConfigServiceImpl);
