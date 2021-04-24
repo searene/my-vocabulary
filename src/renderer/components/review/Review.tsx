@@ -28,12 +28,20 @@ export function Review(props: ReviewProps) {
 
   const [reviewCard, setReviewCard] = useState<CardInstanceVO | undefined>(undefined);
 
-  const pronounce = function(html: string) {
+  const pronounce = async function(html: string) {
     const el = document.createElement('html');
     el.innerHTML = html;
     const imgs = el.getElementsByTagName("img");
+    var clickEvent = new MouseEvent('click', {
+      view: window,
+      bubbles: true,
+      cancelable: true
+    });
     for (let i = 0; i < imgs.length; i++) {
-      imgs[i].click();
+      const img = imgs[i] as HTMLImageElement;
+      if (img.onclick != null) {
+        await img.onclick(clickEvent);
+      }
     }
   }
 
@@ -58,12 +66,12 @@ export function Review(props: ReviewProps) {
 
   useEffect(() => {
     if (globalShortcutEnabled) {
-      bindShortcuts();
+      bindLevelShortcuts();
     }
     return unbindShortcuts;
   });
 
-  const bindShortcuts = function() {
+  const bindLevelShortcuts = function() {
     document.addEventListener("keydown", keyboardEventListener);
   }
 
@@ -80,7 +88,9 @@ export function Review(props: ReviewProps) {
   }
 
   const showAnswerKeyboardEventListener = function(e: KeyboardEvent) {
-    handleShowAnswer();
+    if (e.key === ' ') {
+      handleShowAnswer();
+    }
   }
 
   const keyboardEventListener = async function(e: KeyboardEvent) {
