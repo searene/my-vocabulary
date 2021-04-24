@@ -66,12 +66,12 @@ export function Review(props: ReviewProps) {
 
   useEffect(() => {
     if (globalShortcutEnabled) {
-      bindShortcuts();
+      bindLevelShortcuts();
     }
     return unbindShortcuts;
   });
 
-  const bindShortcuts = function() {
+  const bindLevelShortcuts = function() {
     document.addEventListener("keydown", keyboardEventListener);
   }
 
@@ -88,7 +88,9 @@ export function Review(props: ReviewProps) {
   }
 
   const showAnswerKeyboardEventListener = function(e: KeyboardEvent) {
-    handleShowAnswer();
+    if (e.key === ' ') {
+      handleShowAnswer();
+    }
   }
 
   const keyboardEventListener = async function(e: KeyboardEvent) {
