@@ -12,6 +12,7 @@ import serviceProvider from "../../ServiceProvider";
 import { GoBack } from "../back/GoBack";
 import { ReviewElement } from "./ReviewElement";
 import { selectGlobalShortcutEnabled } from "../shortcut/shortcutSlice";
+import * as React from 'react';
 
 interface MatchParams {
   bookId: string;
