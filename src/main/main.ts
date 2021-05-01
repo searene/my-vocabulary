@@ -166,7 +166,7 @@ const createWindow = async () => {
   win.webContents.session.webRequest.onHeadersReceived({ urls: [] }, onHeadersReceived);
 };
 
-app.commandLine.appendSwitch("proxy-server", "127.0.0.1:3128");
+app.commandLine.appendSwitch("proxy-server", "127.0.0.1:7890");
 
 app.on("ready", createWindow);
 
