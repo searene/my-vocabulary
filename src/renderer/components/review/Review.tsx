@@ -2,7 +2,6 @@ import { RouteComponentProps } from "react-router";
 import { useSelector } from "react-redux";
 import { CardInstanceVO } from "../../../main/facade/CardFacade";
 import { useEffect, useState } from "react";
-import * as React from "react";
 import { Button } from "semantic-ui-react";
 import {
   convertTimeIntervalToString,

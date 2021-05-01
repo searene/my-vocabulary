@@ -1,6 +1,7 @@
 import { injectable } from "@parisholley/inversify-async";
 import {
   BrowseData, BrowseDataRequest,
+  CardCount,
   CardFacade,
   CardInstanceVO,
   FieldTypeVO, ReviewItem,
@@ -24,6 +25,7 @@ import {
 } from "../domain/time/TimeInterval";
 import { CompositeRepository } from "../infrastructure/repository/CompositeRepository";
 import { Field } from "../domain/field/Field";
+import { CardRepository } from "../infrastructure/repository/CardRepository";
 
 @injectable()
 export class CardFacadeImpl implements CardFacade {
@@ -133,4 +135,5 @@ export class CardFacadeImpl implements CardFacade {
     const compositeRepo = await container.getAsync<CompositeRepository>(types.CompositeRepository);
     return compositeRepo.getBrowseData(request);
   }
+
 }

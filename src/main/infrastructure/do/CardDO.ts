@@ -4,4 +4,5 @@ export type CardDO = BaseDO & {
   cardTypeId?: number;
   bookId?: number;
   word?: string;
+  createTime?: number;
 };

@@ -1,5 +1,5 @@
-import * as React from "react";
 import { useState, useEffect } from "react";
+import * as React from 'react';
 import {
   Header,
   Container,
@@ -84,6 +84,7 @@ export function Library(props: LibraryProps) {
             <Table.HeaderCell>Name</Table.HeaderCell>
             <Table.HeaderCell>Total Word Count</Table.HeaderCell>
             <Table.HeaderCell>To Be Reviewed</Table.HeaderCell>
+            <Table.HeaderCell>Card Added Today</Table.HeaderCell>
           </Table.Row>
         </Table.Header>
         <Table.Body>
@@ -97,6 +98,7 @@ export function Library(props: LibraryProps) {
               </Table.Cell>
               <Table.Cell>{book.totalWordCount}</Table.Cell>
               <Table.Cell>{book.dueCardInstanceCount}</Table.Cell>
+              <Table.Cell>{book.todayAddedCardCount}</Table.Cell>
               <Modal
                 closeIcon
                 open={showRemoveBookModal}

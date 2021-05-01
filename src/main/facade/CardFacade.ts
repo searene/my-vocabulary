@@ -64,6 +64,10 @@ export type BrowseDataRequest = {
   limit: number;
 }
 
+export type CardCount = {
+  addedToday: number;
+}
+
 export interface CardFacade {
   /**
    * Get field types of the given cardType, if no cardType was given,
