@@ -23,8 +23,10 @@ export class RichEditor extends React.Component<
     this.divComponent.current?.addEventListener("paste", (event) => {
       const dataTransfer = event.clipboardData;
       const html = dataTransfer?.getData("text/html");
-      document.execCommand("insertHTML", false, html);
-      event.preventDefault();
+      if (html !== "") {
+        document.execCommand("insertHTML", false, html);
+        event.preventDefault();
+      }
     });
   }
 
