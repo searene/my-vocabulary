@@ -8,6 +8,7 @@ import { RepositoryUtils } from "../RepositoryUtils";
 import { CardInstanceDO } from "../../do/CardInstanceDO";
 import { CardInstanceQuery } from "../../query/CardInstanceQuery";
 import { BookQuery } from "../../query/BookQuery";
+import * as DateUtils from "../../../utils/DateUtils";
 
 const knex = KnexFactory.knex;
 
@@ -29,6 +30,7 @@ export class KnexCardRepository implements CardRepository {
         table.integer("card_type_id");
         table.integer("book_id");
         table.string("word");
+        table.dateTime("create_time");
       });
     }
   }
@@ -91,5 +93,19 @@ export class KnexCardRepository implements CardRepository {
       KnexCardRepository._CARDS,
       query
     );
+  }
+
+  async getTodayAddedCardCount(bookId: number): Promise<number> {
+    const queryInterface = knex
+      .from(KnexCardRepository._CARDS)
+      .count("*", {as: "cnt"})
+      .where({bookId})
+      .andWhere("create_time", ">=", DateUtils.getStartOfToday().getTime())
+      .andWhere("create_time", "<=", DateUtils.getEndOfToday().getTime())
+    const rows = await queryInterface;
+    if (rows.length !== 1) {
+      throw new Error("The size of rows must be 1, actual rows: " + rows);
+    }
+    return rows[0].cnt as number;
   }
 }

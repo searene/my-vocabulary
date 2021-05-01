@@ -1,10 +1,7 @@
 import "reflect-metadata";
 import { container } from "../../../config/inversify.config";
 import { types } from "../../../config/types";
-import { ConfigReader } from "../../../ConfigReader";
-import { CardDO } from "../../../infrastructure/do/CardDO";
 import { CardRepository } from "../../../infrastructure/repository/CardRepository";
-import { CardTypeRepository } from "../../../infrastructure/repository/CardTypeRepository";
 import { ConfigRepository } from "../../../infrastructure/repository/ConfigRepository";
 import { assert } from "../../../utils/Assert";
 import { Card } from "../Card";
@@ -20,6 +17,7 @@ export class CardFactory {
       cardTypeId,
       bookId,
       word,
+      createTime: new Date().getTime(),
     });
     return await Card.fromCardDO(insertedCardDO);
   }
