@@ -5,9 +5,6 @@ import { CardQuery } from "../../query/CardQuery";
 import { injectable } from "@parisholley/inversify-async";
 import { Options } from "../../query/Options";
 import { RepositoryUtils } from "../RepositoryUtils";
-import { CardInstanceDO } from "../../do/CardInstanceDO";
-import { CardInstanceQuery } from "../../query/CardInstanceQuery";
-import { BookQuery } from "../../query/BookQuery";
 import * as DateUtils from "../../../utils/DateUtils";
 
 const knex = KnexFactory.knex;

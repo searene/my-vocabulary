@@ -1,5 +1,4 @@
 import fetch from "electron-fetch";
-import { FileUtils } from "../utils/FileUtils";
 
 export class MimeType {
 
@@ -51,6 +50,10 @@ export class MimeType {
     } catch (e) {
       console.log("Got an error");
       console.error(e)
+    }
+    if (blobType?.indexOf(";") !== -1) {
+      // blobType may be "image/jpeg; charset=utf-8"
+      blobType = blobType?.substring(0, blobType?.indexOf(";"))
     }
     const blobTypeSplit = blobType!.split("/");
     if (blobTypeSplit.length !== 2) {

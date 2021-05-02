@@ -1,4 +1,3 @@
-import { FileUtils } from "../utils/FileUtils";
 import { UrlUtils } from "../utils/UrlUtils";
 import { MimeType } from './MimeType';
 
