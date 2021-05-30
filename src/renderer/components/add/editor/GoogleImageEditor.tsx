@@ -3,15 +3,32 @@ import { Modal } from "semantic-ui-react";
 import { useEffect, useRef } from "react";
 import { ConsoleMessageEvent, IpcMessageEvent } from "electron";
 import serviceProvider from "../../../ServiceProvider";
+import { isBlank } from "../../../utils/StringUtils";
+import { image } from "html-to-text/lib/formatter";
+import { isNullOrUndefined } from "../../../../main/utils/ObjectUtils";
 
 interface GoogleImageProps {
   word: string;
-  onChange: (html: string) => void;
+  imgSrc: string;
+  onImgSrcChange: (imgSrc: string) => void;
+}
+
+export const getImageHtml = (imgSrc: string, word: string): string =>
+  `<img src="${imgSrc}" alt="${word}" class="card-img" />`;
+
+export const extractSrcFromHtml = (html: string): string => {
+  const element = document.createElement("html");
+  element.innerHTML = html;
+  const images: HTMLCollectionOf<HTMLImageElement> = element.getElementsByTagName("img");
+  if (isNullOrUndefined(images) || images.length === 0) {
+    return "";
+  } else {
+    return images[0].src;
+  }
 }
 
 export function GoogleImageEditor(props: GoogleImageProps) {
   const [showModal, setShowModal] = React.useState(false);
-  const [imgSrc, setImgSrc] = React.useState<string | undefined>(undefined);
   const webviewRef = useRef<HTMLWebViewElement>(null);
 
   useEffect(() => {
@@ -27,8 +44,7 @@ export function GoogleImageEditor(props: GoogleImageProps) {
         const imageInfo = await serviceProvider.resourceService.saveImage(imageSrc);
         imageSrc = imageInfo.internalLink;
       }
-      setImgSrc(imageSrc);
-      props.onChange(`<img src="${imageSrc}" alt="${props.word}" class="card-img" />`)
+      props.onImgSrcChange(imageSrc);
       setShowModal(false);
     });
   }, [showModal]);
@@ -51,8 +67,8 @@ export function GoogleImageEditor(props: GoogleImageProps) {
         maxHeight: "300px",
         overflow: "hidden",
       }}>
-        {imgSrc == undefined ? "Click here to select images..." :
-          <img src={imgSrc} alt={props.word} className="card-img" style={{
+        {isBlank(props.imgSrc) ? "Click here to select images..." :
+          <img src={props.imgSrc} alt={props.word} className="card-img" style={{
             height: "300px",
           }}/>
         }
