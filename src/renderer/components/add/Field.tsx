@@ -1,9 +1,10 @@
-import { changeFieldContents, FieldVO, selectFieldTypeIdToFieldVOMap } from "./addSlice";
+import { changeFieldContents, selectFieldTypeIdToFieldVOMap } from "./addSlice";
 import * as React from "react";
 import { useSelector } from "react-redux";
 import { useAppDispatch } from "../../redux/store";
 import { RichEditor } from "./editor/RichEditor";
 import { GoogleImageEditor } from "./editor/GoogleImageEditor";
+import { FieldVO } from "../../../main/facade/vo/FieldVO";
 
 interface FieldProps {
   fieldTypeId: number;

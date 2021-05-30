@@ -1,6 +1,7 @@
 import { TimeInterval } from "../domain/time/TimeInterval";
 import { Level } from "../domain/card/Level";
 import { FieldContents } from "../domain/card/FieldContents";
+import { FieldVO } from "./vo/FieldVO";
 
 export type SaveCardParam = {
   word: string;
@@ -15,12 +16,18 @@ export type SaveCardParam = {
   fieldContents: Record<number, FieldContents>; // fieldTypeId -> fieldContents
 };
 export type FieldTypeVO = {
+  /**
+   * fieldTypeId
+   */
   id: number;
   category: string;
   name: string;
 };
 
 export type CardInstanceVO = {
+
+  word: string;
+
   /**
    * cardInstance id
    */
@@ -69,6 +76,7 @@ export type CardCount = {
 }
 
 export interface CardFacade {
+
   /**
    * Get field types of the given cardType, if no cardType was given,
    * the default cardType would be used.
@@ -91,4 +99,6 @@ export interface CardFacade {
   review(reviewRequest: ReviewRequest): Promise<void>;
 
   getBrowseData(browseDataRequest: BrowseDataRequest): Promise<BrowseData>;
+
+  getFieldTypeIdToFieldVOMap(cardInstanceId: number): Promise<Record<number, FieldVO>>;
 }

@@ -13,4 +13,10 @@ export class Router {
   static toReviewPage(bookId: number) {
     history.push(`/review/${bookId}`);
   }
+
+  static toEditCardPage(bookId: number, cardInstanceId: number, word: string) {
+    const urlSearchParams = new URLSearchParams();
+    urlSearchParams.set("word", word);
+    history.push(`/add/edit/${bookId}/${cardInstanceId}?${urlSearchParams.toString()}`);
+  }
 }

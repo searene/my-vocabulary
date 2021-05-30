@@ -141,7 +141,7 @@ export function Library(props: LibraryProps) {
               </Table.Cell>
             </Table.Row>
           ))}
-        </Table.Body>
+      </Table.Body>
       </Table>
     </Container>
   ) : (

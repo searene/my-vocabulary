@@ -12,7 +12,9 @@ import serviceProvider from "../../ServiceProvider";
 import { GoBack } from "../back/GoBack";
 import { ReviewElement } from "./ReviewElement";
 import { selectGlobalShortcutEnabled } from "../shortcut/shortcutSlice";
+import history from "../../route/History";
 import * as React from 'react';
+import { Router } from "../../route/Router";
 
 interface MatchParams {
   bookId: string;
@@ -126,6 +128,10 @@ export function Review(props: ReviewProps) {
     unbindShowAnswerShortcut();
   }
 
+  const edit = () => {
+    Router.toEditCardPage(bookId, reviewCard!.id, reviewCard!.word);
+  }
+
   if (!initiated) {
     return <></>;
   } else if (reviewCard == undefined) {
@@ -134,6 +140,9 @@ export function Review(props: ReviewProps) {
     return (
       <div>
         <GoBack/>
+        <div>
+          <Button onClick={edit}>Edit</Button>
+        </div>
         <div dangerouslySetInnerHTML={{ __html: reviewCard.front }} style={{
           marginTop: "20px"
         }}/>

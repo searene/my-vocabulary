@@ -1,16 +1,10 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import serviceProvider from "../../ServiceProvider";
 import { FieldContents } from "../../../main/domain/card/FieldContents";
+import { FieldVO } from "../../../main/facade/vo/FieldVO";
 
 interface State {
   add: AddState;
-}
-export interface FieldVO {
-  id: number;
-  category: string;
-  name: string;
-  originalContents: string;
-  plainTextContents: string;
 }
 interface AddState {
   fieldTypeIdToFieldVOMap: Record<number, FieldVO>; // fieldTypeId -> field contents
@@ -30,9 +24,7 @@ export const saveCard = createAsyncThunk<
 >("add/saveCard", async ({ word, bookId }, { getState }) => {
   const fieldTypeIdToFieldVOMap = selectFieldTypeIdToFieldVOMap(getState());
   const fieldContents: Record<number, FieldContents> = {};
-  for (const [fieldTypeId, fieldVO] of Object.entries(
-    fieldTypeIdToFieldVOMap
-  )) {
+  for (const [fieldTypeId, fieldVO] of Object.entries(fieldTypeIdToFieldVOMap)) {
     fieldContents[parseInt(fieldTypeId)] = {
       originalContents: fieldVO.originalContents,
       plainTextContents: fieldVO.plainTextContents,
@@ -44,6 +36,14 @@ export const saveCard = createAsyncThunk<
     fieldContents,
   });
 });
+
+export const fetchFieldTypeIdToFieldVOMap = createAsyncThunk<
+  Record<number, FieldVO>,
+  { cardInstanceId: number },
+  { state: State }
+>("add/fetchFieldTypeIdToFieldVOMap", async ({ cardInstanceId }) => {
+  return await serviceProvider.cardFacade.getFieldTypeIdToFieldVOMap(cardInstanceId);
+})
 const addSlice = createSlice({
   name: "add",
   initialState: initialState,
@@ -62,7 +62,9 @@ const addSlice = createSlice({
       try {
         for (const fieldVO of action.payload) {
           state.fieldTypeIdToFieldVOMap[fieldVO.id] = {
-            ...fieldVO,
+            fieldTypeId: fieldVO.id,
+            name: fieldVO.name,
+            category: fieldVO.category,
             originalContents: "",
             plainTextContents: "",
           };
@@ -76,6 +78,14 @@ const addSlice = createSlice({
       console.error("getFieldTypes.rejected: an error occurred");
       console.error(action.error);
     });
+    builder.addCase(fetchFieldTypeIdToFieldVOMap.fulfilled, (state, action) => {
+      console.log(action.payload);
+      state.fieldTypeIdToFieldVOMap = action.payload;
+    });
+    builder.addCase(fetchFieldTypeIdToFieldVOMap.rejected, (state, action) => {
+      console.error("fetchFieldTypeIdToFieldVOMap was rejected");
+      console.error(action.error);
+    })
   },
 });
 

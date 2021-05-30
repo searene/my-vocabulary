@@ -4,6 +4,7 @@ import { RouteComponentProps } from "react-router";
 import { useSelector } from "react-redux";
 import { useState, useEffect } from "react";
 import {
+  fetchFieldTypeIdToFieldVOMap,
   getFieldTypes,
   saveCard,
   selectFieldTypeIdToFieldVOMap,
@@ -14,8 +15,14 @@ import { useAppDispatch } from "../../redux/store";
 import { Router } from "../../route/Router";
 import { GoBack } from "../back/GoBack";
 
+export type EditType = "new" | "edit";
+
 interface MatchParams {
   bookId: string;
+  editType: EditType;
+
+  // Only exist when editType === "edit"
+  cardInstanceId?: string | undefined;
 }
 
 interface AddProps extends RouteComponentProps<MatchParams> {}
@@ -44,7 +51,12 @@ export function Add(props: AddProps) {
 
   useEffect(() => {
     if (!initiated) {
-      dispatch(getFieldTypes());
+      if (props.match.params.editType === "new") {
+        dispatch(getFieldTypes());
+      } else if (props.match.params.editType === "edit") {
+        const cardInstanceId = parseInt(props.match.params.cardInstanceId as string);
+        dispatch(fetchFieldTypeIdToFieldVOMap({ cardInstanceId }));
+      }
     }
     setInitiated(true);
   }, [initiated, dispatch]);

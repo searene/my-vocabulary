@@ -114,7 +114,7 @@ export const BookButtonArea = (props: BookButtonAreaProps) => {
   const handleAdd = async (): Promise<void> => {
     const urlSearchParams = new URLSearchParams();
     urlSearchParams.set("word", word);
-    history.push(`/add/${props.bookId}?${urlSearchParams.toString()}`);
+    history.push(`/add/new/${props.bookId}?${urlSearchParams.toString()}`);
   };
 
 

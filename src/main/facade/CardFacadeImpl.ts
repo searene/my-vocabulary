@@ -25,7 +25,7 @@ import {
 } from "../domain/time/TimeInterval";
 import { CompositeRepository } from "../infrastructure/repository/CompositeRepository";
 import { Field } from "../domain/field/Field";
-import { CardRepository } from "../infrastructure/repository/CardRepository";
+import { FieldVO } from "./vo/FieldVO";
 
 @injectable()
 export class CardFacadeImpl implements CardFacade {
@@ -102,6 +102,7 @@ export class CardFacadeImpl implements CardFacade {
     );
     const contents = await dueCardInstance.getFrontAndBackContents();
     return {
+      word: dueCardInstance.card.word,
       id: dueCardInstance.id,
       front: contents[0],
       back: contents[1],
@@ -134,6 +135,22 @@ export class CardFacadeImpl implements CardFacade {
   async getBrowseData(request: BrowseDataRequest): Promise<BrowseData> {
     const compositeRepo = await container.getAsync<CompositeRepository>(types.CompositeRepository);
     return compositeRepo.getBrowseData(request);
+  }
+
+  async getFieldTypeIdToFieldVOMap(cardInstanceId: number): Promise<Record<number, FieldVO>> {
+
+    const fields = await Field.fromCardInstanceId(cardInstanceId);
+    const result: Record<number, FieldVO> = {};
+    for (const field of fields) {
+      result[field.fieldType.id] = {
+        fieldTypeId: field.fieldType.id,
+        category: field.fieldType.category,
+        name: field.fieldType.name,
+        originalContents: field.originalContents,
+        plainTextContents: field.plainTextContents,
+      }
+    }
+    return result;
   }
 
 }
