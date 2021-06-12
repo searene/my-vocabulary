@@ -4,9 +4,11 @@ import { RouteComponentProps } from "react-router";
 import { useSelector } from "react-redux";
 import { useState, useEffect } from "react";
 import {
+  fetchFieldTypeIdToFieldVOMap,
   getFieldTypes,
-  saveCard,
+  addCard as addCard,
   selectFieldTypeIdToFieldVOMap,
+  editCard,
 } from "./addSlice";
 import { Field } from "./Field";
 import { BookName } from "../bookName/BookName";
@@ -14,13 +16,20 @@ import { useAppDispatch } from "../../redux/store";
 import { Router } from "../../route/Router";
 import { GoBack } from "../back/GoBack";
 
+export type EditType = "new" | "edit";
+
 interface MatchParams {
   bookId: string;
+  editType: EditType;
+
+  // Only exist when editType === "edit"
+  cardInstanceId?: string | undefined;
 }
 
 interface AddProps extends RouteComponentProps<MatchParams> {}
 
 export function Add(props: AddProps) {
+
   const fieldTypeIdToFieldVOMap = useSelector(selectFieldTypeIdToFieldVOMap);
   const dispatch = useAppDispatch();
   const [initiated, setInitiated] = useState(false);
@@ -28,6 +37,7 @@ export function Add(props: AddProps) {
     new URLSearchParams(props.location.search).get("word") as string
   );
   const bookId = parseInt(props.match.params.bookId);
+  const editType = props.match.params.editType;
 
   const fieldComponents = Object.entries(fieldTypeIdToFieldVOMap).map(
     ([fieldTypeId, fieldVO]) => (
@@ -42,20 +52,40 @@ export function Add(props: AddProps) {
     )
   );
 
+  const getCardInstanceId = (url: string): number => {
+    return parseInt(new URLSearchParams(url).get("cardInstanceId") as string);
+  }
+
   useEffect(() => {
     if (!initiated) {
-      dispatch(getFieldTypes());
+      if (editType === "new") {
+        dispatch(getFieldTypes());
+      } else if (editType === "edit") {
+        dispatch(fetchFieldTypeIdToFieldVOMap({
+          cardInstanceId: getCardInstanceId(props.location.search)
+        }));
+      }
     }
     setInitiated(true);
   }, [initiated, dispatch]);
 
   const save = () => {
-    dispatch(saveCard({ word, bookId }))
-      .then(() => Router.toBookPage(bookId))
-      .catch((e) => {
-        console.error("An error occurred when dispatching saveCard");
-        console.error(e);
-      });
+    if (editType === "new") {
+      dispatch(addCard({ word, bookId }))
+        .then(() => Router.toBookPage(bookId))
+        .catch((e) => {
+          console.error("An error occurred when dispatching addCard");
+          console.error(e);
+        });
+    } else if (editType === "edit") {
+      const cardInstanceId = getCardInstanceId(props.location.search);
+      dispatch(editCard({ cardInstanceId, fieldTypeIdToFieldVOMap }))
+        .then(() => Router.toReviewPage(bookId, cardInstanceId))
+        .catch((e) => {
+          console.error("An error occurred when dispatching editCard");
+          console.error(e);
+        });
+    }
   };
 
   return initiated ? (

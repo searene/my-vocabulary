@@ -1,6 +1,5 @@
 import { RouteComponentProps } from "react-router";
 import { useSelector } from "react-redux";
-import { CardInstanceVO } from "../../../main/facade/CardFacade";
 import { useEffect, useState } from "react";
 import { Button } from "semantic-ui-react";
 import {
@@ -12,16 +11,21 @@ import serviceProvider from "../../ServiceProvider";
 import { GoBack } from "../back/GoBack";
 import { ReviewElement } from "./ReviewElement";
 import { selectGlobalShortcutEnabled } from "../shortcut/shortcutSlice";
+import history from "../../route/History";
 import * as React from 'react';
+import { Router } from "../../route/Router";
+import { CardInstanceVO } from "../../../main/facade/vo/CardInstanceVO";
 
 interface MatchParams {
   bookId: string;
+  cardInstanceId?: string;
 }
 
 interface ReviewProps extends RouteComponentProps<MatchParams> {}
 
 export function Review(props: ReviewProps) {
   const bookId = parseInt(props.match.params.bookId);
+  const cardInstanceId = props.match.params.cardInstanceId;
   const [initiated, setInitiated] = useState(false);
   const [showBack, setShowBack] = useState(false);
   const globalShortcutEnabled = useSelector(selectGlobalShortcutEnabled);
@@ -45,12 +49,18 @@ export function Review(props: ReviewProps) {
     }
   }
 
+  const getReviewCard = async (bookId: number, cardInstanceId?: string): Promise<CardInstanceVO | undefined> => {
+    if (cardInstanceId === undefined) {
+      return await serviceProvider.cardFacade.getNextReviewCardInstanceByBookId(bookId);
+    } else {
+      return await serviceProvider.cardFacade.getCardInstanceById(parseInt(cardInstanceId));
+    }
+  }
+
   useEffect(() => {
     async function inner() {
       if (!initiated) {
-        const reviewCard = await serviceProvider.cardFacade.getNextReviewCardInstanceByBookId(
-          bookId
-        );
+        const reviewCard = await getReviewCard(bookId, cardInstanceId);
         setReviewCard(reviewCard);
         pronounce(reviewCard!.front);
         setInitiated(true);
@@ -126,6 +136,10 @@ export function Review(props: ReviewProps) {
     unbindShowAnswerShortcut();
   }
 
+  const edit = () => {
+    Router.toEditCardPage(bookId, reviewCard!.id, reviewCard!.word);
+  }
+
   if (!initiated) {
     return <></>;
   } else if (reviewCard == undefined) {
@@ -134,6 +148,9 @@ export function Review(props: ReviewProps) {
     return (
       <div>
         <GoBack/>
+        <div>
+          <Button onClick={edit}>Edit</Button>
+        </div>
         <div dangerouslySetInnerHTML={{ __html: reviewCard.front }} style={{
           marginTop: "20px"
         }}/>

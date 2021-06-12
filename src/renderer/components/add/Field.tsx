@@ -1,9 +1,10 @@
-import { changeFieldContents, FieldVO, selectFieldTypeIdToFieldVOMap } from "./addSlice";
+import { changeFieldContents, selectFieldTypeIdToFieldVOMap } from "./addSlice";
 import * as React from "react";
 import { useSelector } from "react-redux";
 import { useAppDispatch } from "../../redux/store";
 import { RichEditor } from "./editor/RichEditor";
-import { GoogleImageEditor } from "./editor/GoogleImageEditor";
+import { extractSrcFromHtml, getImageHtml, GoogleImageEditor } from "./editor/GoogleImageEditor";
+import { FieldVO } from "../../../main/facade/vo/FieldVO";
 
 interface FieldProps {
   fieldTypeId: number;
@@ -30,7 +31,7 @@ export const Field = (props: FieldProps) => {
     if (fieldVO.category === "text") {
       return <RichEditor htmlContents={fieldVO.originalContents} onChange={handleRichEditorChange} />;
     } else if (fieldVO.category == "google-image") {
-      return <GoogleImageEditor word={props.word} onChange={(value) => handleRichEditorChange(value, "")} />
+      return <GoogleImageEditor word={props.word} imgSrc={extractSrcFromHtml(fieldVO.originalContents)} onImgSrcChange={(value) => handleRichEditorChange(getImageHtml(value, props.word), "")} />
     } else {
       throw new Error("Unsupported category: " + fieldVO.category);
     }

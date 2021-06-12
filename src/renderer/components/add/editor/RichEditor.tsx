@@ -11,8 +11,9 @@ export class RichEditor extends React.Component<
   RichEditorProps,
   RichEditorStates
 > {
+
   private divComponent = createRef<HTMLDivElement>();
-  private lastValue: string = "";
+  private lastValue = this.props.htmlContents;
 
   constructor(props: RichEditorProps) {
     super(props);
@@ -20,7 +21,8 @@ export class RichEditor extends React.Component<
   }
 
   componentDidMount() {
-    this.divComponent.current?.addEventListener("paste", (event) => {
+    this.divComponent.current!.innerHTML = this.props.htmlContents;
+    this.divComponent.current!.addEventListener("paste", (event) => {
       const dataTransfer = event.clipboardData;
       const html = dataTransfer?.getData("text/html");
       if (html !== "") {
@@ -28,6 +30,10 @@ export class RichEditor extends React.Component<
         event.preventDefault();
       }
     });
+  }
+
+  componentDidUpdate() {
+    this.divComponent.current!.innerHTML = this.props.htmlContents;
   }
 
   shouldComponentUpdate(nextProps: RichEditorProps) {

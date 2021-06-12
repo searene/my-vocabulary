@@ -1,16 +1,10 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import serviceProvider from "../../ServiceProvider";
 import { FieldContents } from "../../../main/domain/card/FieldContents";
+import { FieldVO } from "../../../main/facade/vo/FieldVO";
 
 interface State {
   add: AddState;
-}
-export interface FieldVO {
-  id: number;
-  category: string;
-  name: string;
-  originalContents: string;
-  plainTextContents: string;
 }
 interface AddState {
   fieldTypeIdToFieldVOMap: Record<number, FieldVO>; // fieldTypeId -> field contents
@@ -23,27 +17,48 @@ export const getFieldTypes = createAsyncThunk("add/getFieldTypes", async () => {
   return await serviceProvider.cardFacade.getFieldTypes();
 });
 
-export const saveCard = createAsyncThunk<
+export const addCard = createAsyncThunk<
   void,
   { word: string; bookId: number },
   { state: State }
->("add/saveCard", async ({ word, bookId }, { getState }) => {
+>("add/addCard", async ({ word, bookId }, { getState }) => {
   const fieldTypeIdToFieldVOMap = selectFieldTypeIdToFieldVOMap(getState());
   const fieldContents: Record<number, FieldContents> = {};
-  for (const [fieldTypeId, fieldVO] of Object.entries(
-    fieldTypeIdToFieldVOMap
-  )) {
+  for (const [fieldTypeId, fieldVO] of Object.entries(fieldTypeIdToFieldVOMap)) {
     fieldContents[parseInt(fieldTypeId)] = {
       originalContents: fieldVO.originalContents,
       plainTextContents: fieldVO.plainTextContents,
     };
   }
-  await serviceProvider.cardFacade.saveCard({
+  await serviceProvider.cardFacade.addCard({
     word,
     bookId,
     fieldContents,
   });
 });
+
+export const editCard = createAsyncThunk<
+  void,
+  { cardInstanceId: number; fieldTypeIdToFieldVOMap: Record<number, FieldVO> },
+  { state: State }
+>("/add/editCard", async ({ cardInstanceId, fieldTypeIdToFieldVOMap }, { getState }) => {
+  const fieldContents: Record<number, FieldContents> = {};
+  for (const [fieldTypeId, fieldVO] of Object.entries(fieldTypeIdToFieldVOMap)) {
+    fieldContents[parseInt(fieldTypeId)] = {
+      originalContents: fieldVO.originalContents,
+      plainTextContents: fieldVO.plainTextContents,
+    };
+  }
+  await serviceProvider.cardFacade.editCard(cardInstanceId, fieldContents);
+});
+
+export const fetchFieldTypeIdToFieldVOMap = createAsyncThunk<
+  Record<number, FieldVO>,
+  { cardInstanceId: number },
+  { state: State }
+>("add/fetchFieldTypeIdToFieldVOMap", async ({ cardInstanceId }) => {
+  return await serviceProvider.cardFacade.getFieldTypeIdToFieldVOMap(cardInstanceId);
+})
 const addSlice = createSlice({
   name: "add",
   initialState: initialState,
@@ -62,7 +77,9 @@ const addSlice = createSlice({
       try {
         for (const fieldVO of action.payload) {
           state.fieldTypeIdToFieldVOMap[fieldVO.id] = {
-            ...fieldVO,
+            fieldTypeId: fieldVO.id,
+            name: fieldVO.name,
+            category: fieldVO.category,
             originalContents: "",
             plainTextContents: "",
           };
@@ -76,6 +93,13 @@ const addSlice = createSlice({
       console.error("getFieldTypes.rejected: an error occurred");
       console.error(action.error);
     });
+    builder.addCase(fetchFieldTypeIdToFieldVOMap.fulfilled, (state, action) => {
+      state.fieldTypeIdToFieldVOMap = action.payload;
+    });
+    builder.addCase(fetchFieldTypeIdToFieldVOMap.rejected, (state, action) => {
+      console.error("fetchFieldTypeIdToFieldVOMap was rejected");
+      console.error(action.error);
+    })
   },
 });
 

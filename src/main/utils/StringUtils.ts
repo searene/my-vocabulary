@@ -1,3 +1,5 @@
+import { isNullOrUndefined } from "./ObjectUtils";
+
 export class StringUtils {
   static trimEndingLineSeparatorIfExists(str: string): string {
     if (str.endsWith("\n")) {
@@ -5,5 +7,9 @@ export class StringUtils {
     } else {
       return str;
     }
+  }
+
+  static isBlank(s: string): boolean {
+    return isNullOrUndefined(s) || s.trim() === "";
   }
 }

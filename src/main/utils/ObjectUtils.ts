@@ -16,3 +16,6 @@ export function haveSameEnumerableKeys(obj1: any, obj2: any): boolean {
     return obj2.hasOwnProperty(prop);
   });
 }
+
+export const isNullOrUndefined = (obj: any): boolean => obj == null || obj == undefined;
+export const isNeitherNullNorUndefined = (obj: any): boolean => !isNullOrUndefined(obj);

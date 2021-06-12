@@ -8,7 +8,8 @@ export class Card {
   public constructor(
     private readonly _id: number,
     private readonly _bookId: number,
-    private readonly _cardType: CardType
+    private readonly _cardType: CardType,
+    private readonly _word: string,
   ) {}
 
   public get id(): number {
@@ -19,6 +20,9 @@ export class Card {
   }
   public get bookId(): number {
     return this._bookId;
+  }
+  public get word(): string {
+    return this._word;
   }
 
   static async fromCardDO(cardDO: CardDO): Promise<Card> {
@@ -34,7 +38,8 @@ export class Card {
     return new Card(
       cardDO.id as number,
       cardDO.bookId as number,
-      CardType.fromCardTypeDO(cardTypeDO)
+      CardType.fromCardTypeDO(cardTypeDO),
+      cardDO.word as string,
     );
   }
 }
