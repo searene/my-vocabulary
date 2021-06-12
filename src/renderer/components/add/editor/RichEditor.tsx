@@ -11,6 +11,7 @@ export class RichEditor extends React.Component<
   RichEditorProps,
   RichEditorStates
 > {
+
   private divComponent = createRef<HTMLDivElement>();
   private lastValue = this.props.htmlContents;
 
@@ -29,6 +30,10 @@ export class RichEditor extends React.Component<
         event.preventDefault();
       }
     });
+  }
+
+  componentDidUpdate() {
+    this.divComponent.current!.innerHTML = this.props.htmlContents;
   }
 
   shouldComponentUpdate(nextProps: RichEditorProps) {

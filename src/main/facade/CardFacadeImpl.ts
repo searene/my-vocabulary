@@ -3,7 +3,6 @@ import {
   BrowseData, BrowseDataRequest,
   CardCount,
   CardFacade,
-  CardInstanceVO,
   FieldTypeVO, ReviewItem,
   ReviewRequest,
   SaveCardParam,
@@ -26,6 +25,9 @@ import {
 import { CompositeRepository } from "../infrastructure/repository/CompositeRepository";
 import { Field } from "../domain/field/Field";
 import { FieldVO } from "./vo/FieldVO";
+import { FieldContents } from "../domain/card/FieldContents";
+import { CardInstanceFactory } from "../domain/card/instance/CardInstanceFactory";
+import { CardInstanceVO, fromCardInstance } from "./vo/CardInstanceVO";
 
 @injectable()
 export class CardFacadeImpl implements CardFacade {
@@ -43,7 +45,7 @@ export class CardFacadeImpl implements CardFacade {
     });
   }
 
-  async saveCard(saveCardParam: SaveCardParam): Promise<number> {
+  async addCard(saveCardParam: SaveCardParam): Promise<number> {
     const card = await this._cardFactory.createCard(saveCardParam.bookId,
       saveCardParam.word);
     await Field.batchCreate(card.id, saveCardParam.fieldContents);
@@ -96,18 +98,7 @@ export class CardFacadeImpl implements CardFacade {
     const dueCardInstance = await CardInstance.fromCardInstanceDO(
       dueCardInstanceDO
     );
-    const scheduler = container.get<Scheduler>(types.Scheduler);
-    const reviewTimeRecord = await scheduler.getNextReviewTimeRecord(
-      dueCardInstance
-    );
-    const contents = await dueCardInstance.getFrontAndBackContents();
-    return {
-      word: dueCardInstance.card.word,
-      id: dueCardInstance.id,
-      front: contents[0],
-      back: contents[1],
-      reviewTimeRecord: reviewTimeRecord,
-    };
+    return await fromCardInstance(dueCardInstance);
   }
 
   async review(reviewRequest: ReviewRequest): Promise<void> {
@@ -153,4 +144,19 @@ export class CardFacadeImpl implements CardFacade {
     return result;
   }
 
+  async editCard(cardInstanceId: number, fieldTypeIdToFieldContentsMap: Record<number, FieldContents>): Promise<void> {
+    const fields: Field[] = await Field.fromCardInstanceId(cardInstanceId);
+    for (const field of fields) {
+      const fieldContents: FieldContents = fieldTypeIdToFieldContentsMap[field.fieldType.id];
+      await field.updateFieldContents(fieldContents.originalContents, fieldContents.plainTextContents);
+    }
+  }
+
+  async getCardInstanceById(cardInstanceId: number): Promise<CardInstanceVO> {
+    const cardInstance = await CardInstanceFactory.queryById(cardInstanceId);
+    if (cardInstance === undefined) {
+      throw new Error("CardInstance doesn't exit, id: " + cardInstanceId);
+    }
+    return await fromCardInstance(cardInstance);
+  }
 }

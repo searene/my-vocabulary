@@ -1,5 +1,5 @@
-import { CardInstanceVO } from "../../../main/facade/CardFacade";
 import { createSlice } from "@reduxjs/toolkit";
+import { CardInstanceVO } from "../../../main/facade/vo/CardInstanceVO";
 
 interface State {
   review: ReviewState;

@@ -1,7 +1,8 @@
-import { TimeInterval } from "../domain/time/TimeInterval";
-import { Level } from "../domain/card/Level";
 import { FieldContents } from "../domain/card/FieldContents";
 import { FieldVO } from "./vo/FieldVO";
+import { Level } from "../domain/card/Level";
+import { TimeInterval } from "../domain/time/TimeInterval";
+import { CardInstanceVO } from "./vo/CardInstanceVO";
 
 export type SaveCardParam = {
   word: string;
@@ -22,22 +23,6 @@ export type FieldTypeVO = {
   id: number;
   category: string;
   name: string;
-};
-
-export type CardInstanceVO = {
-
-  word: string;
-
-  /**
-   * cardInstance id
-   */
-  id: number;
-
-  front: string;
-
-  back: string;
-
-  reviewTimeRecord: Record<Level, TimeInterval>;
 };
 
 export type ReviewRequest = {
@@ -84,14 +69,21 @@ export interface CardFacade {
   getFieldTypes(cardTypeId?: number): Promise<FieldTypeVO[]>;
 
   /**
-   * Save the card to database
+   * Add a card to database.
    * @returns cardId
    */
-  saveCard(saveCardParam: SaveCardParam): Promise<number>;
+  addCard(saveCardParam: SaveCardParam): Promise<number>;
+
+  /**
+   * Edit the field contents of the card that "cardInstanceId" refers to.
+   */
+  editCard(cardInstanceId: number, fieldTypeIdToFieldContentsMap: Record<number, FieldContents>): Promise<void>;
 
   getNextReviewCardInstanceByBookId(
     bookId: number
   ): Promise<CardInstanceVO | undefined>;
+
+  getCardInstanceById(cardInstanceId: number): Promise<CardInstanceVO>;
 
   /**
    * Run a review on a card instance

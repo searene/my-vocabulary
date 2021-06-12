@@ -19,6 +19,7 @@ import {
   setPageNo,
 } from "./bookSlice";
 import { useAppDispatch } from "../../redux/store";
+import { Router } from "../../route/Router";
 
 interface BookButtonAreaProps {
   bookId: number;
@@ -112,9 +113,7 @@ export const BookButtonArea = (props: BookButtonAreaProps) => {
   }
 
   const handleAdd = async (): Promise<void> => {
-    const urlSearchParams = new URLSearchParams();
-    urlSearchParams.set("word", word);
-    history.push(`/add/new/${props.bookId}?${urlSearchParams.toString()}`);
+    Router.toAddCardPage(props.bookId, word);
   };
 
 

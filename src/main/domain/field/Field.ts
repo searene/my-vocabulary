@@ -17,6 +17,15 @@ export class Field {
     private readonly _cardId: number
   ) {}
 
+  updateFieldContents = async (originalContents: string, plainTextContents: string) => {
+    const fieldRepo = await container.getAsync<FieldRepository>(types.FieldRepository);
+    await fieldRepo.updateById({
+      id: this.id,
+      originalContents,
+      plainTextContents
+    });
+  }
+
   get fieldType(): FieldType {
     return this._fieldType;
   }
