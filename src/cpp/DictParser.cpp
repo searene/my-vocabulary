@@ -5,7 +5,9 @@
 #include <common_helper/FileHelper.h>
 #include <DictFinder.h>
 #include <resource/Resource.h>
+#include <resource/DictSpecificResource.h>
 #include <common_helper/FileHelper.h>
+#include <type/types.h>
 
 Napi::Value GetSuggestedWords(const Napi::CallbackInfo& info) {
   Napi::Env env = info.Env();
@@ -39,6 +41,14 @@ Napi::Value GetResource(const Napi::CallbackInfo& info) {
   return Napi::Buffer<char>::Copy(env, resourceContents->data(), resourceContents->size());
 }
 
+Napi::Value GetDictSpecificResourceUrl(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+    int dictId = info[0].As<Napi::Number>();
+    std::string resourceName = info[1].As<Napi::String>();
+    const UTF8String& resourceUrl = DictSpecificResource::getResourceUrl(dictId, resourceName);
+    return Napi::String::New(env, resourceUrl);
+}
+
 Napi::Value GetResourceUrlProtocol(const Napi::CallbackInfo& info) {
   Napi::Env env = info.Env();
   const UTF8String& protocol = Resource::getResourceUrlProtocol();
@@ -60,6 +70,7 @@ Napi::Object Init(Napi::Env env, Napi::Object exports) {
   exports.Set(Napi::String::New(env, "getSuggestedWords"), Napi::Function::New(env, GetSuggestedWords));
   exports.Set(Napi::String::New(env, "getHtml"), Napi::Function::New(env, GetHtml));
   exports.Set(Napi::String::New(env, "getResource"), Napi::Function::New(env, GetResource));
+  exports.Set(Napi::String::New(env, "getDictSpecificResourceUrl"), Napi::Function::New(env, GetDictSpecificResourceUrl));
   exports.Set(Napi::String::New(env, "getResourceUrlProtocol"), Napi::Function::New(env, GetResourceUrlProtocol));
   exports.Set(Napi::String::New(env, "getResourceMimeType"), Napi::Function::New(env, GetResourceMimeType));
   return exports;

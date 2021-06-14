@@ -1,13 +1,13 @@
 import * as path from 'path';
 
 export class UrlUtils {
-  static getInternalImageLink = async (
-    imgFilePath: string
+  static getInternalResourceLink = async (
+    resourceFilePath: string
   ): Promise<string> => {
-    return `${UrlUtils.getInternalImageLinkProtocol()}://${path.basename(imgFilePath)}`;
+    return `${UrlUtils.getInternalResourceLinkProtocol()}://${path.basename(resourceFilePath)}`;
   };
 
-  static getInternalImageLinkProtocol = (): string => {
+  static getInternalResourceLinkProtocol = (): string => {
     return "mc";
   };
 
