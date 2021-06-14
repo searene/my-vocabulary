@@ -25,6 +25,6 @@ export class SoundHTMLTransformer implements HTMLTransformer {
                      });
             });
         await p;
-        return $.html();
+        return $("body").html() as string;
     }
 }
