@@ -6,7 +6,7 @@ const baseConfig = require('./webpack.base.config');
 module.exports = merge(baseConfig, {
     target: 'electron-main',
     entry: {
-        main: ['./src/main/main.ts', './build/Release/DictParser.node']
+        main: ['./src/main/Main.ts', './build/Release/DictParser.node']
     },
     module: {
         rules: [
