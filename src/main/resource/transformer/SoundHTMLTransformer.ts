@@ -19,6 +19,8 @@ export class SoundHTMLTransformer implements HTMLTransformer {
                 p = p.then(() => resourceService.saveSound(dictId, resourceName))
                      .then(resourceInfo => {
                          $(this).attr("onclick", `return playInternalAudio("${resourceInfo.internalLink}", "${resourceInfo.mimeType.toString()}")`);
+                         $(this).removeAttr("data-dp-dict-id");
+                         $(this).removeAttr("data-dp-resource-name");
                          return Promise.resolve();
                      });
             });
