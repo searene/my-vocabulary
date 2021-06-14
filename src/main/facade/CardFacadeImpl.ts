@@ -1,9 +1,8 @@
 import { injectable } from "@parisholley/inversify-async";
 import {
   BrowseData, BrowseDataRequest,
-  CardCount,
   CardFacade,
-  FieldTypeVO, ReviewItem,
+  FieldTypeVO,
   ReviewRequest,
   SaveCardParam,
 } from "./CardFacade";

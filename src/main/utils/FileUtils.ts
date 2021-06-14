@@ -1,4 +1,6 @@
 import * as fs from "fs-extra";
+import * as path from "path";
+import { Configs } from "../config/Configs";
 import fetch from 'electron-fetch';
 import { Readable } from 'stream'
 
@@ -18,6 +20,19 @@ export class FileUtils {
       fileStream.on("finish", resolve);
     });
   }
+
+  static async saveBufferToFile(buffer: Buffer, filePath: string): Promise<void> {
+    const fd = await fs.open(filePath, 'w');
+    await fs.write(fd, buffer, 0, buffer.length, 0);
+    await fs.close(fd);
+  }
+
+  static getNewInternalFilePath(ext: string) {
+    return path.join(Configs.get().getResourceDir(), Date.now().toString()) +
+      "." +
+      ext;
+  }
+
 
   static async exists(filePath: string): Promise<boolean> {
     try {
@@ -49,5 +64,18 @@ export class FileUtils {
     if (!this.existsSync(filePath)) {
       fs.mkdirSync(filePath, { recursive: true });
     }
+  }
+
+  /**
+   * Get extension without the dot.
+   */
+  static getExt(filePath: string) {
+    const extWithDot = path.extname(this.getFileName(filePath));
+    const extSplit = extWithDot.split(".");
+    return extSplit[1];
+  }
+
+  static getFileName(filePath: string) {
+    return path.basename(filePath);
   }
 }

@@ -15,6 +15,7 @@ import { CompositionRepository } from "./infrastructure/repository/CompositionRe
 import { UrlUtils } from "./utils/UrlUtils";
 import { ResourceService } from "./resource/ResourceService";
 import { MimeType } from "./resource/MimeType";
+import { migrate } from "./migration/SoundMigration";
 
 exports.bookService = container.get(types.BookService);
 exports.wordService = container.get(types.WordService);
@@ -191,6 +192,12 @@ protocol.registerSchemesAsPrivileged([
       supportFetchAPI: true,
     },
   },
+  {
+    scheme: UrlUtils.getInternalResourceLinkProtocol(),
+    privileges: {
+      supportFetchAPI: true,
+    }
+  }
 ]);
 app.whenReady().then(() => {
   protocol.registerBufferProtocol(
@@ -212,13 +219,15 @@ app.whenReady().then(() => {
         });
     }
   );
-  protocol.registerBufferProtocol(UrlUtils.getInternalImageLinkProtocol(), async (request, callback) => {
+  protocol.registerBufferProtocol(UrlUtils.getInternalResourceLinkProtocol(), async (request, callback) => {
     const resourceService = container.get<ResourceService>(types.ResourceService);
-    const fileBuffer = await resourceService.getImageAsBuffer(request.url);
-    const mimeType = MimeType.buildImageTypeFromInternalResourceLink(request.url);
+    const fileBuffer = await resourceService.getInternalResourceAsBuffer(request.url);
+    const mimeType = MimeType.buildMimeTypeFromInternalResourceLink(request.url);
     callback({
       mimeType: mimeType.toString(),
       data: fileBuffer
     });
   });
 });
+
+// migrate();

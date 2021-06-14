@@ -8,20 +8,33 @@ export class MimeType {
   ) {}
 
   private static knownTypeList = [{
+    mainType: "image",
     subType: "jpeg",
     ext: "jpg",
   }, {
+    mainType: "image",
     subType: "svg+xml",
     ext: "svg",
   }, {
+    mainType: "image",
     subType: "gif",
     ext: "gif",
   }, {
+    mainType: "image",
     subType: "png",
     ext: "png",
   }, {
+    mainType: "image",
     subType: "webp",
     ext: "webp",
+  }, {
+    mainType: "audio",
+    subType: "vnd.wav",
+    ext: "wav"
+  }, {
+    mainType: "audio",
+    subType: "mpeg",
+    ext: "mp3"
   }];
 
   getExt(): string {
@@ -33,11 +46,11 @@ export class MimeType {
     throw new Error("Ext is unavailable for mimeType: " + this.toString());
   }
   
-  static buildImageMimeTypeFromExt(ext: string): MimeType {
+  static buildMimeTypeFromExt(ext: string): MimeType {
     ext = ext.toLowerCase();
     for (const knownType of this.knownTypeList) {
       if (knownType.ext === ext) {
-        return new MimeType("image", knownType.subType);
+        return new MimeType(knownType.mainType, knownType.subType);
       }
     }
     throw new Error(`Unsupported extension: ${ext}`);
@@ -62,13 +75,13 @@ export class MimeType {
     return new MimeType(blobTypeSplit[0], blobTypeSplit[1]);
   }
 
-  static buildImageTypeFromInternalResourceLink(internalLink: string): MimeType {
+  static buildMimeTypeFromInternalResourceLink(internalLink: string): MimeType {
     const internalLinkSplit = internalLink.split(".");
     if (internalLinkSplit.length < 2) {
       throw new Error("The length of internalLink split is less than 2, actual internalLink: " + internalLink);
     }
     const ext = internalLinkSplit[1];
-    return this.buildImageMimeTypeFromExt(ext);
+    return this.buildMimeTypeFromExt(ext);
   }
   
   toString() {

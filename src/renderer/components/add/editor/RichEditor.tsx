@@ -1,5 +1,6 @@
 import * as React from "react";
 import { createRef } from "react";
+import serviceProvider from "../../../ServiceProvider";
 
 interface RichEditorProps {
   htmlContents: string;
@@ -22,12 +23,15 @@ export class RichEditor extends React.Component<
 
   componentDidMount() {
     this.divComponent.current!.innerHTML = this.props.htmlContents;
-    this.divComponent.current!.addEventListener("paste", (event) => {
+    this.divComponent.current!.addEventListener("paste", async (event) => {
       const dataTransfer = event.clipboardData;
       const html = dataTransfer?.getData("text/html");
-      if (html !== "") {
-        document.execCommand("insertHTML", false, html);
+      if (html !== undefined && html !== "") {
         event.preventDefault();
+        const transformedHTML = await serviceProvider.resourceService.transformDictHTML(html);
+        console.log("blah");
+        console.log(transformedHTML);
+        document.execCommand("insertHTML", false, transformedHTML);
       }
     });
   }
