@@ -62,23 +62,14 @@ export function Review(props: ReviewProps) {
       if (!initiated) {
         const reviewCard = await getReviewCard(bookId, cardInstanceId);
         setReviewCard(reviewCard);
+        if (reviewCard !== undefined) {
+          pronounce(reviewCard.front);
+        }
         setInitiated(true);
       }
     }
     inner();
   }, []);
-
-  useEffect(() => {
-    if (reviewCard === undefined) {
-      // Initialization is not finished, or no more review card is available.
-      return;
-    }
-    if (showBack) {
-      pronounce(reviewCard!.back);
-    } else {
-      pronounce(reviewCard!.front);
-    }
-  }, [showBack, initiated])
 
   useEffect(() => {
     bindShowAnswerShortcut();
@@ -135,6 +126,9 @@ export function Review(props: ReviewProps) {
       bookId
     );
     setReviewCard(nextReviewCard);
+    if (nextReviewCard !== undefined) {
+      pronounce(nextReviewCard.front);
+    }
     setShowBack(false);
   };
 

@@ -22,9 +22,8 @@
             window.audio.src = url;
             return window.audio.play();
           })
-          .then(response => {
-            new Promise(resolve => window.audio.addEventListener("ended", resolve));
-          });
+          .then(response =>
+              new Promise(resolve => window.audio.addEventListener("ended", resolve)));
     }
   </script>
   <link rel="stylesheet" type="text/css" href="dp://commonResource?fileName=style.css">
