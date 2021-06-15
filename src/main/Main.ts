@@ -229,5 +229,3 @@ app.whenReady().then(() => {
     });
   });
 });
-
-// migrate();
