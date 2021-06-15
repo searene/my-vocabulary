@@ -5,20 +5,26 @@
   <title>Title</title>
   <script src="dp://commonResource?fileName=main.js"></script>
   <script>
-    async function playInternalAudio(audioUrl, mimeType) {
-      const res = await fetch(audioUrl);
-        if (!res.ok) {
-            throw new Error(`${res.status} = ${res.statusText}`);
-        }
-        const response = await res.body.getReader().read();
-        var blob = new Blob([response.value], { type: mimeType });
-        var url = window.URL.createObjectURL(blob)
-        window.audio = new Audio();
-        window.audio.src = url;
-        await window.audio.play();
-        return new Promise((resolve) => {
-            window.audio.addEventListener("ended", resolve);
-        });
+    let p = Promise.resolve();
+    function playInternalAudio(audioUrl, mimeType) {
+      console.log(p)
+      p = p.then(() => fetch(audioUrl))
+          .then(res => {
+            if (!res.ok) {
+                throw new Error(`${res.status} = ${res.statusText}`);
+            }
+            return res.body.getReader().read();
+          })
+          .then(response => {
+            var blob = new Blob([response.value], { type: mimeType });
+            var url = window.URL.createObjectURL(blob)
+            window.audio = new Audio();
+            window.audio.src = url;
+            return window.audio.play();
+          })
+          .then(response => {
+            new Promise(resolve => window.audio.addEventListener("ended", resolve));
+          });
     }
   </script>
   <link rel="stylesheet" type="text/css" href="dp://commonResource?fileName=style.css">
