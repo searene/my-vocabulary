@@ -62,12 +62,23 @@ export function Review(props: ReviewProps) {
       if (!initiated) {
         const reviewCard = await getReviewCard(bookId, cardInstanceId);
         setReviewCard(reviewCard);
-        pronounce(reviewCard!.front);
         setInitiated(true);
       }
     }
     inner();
   }, []);
+
+  useEffect(() => {
+    if (reviewCard === undefined) {
+      // Initialization is not finished, or no more review card is available.
+      return;
+    }
+    if (showBack) {
+      pronounce(reviewCard!.back);
+    } else {
+      pronounce(reviewCard!.front);
+    }
+  }, [showBack, initiated])
 
   useEffect(() => {
     bindShowAnswerShortcut();
