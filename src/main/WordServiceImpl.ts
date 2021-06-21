@@ -9,7 +9,7 @@ import { WordContextStep } from "./domain/WordContextStep";
 import { container } from "./config/inversify.config";
 import { BookRepository } from "./infrastructure/repository/BookRepository";
 import { WordRepository } from "./infrastructure/repository/WordRepository";
-import { getPositionsAsNumberArray, WordDO } from "./infrastructure/do/WordDO";
+import { getPositionsAsNumberArray, WordDO } from "./infrastructure/do/word/WordDO";
 import { ImportKnownWordsService } from "./import/ImportKnownWordsService";
 
 @injectable()
@@ -18,7 +18,7 @@ export class WordServiceImpl implements WordService {
   async getWords(
     bookId: number,
     word: string | undefined,
-    wordStatus: WordStatus,
+    status: WordStatus,
     pageNo: number,
     pageSize: number,
     contextStep: WordContextStep,
@@ -27,28 +27,27 @@ export class WordServiceImpl implements WordService {
     const bookRepo = await container.getAsync<BookRepository>(types.BookRepository);
     const bookDO = await bookRepo.queryByIdOrThrow(bookId);
     const wordRepo = await container.getAsync<WordRepository>(types.WordRepository);
-    const wordDOList = await wordRepo.query({
+    const wordWithPositionsArray = await wordRepo.queryWordWithPositionsArray({
       bookId,
-      status: wordStatus,
+      status: status,
       word,
       countOriginalWord: true,
     }, {
       offset: (pageNo - 1) * pageSize,
       limit: pageSize
     })
-    return wordDOList.map((wordDO) => {
+    return wordWithPositionsArray.map((wordWithPositions) => {
       return {
-        id: wordDO.id as number,
-        word: wordDO.word as string,
-        originalWord: wordDO.originalWord as string,
+        word: wordWithPositions.word,
+        originalWord: wordWithPositions.originalWord,
         contextList: WordContextService.getContextList(
-          wordDO.word as string,
-          getPositionsAsNumberArray(wordDO.positions as string),
+          wordWithPositions.word as string,
+          wordWithPositions.positions,
           bookDO.contents as string,
           contextStep,
           contextLimit
         ),
-        status: wordDO.status as WordStatus,
+        status,
       };
     });
   }

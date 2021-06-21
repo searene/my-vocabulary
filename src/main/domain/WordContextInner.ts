@@ -1,7 +1,8 @@
 export type WordContextInner = {
-  startPos: number;
-  wordPos: number;
-  endPos: number;
+  contextStartPos: number;
+  contextEndPos: number;
+  wordStartPos: number;
+  wordEndPos: number;
   plainContents: string;
   htmlContents: string;
 };

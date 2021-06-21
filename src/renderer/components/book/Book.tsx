@@ -10,7 +10,7 @@ import { ContextItem } from "./ContextItem";
 import {
   retrieveWord, searchWord, selectContextList, selectOriginalWord,
   selectPageNo,
-  selectWord, selectWordCount, selectWordId,
+  selectWord, selectWordCount,
   selectWordStatus,
   setBookId,
   setWord,
@@ -37,7 +37,6 @@ export const Book = (props: BookProps) => {
 
   const [initiated, setInitiated] = useState(false);
   const wordStatus = useSelector(selectWordStatus);
-  const wordId = useSelector(selectWordId);
   const word = useSelector(selectWord);
   const originalWord = useSelector(selectOriginalWord);
   const contextList = useSelector(selectContextList);
@@ -107,7 +106,7 @@ export const Book = (props: BookProps) => {
           {wordCount!.unknown}
         </Grid.Column>
       </Grid.Row>
-      {wordId == undefined ? (
+      {word == undefined ? (
         <div>No more words.</div>
       ) : (
         <>

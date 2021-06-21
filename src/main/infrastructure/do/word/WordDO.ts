@@ -1,4 +1,4 @@
-import { BaseDO } from "./BaseDO";
+import { BaseDO } from "../BaseDO";
 
 export type WordDO = BaseDO & {
   bookId?: number;

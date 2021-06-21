@@ -13,17 +13,17 @@ interface StringToNumberType {
   [index: string]: number;
 }
 
-interface StringToNumberArrayType {
-  [index: string]: number[];
+interface StringToStringArrayType {
+  [index: string]: string[];
 }
 
 interface BookState {
-  word: string;
+  word: string | undefined;
   wordId: number | undefined;
   wordStatus: WordStatus;
   wordStatusToPageNoMap: StringToNumberType;
-  wordStatusToProcessedWordIdsMap: StringToNumberArrayType;
-  originalWord: string;
+  wordStatusToProcessedWordsMap: StringToStringArrayType;
+  originalWord: string | undefined;
   contextList: WordContext[];
   wordCount: WordCount;
   bookId: number | undefined;
@@ -40,8 +40,8 @@ const initWordStatusToPageNoMap = (): StringToNumberType => {
   return result;
 }
 
-const initWordStatusToProcessedWordIdsMap = (): StringToNumberArrayType => {
-  const result: StringToNumberArrayType = {};
+const initWordStatusToProcessedWordIdsMap = (): StringToStringArrayType => {
+  const result: StringToStringArrayType = {};
   for (const wordStatus in WordStatus) {
     if (!isNaN(Number(wordStatus))) {
       result[wordStatus.toString()] = [];
@@ -55,7 +55,7 @@ const initialState: BookState = {
   wordId: undefined,
   wordStatus: WordStatus.UNKNOWN,
   wordStatusToPageNoMap: initWordStatusToPageNoMap(),
-  wordStatusToProcessedWordIdsMap: initWordStatusToProcessedWordIdsMap(),
+  wordStatusToProcessedWordsMap: initWordStatusToProcessedWordIdsMap(),
   originalWord: "",
   contextList: [],
   wordCount: { ...ALL_ZEROS_WORD_COUNT },
@@ -94,7 +94,7 @@ export const refreshBookName = createAsyncThunk<
 });
 
 export const retrieveWord = createAsyncThunk<
-  { wordId: number | undefined, word: string, originalWord: string, contextList: WordContext[], wordCount: WordCount},
+  { word: string | undefined, originalWord: string | undefined, contextList: WordContext[], wordCount: WordCount},
   void,
   {state: State}
 >("book/retrieveWord", async (_, {getState}) => {
@@ -102,16 +102,15 @@ export const retrieveWord = createAsyncThunk<
   const wordVO = await getCurrentWord(getState().book.bookId as number, pageNo, getState().book.wordStatus);
   const wordCount = await serviceProvider.wordService.getWordCount(getState().book.bookId as number);
   return {
-    wordId: wordVO?.id,
-    word: wordVO === undefined ? "" : wordVO.word,
-    originalWord: wordVO === undefined ? "" : wordVO.originalWord,
+    word: wordVO === undefined ? undefined : wordVO.word,
+    originalWord: wordVO === undefined ? undefined : wordVO.originalWord,
     contextList: wordVO === undefined ? [] : wordVO.contextList,
     wordCount: wordCount,
   }
 });
 
 export const searchWord = createAsyncThunk<
-  {wordId: number, word: string, originalWord: string, contextList: WordContext[]},
+  {word: string | undefined, originalWord: string | undefined, contextList: WordContext[]},
   {bookId: number, word: string},
   {state: State}
 >("book/searchWord", async ({bookId, word}, {getState}) => {
@@ -133,7 +132,6 @@ export const searchWord = createAsyncThunk<
   }
   const wordVO = wordVOArray[0];
   return {
-    wordId: wordVO.id,
     word: wordVO.word,
     originalWord: wordVO.originalWord,
     contextList: wordVO.contextList
@@ -160,15 +158,14 @@ const bookSlice = createSlice({
       state.bookId = action.payload;
     },
     markCurrentWordAsProcessed: (state) => {
-      state.wordStatusToProcessedWordIdsMap[state.wordStatus.toString()].push(state.wordId as number);
+      state.wordStatusToProcessedWordsMap[state.wordStatus.toString()].push(state.word as string);
     },
     removeLastProcessedWord: (state) => {
-      state.wordStatusToProcessedWordIdsMap[state.wordStatus.toString()].pop();
+      state.wordStatusToProcessedWordsMap[state.wordStatus.toString()].pop();
     }
   },
   extraReducers: (builder) => {
     builder.addCase(retrieveWord.fulfilled, (state, action) => {
-      state.wordId = action.payload.wordId;
       state.word = action.payload.word;
       state.originalWord = action.payload.originalWord;
       state.contextList = action.payload.contextList;
@@ -179,7 +176,6 @@ const bookSlice = createSlice({
       console.error(action.error);
     });
     builder.addCase(searchWord.fulfilled, (state, action) => {
-      state.wordId = action.payload.wordId;
       state.word = action.payload.word;
       state.originalWord = action.payload.originalWord;
       state.contextList = action.payload.contextList;
@@ -203,13 +199,12 @@ export const bookReducer = bookSlice.reducer;
 export const selectWord = (state: State) => state.book.word;
 export const selectOriginalWord = (state: State) => state.book.originalWord;
 export const selectContextList = (state: State) => state.book.contextList;
-export const selectWordId = (state: State) => state.book.wordId;
 export const selectWordStatus = (state: State) => state.book.wordStatus;
 export const selectPageNo = (state: State) => state.book.wordStatusToPageNoMap[state.book.wordStatus.toString()];
 export const selectWordCount = (state: State) => state.book.wordCount;
 export const selectBookId = (state: State) => state.book.bookId;
 export const selectBookName = (state: State) => state.book.bookName;
-export const selectLastProcessedWordId = (state: State): number | undefined => {
-  const processedWordIds = state.book.wordStatusToProcessedWordIdsMap[state.book.wordStatus.toString()];
-  return processedWordIds.length === 0 ? undefined : processedWordIds[processedWordIds.length - 1];
+export const selectLastProcessedWord = (state: State): string | undefined => {
+  const processedWords = state.book.wordStatusToProcessedWordsMap[state.book.wordStatus.toString()];
+  return processedWords.length === 0 ? undefined : processedWords[processedWords.length - 1];
 }

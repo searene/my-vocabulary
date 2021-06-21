@@ -1,7 +1,7 @@
 import { container } from "../../../config/inversify.config";
 import { types } from "../../../config/types";
 import { WordStatus } from "../../../enum/WordStatus";
-import { WordDO } from "../../../infrastructure/do/WordDO";
+import { WordDO } from "../../../infrastructure/do/word/WordDO";
 import { WordRepository } from "../../../infrastructure/repository/WordRepository";
 import { WordFormReader } from "../../../WordFormReader";
 import { Word } from "../../word/Word";

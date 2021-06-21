@@ -1,5 +1,5 @@
 import { injectable } from "@parisholley/inversify-async";
-import { WordDO } from "../../do/WordDO";
+import { WordDO } from "../../do/word/WordDO";
 import { Options } from "../../query/Options";
 import { WordQuery } from "../../query/WordQuery";
 import { RepositoryUtils } from "../RepositoryUtils";
@@ -10,7 +10,7 @@ import { CardDO } from "../../do/CardDO";
 import { ALL_ZEROS_WORD_COUNT, WordCount } from "../../../domain/WordCount";
 import { WordStatus } from "../../../enum/WordStatus";
 import { QueryBuilder } from "knex";
-import { removeUndefinedKeys } from "../../../utils/ObjectUtils";
+import { isNullOrUndefined, removeUndefinedKeys } from "../../../utils/ObjectUtils";
 
 @injectable()
 export class KnexWordRepository implements WordRepository {
@@ -48,8 +48,15 @@ export class KnexWordRepository implements WordRepository {
     throw new Error("Method not implemented.");
   }
   async query(query: WordQuery, options?: Options): Promise<WordDO[]> {
+    throw new Error("Not implemented.");
+  }
+  async queryWordWithPositionsArray(query: WordQuery, options?: Options): Promise<WordWithPositions[]> {
     query = removeUndefinedKeys(query);
-    return await this.getQueryInterface(query, options);
+    const rows: any[] = await this.getQueryInterface(query, options);
+    if (isNullOrUndefined(rows) || rows.length === 0) {
+      return [];
+    }
+    return rows.map(row => this.toWordWithPositionsObject(row.word, row.originalWord, row.wordWithPositions));
   }
   async batchQueryByIds(ids: number[]): Promise<WordDO[]> {
     return await RepositoryUtils.batchQueryByIds(
@@ -133,7 +140,12 @@ export class KnexWordRepository implements WordRepository {
   }
 
   private async getQueryInterface(query: WordQuery, options?: Options) {
-    return this.getQueryInterfaceWithoutSelect(query, options).select("a.*");
+    if (!query.countOriginalWord || query.status === WordStatus.SKIPPED) {
+      return this.getQueryInterfaceWithoutSelect(query, options)
+        .select("*", `word || ":" || positions || ";" as word_with_positions`);
+    } else {
+      return this.getQueryInterfaceWithoutSelect(query, options).select("a.*");
+    }
   }
 
   private getQueryInterfaceWithoutSelect(query: WordQuery, options?: Options): QueryBuilder {
@@ -150,9 +162,12 @@ export class KnexWordRepository implements WordRepository {
     if (query.status === WordStatus.UNKNOWN) {
       queryInterface = knex(
         knex("words")
-        .select("*")
+        .select("original_word as word",
+                "original_word",
+                knex.raw(`GROUP_CONCAT(word || ":" || positions || ";", "") as word_with_positions`))
         .where(query)
         .as("a")
+        .groupBy("original_word")
       )
       .leftJoin(
         knex("words")
@@ -167,7 +182,7 @@ export class KnexWordRepository implements WordRepository {
     } else if (query.status === WordStatus.KNOWN) {
       queryInterface = knex(
         knex("words")
-        .select("*")
+        .select("original_word as word", `GROUP_CONCAT(word || ":" || positions || ";", "") as word_with_positions`)
         .where(query)
         .as("a")
       )
@@ -190,4 +205,26 @@ export class KnexWordRepository implements WordRepository {
     }
     return queryInterface;
   }
+  /**
+   * @param wordWithPositions example: clock:30;clocks:36;
+   */
+  private toWordWithPositionsObject(word: string, originalWord: string, wordWithPositions: string): WordWithPositions {
+    const wordWithPositionsArray = wordWithPositions.split(";");
+    const positions: WordPosition[] = [];
+    for (const wordWithPositionsElement of wordWithPositionsArray) {
+      if (wordWithPositionsElement.length === 0) {
+        continue;
+      }
+      const wordWithPositionsElementSplit = wordWithPositionsElement.split(":");
+      const startWordPosArray = wordWithPositionsElementSplit[1].split(",");
+      for (const startWordPos of startWordPosArray) {
+        positions.push({
+          startWordPos: parseInt(startWordPos),
+          endWordPos: wordWithPositionsElementSplit[0].length + parseInt(startWordPos)
+        });
+      }
+    }
+    return { word, originalWord, positions };
+  }
 }
+
