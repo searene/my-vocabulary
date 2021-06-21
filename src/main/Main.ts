@@ -15,7 +15,6 @@ import { CompositionRepository } from "./infrastructure/repository/CompositionRe
 import { UrlUtils } from "./utils/UrlUtils";
 import { ResourceService } from "./resource/ResourceService";
 import { MimeType } from "./resource/MimeType";
-import { migrate } from "./migration/SoundMigration";
 
 exports.bookService = container.get(types.BookService);
 exports.wordService = container.get(types.WordService);

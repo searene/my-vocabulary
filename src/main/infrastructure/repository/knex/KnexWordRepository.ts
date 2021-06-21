@@ -9,6 +9,8 @@ import { CardInstanceDO } from "../../do/CardInstanceDO";
 import { CardDO } from "../../do/CardDO";
 import { ALL_ZEROS_WORD_COUNT, WordCount } from "../../../domain/WordCount";
 import { WordStatus } from "../../../enum/WordStatus";
+import { QueryBuilder } from "knex";
+import { removeUndefinedKeys } from "../../../utils/ObjectUtils";
 
 @injectable()
 export class KnexWordRepository implements WordRepository {
@@ -46,11 +48,8 @@ export class KnexWordRepository implements WordRepository {
     throw new Error("Method not implemented.");
   }
   async query(query: WordQuery, options?: Options): Promise<WordDO[]> {
-    return await RepositoryUtils.query(
-      KnexWordRepository._WORDS,
-      query,
-      options
-    );
+    query = removeUndefinedKeys(query);
+    return await this.getQueryInterface(query, options);
   }
   async batchQueryByIds(ids: number[]): Promise<WordDO[]> {
     return await RepositoryUtils.batchQueryByIds(
@@ -87,9 +86,13 @@ export class KnexWordRepository implements WordRepository {
   }
 
   async queryOne(query: WordQuery): Promise<WordDO | undefined> {
-    return await RepositoryUtils.queryOne(
-      KnexWordRepository._WORDS,
-      query);
+    const queryInterface = this.getQueryInterface(query, { offset: 0, limit: 1 });
+    const rows = await queryInterface;
+    if (rows === undefined || rows === null || rows.length === 0) {
+      return undefined;
+    } else {
+      return rows[0];
+    }
   }
 
   async deleteById(id: number): Promise<void> {
@@ -106,18 +109,14 @@ export class KnexWordRepository implements WordRepository {
   }
 
   async queryCount(query: WordQuery): Promise<number> {
-    return await RepositoryUtils.queryCount(
-      KnexWordRepository._WORDS,
-      query
-    );
+    throw new Error("KnexWordRepository.queryCount is not implemented.");
   }
 
   async getWordCount(bookId: number): Promise<WordCount> {
-    const rows = await knex(KnexWordRepository._WORDS)
-      .select("status")
-      .count("* AS cnt")
-      .where({bookId})
-      .groupBy("status");
+    const rows = await this.getQueryInterfaceWithoutSelect({ bookId })
+                               .select("status")
+                               .count("* AS cnt")
+                               .groupBy("status");
     const wordCount = {
       ...ALL_ZEROS_WORD_COUNT
     };
@@ -131,5 +130,64 @@ export class KnexWordRepository implements WordRepository {
       }
     }
     return wordCount;
+  }
+
+  private async getQueryInterface(query: WordQuery, options?: Options) {
+    return this.getQueryInterfaceWithoutSelect(query, options).select("a.*");
+  }
+
+  private getQueryInterfaceWithoutSelect(query: WordQuery, options?: Options): QueryBuilder {
+    if (!query.countOriginalWord || query.status === WordStatus.SKIPPED) {
+      delete query.countOriginalWord;
+      return RepositoryUtils.getQueryInterfaceWithoutSelect(
+        KnexWordRepository._WORDS,
+        query,
+        options
+      );
+    }
+    delete query.countOriginalWord;
+    let queryInterface;
+    if (query.status === WordStatus.UNKNOWN) {
+      queryInterface = knex(
+        knex("words")
+        .select("*")
+        .where(query)
+        .as("a")
+      )
+      .leftJoin(
+        knex("words")
+        .distinct("original_word")
+        .where({ status: query.status })
+        .as("b"),
+        function() {
+          this.on("a.original_word", "b.original_word")
+              .onNull("b.original_word")
+        }
+      )
+    } else if (query.status === WordStatus.KNOWN) {
+      queryInterface = knex(
+        knex("words")
+        .select("*")
+        .where(query)
+        .as("a")
+      )
+      .select("a.*")
+      .join(
+        knex("words")
+        .distinct("original_word")
+        .where({ status: query.status })
+        .as("b"),
+        "a.original_word", "b.original_word"
+      )
+    } else {
+      throw new Error("Unsupported word status: " + status);
+    }
+    if (options?.offset !== undefined) {
+      queryInterface.offset(options.offset);
+    }
+    if (options?.limit !== undefined) {
+      queryInterface.limit(options.limit);
+    }
+    return queryInterface;
   }
 }

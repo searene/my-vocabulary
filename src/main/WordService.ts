@@ -13,7 +13,7 @@ export interface WordService {
     pageNo: number,
     pageSize: number,
     contextStep: WordContextStep,
-    contextLimit: number
+    contextLimit: number,
   ): Promise<WordVO[]>;
 
   updateWord(wordQuery: WordQuery): Promise<void>;
