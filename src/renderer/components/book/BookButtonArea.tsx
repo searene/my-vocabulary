@@ -1,20 +1,17 @@
+import * as React from 'react';
 import { Button} from "semantic-ui-react";
-import * as React from "react";
 import { WordStatus } from "../../../main/enum/WordStatus";
 import serviceProvider from "../../ServiceProvider";
-import { addItemToArray } from "../../utils/ImmutableUtils";
-import history from "../../route/History";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { selectGlobalShortcutEnabled } from "../shortcut/shortcutSlice";
 import {
   markCurrentWordAsProcessed,
   removeLastProcessedWord,
   retrieveWord,
-  selectLastProcessedWordId,
+  selectLastProcessedWord,
   selectPageNo,
   selectWord,
-  selectWordId,
   selectWordStatus,
   setPageNo,
 } from "./bookSlice";
@@ -30,8 +27,7 @@ export const BookButtonArea = (props: BookButtonAreaProps) => {
   const globalShortcutEnabled = useSelector(selectGlobalShortcutEnabled);
   const pageNo = useSelector(selectPageNo);
   const word = useSelector(selectWord);
-  const wordId = useSelector(selectWordId);
-  const lastProcessedWordId = useSelector(selectLastProcessedWordId);
+  const lastProcessedWord = useSelector(selectLastProcessedWord);
   const wordStatus = useSelector(selectWordStatus);
 
   useEffect(() => {
@@ -42,11 +38,11 @@ export const BookButtonArea = (props: BookButtonAreaProps) => {
   });
 
   const undo = async (): Promise<void> => {
-    if (lastProcessedWordId === undefined) {
+    if (lastProcessedWord === undefined) {
       return;
     }
     await serviceProvider.wordService.updateWord({
-      id: lastProcessedWordId,
+      word: lastProcessedWord,
       status: wordStatus,
     });
     dispatch(removeLastProcessedWord());
@@ -81,11 +77,11 @@ export const BookButtonArea = (props: BookButtonAreaProps) => {
     dispatch(retrieveWord());
   };
   const handleKnowAndNext = async (): Promise<void> => {
-    if (wordId === undefined) {
+    if (word === undefined) {
       return;
     }
     await serviceProvider.wordService.updateWord({
-      id: wordId,
+      word,
       status: WordStatus.KNOWN,
     });
     dispatch(markCurrentWordAsProcessed());
@@ -93,7 +89,7 @@ export const BookButtonArea = (props: BookButtonAreaProps) => {
   };
 
   const handleNext = async (): Promise<void> => {
-    if (wordId === undefined) {
+    if (word === undefined) {
       return;
     }
     dispatch(setPageNo(pageNo + 1));
@@ -101,11 +97,11 @@ export const BookButtonArea = (props: BookButtonAreaProps) => {
   };
 
   const handleSkip = async (): Promise<void> => {
-    if (wordId == undefined) {
+    if (word == undefined) {
       return;
     }
     await serviceProvider.wordService.updateWord({
-      id: wordId,
+      word,
       status: WordStatus.SKIPPED,
     });
     dispatch(markCurrentWordAsProcessed());
@@ -113,7 +109,7 @@ export const BookButtonArea = (props: BookButtonAreaProps) => {
   }
 
   const handleAdd = async (): Promise<void> => {
-    Router.toAddCardPage(props.bookId, word);
+    Router.toAddCardPage(props.bookId, word as string);
   };
 
 
@@ -127,15 +123,15 @@ export const BookButtonArea = (props: BookButtonAreaProps) => {
         Previous (p)
       </Button>
       <Button
-        disabled={wordId == undefined}
+        disabled={word == undefined}
         onClick={handleKnowAndNext}
       >
         Know and Next (k)
       </Button>
-      <Button disabled={wordId == undefined}
+      <Button disabled={word == undefined}
               onClick={handleSkip}>Skip (s) </Button>
       <Button
-        disabled={wordId == undefined}
+        disabled={word == undefined}
         onClick={handleNext}
       >
         Next (n)

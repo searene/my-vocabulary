@@ -5,7 +5,7 @@ import { WordContextInner } from "./domain/WordContextInner";
 export class WordContextService {
   static getContextList(
     word: string,
-    positions: number[],
+    positions: WordPosition[],
     bookContents: string,
     contextStep: WordContextStep,
     contextLimit: number
@@ -33,18 +33,24 @@ export class WordContextService {
   private static getWordContextInner(
     word: string,
     bookContents: string,
-    wordPos: number,
+    wordPos: WordPosition,
     contextStep: number
   ): WordContextInner {
-    const startPos = Math.max(0, wordPos - contextStep);
-    const endPos = Math.min(bookContents.length, wordPos + contextStep);
+    const startPos = Math.max(0, wordPos.startWordPos - contextStep);
+    const endPos = Math.min(bookContents.length, wordPos.startWordPos + contextStep);
     const plainContents = bookContents.substring(startPos, endPos);
-    const htmlContents = `${bookContents.substring(startPos, wordPos)}
+    const htmlContents = `${bookContents.substring(startPos, endPos)}
       <span class="highlight">${bookContents.substring(
-        wordPos,
-        wordPos + word.length
+        wordPos.startWordPos,
+        wordPos.endWordPos,
       )}</span>
-      ${bookContents.substring(wordPos + word.length, endPos)}`;
-    return { startPos, wordPos, endPos, plainContents, htmlContents };
+      ${bookContents.substring(wordPos.endWordPos, endPos)}`;
+    return {
+      contextStartPos: startPos,
+      wordStartPos: wordPos.startWordPos,
+      wordEndPos: wordPos.endWordPos,
+      contextEndPos: endPos,
+      plainContents, htmlContents
+    };
   }
 }

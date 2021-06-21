@@ -14,8 +14,10 @@ export const Dictionary = (props: DictionaryProps) => {
   const [word, setWord] = useState("");
 
   useEffect(() => {
-    setSearchValue(currentBookWord);
-    setWord(currentBookWord);
+    if (currentBookWord !== undefined) {
+      setSearchValue(currentBookWord);
+      setWord(currentBookWord);
+    }
   }, [currentBookWord]);
 
   return (
