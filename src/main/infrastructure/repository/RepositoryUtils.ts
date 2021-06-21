@@ -5,6 +5,7 @@ import { Options } from "../query/Options";
 import { knex } from "./knex/KnexFactory";
 import { CardInstanceDO } from "../do/CardInstanceDO";
 import { removeUndefinedKeys } from "../../utils/ObjectUtils";
+import { QueryBuilder, QueryInterface } from "knex";
 
 export class RepositoryUtils {
   static async batchInsert<D extends BaseDO>(
@@ -25,7 +26,27 @@ export class RepositoryUtils {
     query: Q,
     options?: Options
   ): Promise<D[]> {
-    const queryInterface = knex.from(tableName).select("*");
+    const queryInterface = this.getQueryInterface(tableName, query, options);
+    const rows = await queryInterface;
+    return rows as D[];
+  }
+
+  static async getQueryInterface<Q extends BaseQuery>(
+    tableName: string,
+    query: Q,
+    options?: Options
+  ) {
+    const queryInterface = this.getQueryInterfaceWithoutSelect(tableName, query, options)
+                               .select("*");
+    return queryInterface;
+  }
+
+  static getQueryInterfaceWithoutSelect<Q extends BaseQuery>(
+    tableName: string,
+    query: Q,
+    options?: Options
+  ): QueryBuilder {
+    const queryInterface = knex.from(`${tableName} as a`)
     if (options !== undefined) {
       if (options.offset !== undefined) {
         queryInterface.offset(options.offset);
@@ -35,10 +56,8 @@ export class RepositoryUtils {
       }
     }
     queryInterface.where(removeUndefinedKeys(query)).orderBy("id");
-    const rows = await queryInterface;
-    return rows as D[];
+    return queryInterface;
   }
-
   static async queryCount<Q extends BaseQuery>(tableName: string, query: Q): Promise<number> {
     const queryInterface = knex
       .from(tableName)

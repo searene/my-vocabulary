@@ -2,6 +2,7 @@ import { WordDO } from "../do/WordDO";
 import { WordQuery } from "../query/WordQuery";
 import { BaseRepository } from "./BaseRepository";
 import { WordCount } from "../../domain/WordCount";
+import { WordStatus } from "../../enum/WordStatus";
 
 export interface WordRepository extends BaseRepository<WordQuery, WordDO> {
   updateByWord(wordDO: WordDO): Promise<WordDO[]>;

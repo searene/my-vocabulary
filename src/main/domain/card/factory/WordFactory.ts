@@ -23,7 +23,7 @@ export class WordFactory {
   async createWord(
     bookId: number,
     word: string,
-    positions: number[]
+    positions: number[],
   ): Promise<Word> {
     const wordRepository: WordRepository = await container.getAsync(
       types.WordRepository

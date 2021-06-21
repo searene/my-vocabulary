@@ -22,4 +22,9 @@ export type WordQuery = BaseQuery & {
    * @see WordStatus
    */
   status?: number;
+
+  /**
+   * Whether count original words.
+   */
+  countOriginalWord?: boolean;
 };

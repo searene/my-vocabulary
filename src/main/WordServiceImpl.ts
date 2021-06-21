@@ -22,7 +22,7 @@ export class WordServiceImpl implements WordService {
     pageNo: number,
     pageSize: number,
     contextStep: WordContextStep,
-    contextLimit: number
+    contextLimit: number,
   ): Promise<WordVO[]> {
     const bookRepo = await container.getAsync<BookRepository>(types.BookRepository);
     const bookDO = await bookRepo.queryByIdOrThrow(bookId);
@@ -31,6 +31,7 @@ export class WordServiceImpl implements WordService {
       bookId,
       status: wordStatus,
       word,
+      countOriginalWord: true,
     }, {
       offset: (pageNo - 1) * pageSize,
       limit: pageSize
