@@ -1,7 +1,7 @@
 import { injectable } from "@parisholley/inversify-async";
 import { WordDO } from "../../do/word/WordDO";
 import { Options } from "../../query/Options";
-import { WordQuery } from "../../query/WordQuery";
+import { WordQuery } from "../../query/word/WordQuery";
 import { RepositoryUtils } from "../RepositoryUtils";
 import { WordRepository } from "../WordRepository";
 import { knex } from "./KnexFactory";
@@ -11,16 +11,16 @@ import { ALL_ZEROS_WORD_COUNT, WordCount } from "../../../domain/WordCount";
 import { WordStatus } from "../../../enum/WordStatus";
 import { QueryBuilder } from "knex";
 import { isNullOrUndefined, removeUndefinedKeys } from "../../../utils/ObjectUtils";
+import { BaseWordQuery } from "../../query/word/BaseWordQuery";
 
 @injectable()
 export class KnexWordRepository implements WordRepository {
   private static readonly _WORDS = "words";
 
-  async updateByWord(wordDO: WordDO): Promise<WordDO[]> {
+  async updateByWord(wordDO: WordDO): Promise<void> {
     await knex(KnexWordRepository._WORDS)
       .where("word", wordDO.word)
       .update(wordDO);
-    return await this.query({ word: wordDO.word });
   }
   async init(): Promise<void> {
     await this.createTableIfNotExists();
@@ -41,14 +41,17 @@ export class KnexWordRepository implements WordRepository {
       });
     }
   }
-  async insert(wordDO: WordDO): Promise<WordDO> {
+  async upsert(wordDO: WordDO): Promise<WordDO> {
     return await RepositoryUtils.insert(KnexWordRepository._WORDS, wordDO);
   }
   async batchInsert(wordDOs: WordDO[]): Promise<WordDO[]> {
     throw new Error("Method not implemented.");
   }
+  async baseQuery(query: BaseWordQuery, options?: Options): Promise<WordDO[]> {
+    return await RepositoryUtils.query(KnexWordRepository._WORDS, query, options);
+  }
   async query(query: WordQuery, options?: Options): Promise<WordDO[]> {
-    throw new Error("Not implemented.");
+    throw new Error("KnexWordRepository.query is not implemented");
   }
   async queryWordWithPositionsArray(query: WordQuery, options?: Options): Promise<WordWithPositions[]> {
     query = removeUndefinedKeys(query);
@@ -139,6 +142,12 @@ export class KnexWordRepository implements WordRepository {
     return wordCount;
   }
 
+  async updateByOriginalWord(wordDO: WordDO): Promise<void> {
+    await knex(KnexWordRepository._WORDS)
+      .where({ originalWord: wordDO.originalWord })
+      .update(wordDO);
+  }
+
   private async getQueryInterface(query: WordQuery, options?: Options) {
     if (!query.countOriginalWord || query.status === WordStatus.SKIPPED) {
       return this.getQueryInterfaceWithoutSelect(query, options)
@@ -226,5 +235,6 @@ export class KnexWordRepository implements WordRepository {
     }
     return { word, originalWord, positions };
   }
+
 }
 

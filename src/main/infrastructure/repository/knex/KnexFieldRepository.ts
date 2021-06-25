@@ -30,7 +30,7 @@ export class KnexFieldRepository implements FieldRepository {
       });
     }
   }
-  async insert(fieldTypeDO: FieldDO): Promise<FieldDO> {
+  async upsert(fieldTypeDO: FieldDO): Promise<FieldDO> {
     return await RepositoryUtils.insert(
       KnexFieldRepository._FIELDS,
       fieldTypeDO

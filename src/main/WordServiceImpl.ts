@@ -11,6 +11,7 @@ import { BookRepository } from "./infrastructure/repository/BookRepository";
 import { WordRepository } from "./infrastructure/repository/WordRepository";
 import { getPositionsAsNumberArray, WordDO } from "./infrastructure/do/word/WordDO";
 import { ImportKnownWordsService } from "./import/ImportKnownWordsService";
+import { ConfigRepository } from "./infrastructure/repository/ConfigRepository";
 
 @injectable()
 export class WordServiceImpl implements WordService {
@@ -52,9 +53,17 @@ export class WordServiceImpl implements WordService {
     });
   }
 
-  async updateWord(wordDO: WordDO): Promise<void> {
+  async updateWordStatus(bookId: number, word: string, status: WordStatus): Promise<void> {
+    const configRepo = await container.getAsync<ConfigRepository>(types.ConfigRepository);
     const wordRepo = await container.getAsync<WordRepository>(types.WordRepository);
-    await wordRepo.updateById(wordDO);
+    const configContents = await configRepo.queryConfigContents();
+    if (configContents === undefined) {
+      throw new Error("Config is missing.");
+    }
+    if(configContents.onlyCountOriginalWords) {
+      await wordRepo.updateByOriginalWord({ bookId, originalWord: word, status });
+    }
+    await wordRepo.updateByWord({ bookId, word, status });
   }
 
   async getWordCount(bookId: number): Promise<WordCount> {

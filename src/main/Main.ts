@@ -25,22 +25,22 @@ exports.configService = container.get(types.ConfigService);
 
 async function createSimpleCard(): Promise<void> {
   const cardTypeRepo = await container.getAsync<CardTypeRepository>(types.CardTypeRepository);
-  const cardTypeDO = await cardTypeRepo.insert({ name: "simple" });
+  const cardTypeDO = await cardTypeRepo.upsert({ name: "simple" });
 
   const fieldTypeRepo = await container.getAsync<FieldTypeRepository>(types.FieldTypeRepository);
-  const frontFieldTypeDO = await fieldTypeRepo.insert({
+  const frontFieldTypeDO = await fieldTypeRepo.upsert({
     name: "front",
     category: "text",
     cardTypeId: cardTypeDO.id,
   });
-  const backFieldTypeDO = await fieldTypeRepo.insert({
+  const backFieldTypeDO = await fieldTypeRepo.upsert({
     name: "back",
     category: "text",
     cardTypeId: cardTypeDO.id,
   });
 
   const compositionRepo = await container.getAsync<CompositionRepository>(types.CompositionRepository);
-  await compositionRepo.insert({
+  await compositionRepo.upsert({
     name: "simple",
     frontTypeIds: `${frontFieldTypeDO.id}`,
     backTypeIds: `${backFieldTypeDO.id}`,
@@ -50,27 +50,27 @@ async function createSimpleCard(): Promise<void> {
 
 async function createStandardCard(): Promise<void> {
   const cardTypeRepo = await container.getAsync<CardTypeRepository>(types.CardTypeRepository);
-  const cardTypeDO = await cardTypeRepo.insert({ name: "standard" });
+  const cardTypeDO = await cardTypeRepo.upsert({ name: "standard" });
 
   const fieldTypeRepo = await container.getAsync<FieldTypeRepository>(types.FieldTypeRepository);
-  const frontFieldTypeDO = await fieldTypeRepo.insert({
+  const frontFieldTypeDO = await fieldTypeRepo.upsert({
     name: "front",
     category: "text",
     cardTypeId: cardTypeDO.id,
   });
-  const baseBackFieldTypeDO = await fieldTypeRepo.insert({
+  const baseBackFieldTypeDO = await fieldTypeRepo.upsert({
     name: "baseBack",
     category: "text",
     cardTypeId: cardTypeDO.id,
   });
-  const imageBackFieldTypeDO = await fieldTypeRepo.insert({
+  const imageBackFieldTypeDO = await fieldTypeRepo.upsert({
     name: "imageBack",
     category: "google-image",
     cardTypeId: cardTypeDO.id,
   });
 
   const compositionRepo = await container.getAsync<CompositionRepository>(types.CompositionRepository);
-  await compositionRepo.insert({
+  await compositionRepo.upsert({
     name: "standard",
     frontTypeIds: `${frontFieldTypeDO.id}`,
     backTypeIds: `${baseBackFieldTypeDO.id},${imageBackFieldTypeDO.id}`,
@@ -78,7 +78,7 @@ async function createStandardCard(): Promise<void> {
   });
 
   const configRepo = await container.getAsync<ConfigRepository>(types.ConfigRepository);
-  await configRepo.insert({
+  await configRepo.upsertByConfigContents({
     defaultCardTypeId: cardTypeDO.id,
   });
 }
@@ -93,6 +93,7 @@ async function initialization(): Promise<void> {
   if ((await configRepository.query({})).length === 0) {
     await createSimpleCard();
     await createStandardCard();
+    await configRepository.setOnlyCountOriginalWords(true);
   }
 }
 

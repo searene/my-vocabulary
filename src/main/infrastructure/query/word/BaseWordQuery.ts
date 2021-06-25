@@ -1,6 +1,7 @@
-import { BaseQuery } from "./BaseQuery";
+import { BaseQuery } from "../BaseQuery";
 
-export type WordQuery = BaseQuery & {
+export type BaseWordQuery = BaseQuery & {
+
   bookId?: number;
 
   /**
@@ -22,9 +23,4 @@ export type WordQuery = BaseQuery & {
    * @see WordStatus
    */
   status?: number;
-
-  /**
-   * Whether count original words.
-   */
-  countOriginalWord?: boolean;
-};
+}

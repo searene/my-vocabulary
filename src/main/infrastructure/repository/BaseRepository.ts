@@ -5,7 +5,7 @@ import { Options } from "../query/Options";
 export interface BaseRepository<Q extends BaseQuery, D extends BaseDO> {
   init(): Promise<void>;
 
-  insert(dataObject: D): Promise<D>;
+  upsert(dataObject: D): Promise<D>;
 
   batchInsert(dataObjects: D[]): Promise<D[]>;
 

@@ -58,7 +58,7 @@ export class KnexReviewRepository implements ReviewRepository {
     );
   }
 
-  async insert(reviewDO: ReviewDO): Promise<ReviewDO> {
+  async upsert(reviewDO: ReviewDO): Promise<ReviewDO> {
     return await RepositoryUtils.insert(
       KnexReviewRepository._REVIEWS,
       reviewDO

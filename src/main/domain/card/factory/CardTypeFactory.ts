@@ -13,13 +13,11 @@ export class CardTypeFactory {
     const configRepository: ConfigRepository = await container.getAsync(
       types.ConfigRepository
     );
-    const configDOList = await configRepository.query({});
-    if (configDOList.length !== 1) {
-      throw new Error("configDOList.length should be 1");
+    const configContents = await configRepository.queryConfigContents();
+    if (configContents === undefined) {
+      throw new Error("configContents are not available");
     }
-    const cardType = await this.getById(
-      configDOList[0].defaultCardTypeId as number
-    );
+    const cardType = await this.getById(configContents.defaultCardTypeId as number);
     if (cardType === undefined) {
       throw new Error("The default card type is not available.");
     }

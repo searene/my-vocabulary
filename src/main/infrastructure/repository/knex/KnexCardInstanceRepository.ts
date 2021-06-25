@@ -58,7 +58,7 @@ export class KnexCardInstanceRepository implements CardInstanceRepository {
     );
   }
 
-  async insert(cardInstanceDO: CardInstanceDO): Promise<CardInstanceDO> {
+  async upsert(cardInstanceDO: CardInstanceDO): Promise<CardInstanceDO> {
     return await RepositoryUtils.insert(
       KnexCardInstanceRepository._CARD_INSTANCES,
       cardInstanceDO

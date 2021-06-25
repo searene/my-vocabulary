@@ -46,12 +46,12 @@ export class FieldTypeFactory {
         )
       );
     }
-    const frontFieldDO = await fieldTypeRepository.insert({
+    const frontFieldDO = await fieldTypeRepository.upsert({
       name: "front",
       category: "text",
       cardTypeId: initialCardTypeId,
     });
-    const backFieldDO = await fieldTypeRepository.insert({
+    const backFieldDO = await fieldTypeRepository.upsert({
       name: "back",
       category: "text",
       cardTypeId: initialCardTypeId,
