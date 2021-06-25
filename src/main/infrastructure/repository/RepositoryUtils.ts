@@ -75,7 +75,7 @@ export class RepositoryUtils {
     dataObject: D
   ): Promise<D> {
     const dataObjectWithId = { ...dataObject };
-    dataObjectWithId.id = await knex(tableName).insert(dataObject);
+    dataObjectWithId.id = (await knex(tableName).insert(dataObject))[0];
     return dataObjectWithId;
   }
 

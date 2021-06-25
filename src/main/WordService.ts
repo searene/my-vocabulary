@@ -16,7 +16,7 @@ export interface WordService {
     contextLimit: number,
   ): Promise<WordVO[]>;
 
-  updateWord(wordQuery: WordQuery): Promise<void>;
+  updateWordStatus(bookId: number, word: string, status: WordStatus): Promise<void>;
 
   getWordCount(bookId: number): Promise<WordCount>;
 

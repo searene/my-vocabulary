@@ -28,7 +28,7 @@ export class WordFactory {
     const wordRepository: WordRepository = await container.getAsync(
       types.WordRepository
     );
-    const wordDOs = await wordRepository.query(
+    const wordDOs = await wordRepository.baseQuery(
       {
         word: word,
         status: WordStatus.KNOWN,
@@ -38,7 +38,7 @@ export class WordFactory {
     const statusOfNewWord =
       wordDOs.length > 0 ? WordStatus.KNOWN : WordStatus.UNKNOWN;
     const originalWord = await this._wordFormReader.getOriginalWord(word);
-    const wordDO = await wordRepository.insert({
+    const wordDO = await wordRepository.upsert({
       bookId: bookId,
       word: word,
       status: statusOfNewWord,

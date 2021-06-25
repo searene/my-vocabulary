@@ -34,7 +34,7 @@ export class CardType {
     if (simpleCardTypeDO !== undefined) {
       return CardType.fromCardTypeDO(simpleCardTypeDO);
     }
-    const cardTypeDO = await cardTypeRepo.insert({
+    const cardTypeDO = await cardTypeRepo.upsert({
       name: "simple",
     });
     const configRepo = await container.getAsync<ConfigRepository>(types.ConfigRepository);
@@ -48,7 +48,7 @@ export class CardType {
     if (standardCardDO !== undefined) {
       return CardType.fromCardTypeDO(standardCardDO);
     }
-    const cardTypeDO = await cardTypeRepo.insert({
+    const cardTypeDO = await cardTypeRepo.upsert({
       name: "standard",
     });
     const configRepo = await container.getAsync<ConfigRepository>(types.ConfigRepository);

@@ -1,17 +1,21 @@
 import { ConfigRepository } from "../ConfigRepository";
 import { knex } from "./KnexFactory";
-import { ConfigDO } from "../../do/ConfigDO";
+import { ConfigDO } from "../../do/config/ConfigDO";
 import { ConfigQuery } from "../../query/ConfigQuery";
 import { injectable } from "@parisholley/inversify-async";
 import { Options } from "../../query/Options";
 import { RepositoryUtils } from "../RepositoryUtils";
 import { assert } from "../../../utils/Assert";
-import { CardInstanceDO } from "../../do/CardInstanceDO";
-import { CardDO } from "../../do/CardDO";
+import { ConfigContents } from "../../do/config/ConfigContents";
 
 @injectable()
 export class KnexConfigRepository implements ConfigRepository {
+
   private static readonly _CONFIGS = "configs";
+
+  async init(): Promise<void> {
+    await this.createTableIfNotExists();
+  }
 
   async getConfig(): Promise<ConfigDO | undefined> {
     const configs = await this.query({});
@@ -23,24 +27,21 @@ export class KnexConfigRepository implements ConfigRepository {
   }
 
   async setDefaultCardTypeId(defaultCardTypeId: number): Promise<void> {
-    const config = await this.getConfig();
-    if (config === undefined) {
-      await this.insert({ defaultCardTypeId });
-      return;
-    }
-    await this.updateById({
-      id: config.id,
-      defaultCardTypeId,
-    });
-  }
-
-  async init(): Promise<void> {
-    await this.createTableIfNotExists();
+    await this.upsertByConfigContents({ defaultCardTypeId });
   }
 
   async getDefaultCardTypeId(): Promise<number | undefined> {
     const configs = await this.query({});
-    return configs.length === 0 ? undefined : configs[0].defaultCardTypeId;
+    return configs.length === 0 ? undefined : JSON.parse(configs[0].configs).defaultCardTypeId;
+  }
+
+  async setOnlyCountOriginalWords(onlyCountOriginalWords: boolean): Promise<void> {
+    await this.upsertByConfigContents({ onlyCountOriginalWords });
+  }
+
+  async onlyCountOriginalWords(): Promise<boolean | undefined> {
+    const configs = await this.query({});
+    return configs.length === 0 ? undefined : JSON.parse(configs[0].configs).onlyCountOriginalWords;
   }
 
   async updateById(configDO: ConfigDO): Promise<void> {
@@ -51,7 +52,7 @@ export class KnexConfigRepository implements ConfigRepository {
     if (!tablesExists) {
       await knex.schema.createTable("configs", (table) => {
         table.increments();
-        table.integer("default_card_type_id");
+        table.json("configs");
       });
     }
   }
@@ -79,11 +80,11 @@ export class KnexConfigRepository implements ConfigRepository {
     );
   }
 
-  async queryById(id: number): Promise<CardInstanceDO | undefined> {
+  async queryById(id: number): Promise<ConfigDO | undefined> {
     return await RepositoryUtils.queryById(KnexConfigRepository._CONFIGS, id);
   }
 
-  async queryByIdOrThrow(id: number): Promise<CardDO> {
+  async queryByIdOrThrow(id: number): Promise<ConfigDO> {
     return await RepositoryUtils.queryByIdOrThrow(
       KnexConfigRepository._CONFIGS,
       id
@@ -129,4 +130,34 @@ export class KnexConfigRepository implements ConfigRepository {
     }
     return result;
   }
+
+  async upsert(configDO: ConfigDO): Promise<ConfigDO> {
+    return await this.upsertByConfigContents(JSON.parse(configDO.configs as string));
+  }
+
+  async upsertByConfigContents(configContents: ConfigContents): Promise<ConfigDO> {
+    const originalConfigContents = await this.queryConfigContents();
+    if (originalConfigContents === undefined) {
+      // Insert
+      const configs = JSON.stringify({ ...configContents });
+      return await this.insert({ configs });
+    }
+    // Update
+    const newConfigs = JSON.stringify({
+      ...originalConfigContents,
+      ...configContents,
+    });
+    const newConfigDO = { configs: newConfigs };
+    await this.updateTheOnlyConfig(newConfigDO);
+    return newConfigDO;
+  }
+
+  async queryConfigContents(): Promise<ConfigContents | undefined> {
+    const configDO = await this.queryOne({});
+    if (configDO === undefined) {
+      return undefined;
+    }
+    return { ...JSON.parse(configDO.configs) };
+  }
+
 }

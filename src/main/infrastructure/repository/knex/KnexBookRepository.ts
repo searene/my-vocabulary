@@ -40,7 +40,7 @@ export class KnexBookRepository implements BookRepository {
     await this.createTableIfNotExists();
   }
 
-  async insert(dataObject: BookDO): Promise<BookDO> {
+  async upsert(dataObject: BookDO): Promise<BookDO> {
     return await RepositoryUtils.insert(
       KnexBookRepository._BOOKS,
       dataObject

@@ -13,7 +13,7 @@ export class CardFactory {
       const configRepository = await this.getConfigRepository();
       cardTypeId = await configRepository.getDefaultCardTypeId();
     }
-    const insertedCardDO = await cardRepository.insert({
+    const insertedCardDO = await cardRepository.upsert({
       cardTypeId,
       bookId,
       word,

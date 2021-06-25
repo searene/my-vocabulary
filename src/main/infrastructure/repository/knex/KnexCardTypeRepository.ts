@@ -25,7 +25,7 @@ export class KnexCardTypeRepository implements CardTypeRepository {
       dataObject
     );
   }
-  async batchInsert(dataObjects: CardTypeDO[]): Promise<CardTypeDO[]> {
+  async batchInsert(cardTypeDOs: CardTypeDO[]): Promise<CardTypeDO[]> {
     throw new Error("Method not implemented.");
   }
   async batchQueryByIds(ids: number[]): Promise<CardTypeDO[]> {
@@ -34,7 +34,7 @@ export class KnexCardTypeRepository implements CardTypeRepository {
       ids
     );
   }
-  async insert(cardTypeDO: CardTypeDO): Promise<CardTypeDO> {
+  async upsert(cardTypeDO: CardTypeDO): Promise<CardTypeDO> {
     return await RepositoryUtils.insert(
       KnexCardTypeRepository._CARD_TYPES,
       cardTypeDO

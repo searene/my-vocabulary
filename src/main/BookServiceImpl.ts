@@ -19,7 +19,7 @@ export class BookServiceImpl implements BookService {
     }
 
     const bookRepo = await container.getAsync<BookRepository>(types.BookRepository);
-    const bookDO: BookDO = await bookRepo.insert({
+    const bookDO: BookDO = await bookRepo.upsert({
       name: path.parse(filePath).name,
       contents,
       type

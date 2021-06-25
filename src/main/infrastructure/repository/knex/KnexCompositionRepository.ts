@@ -20,7 +20,7 @@ export class KnexCompositionRepository implements CompositionRepository {
   async init(): Promise<void> {
     await this.createTableIfNotExists();
   }
-  async insert(CompositionDO: CompositionDO): Promise<CompositionDO> {
+  async upsert(CompositionDO: CompositionDO): Promise<CompositionDO> {
     return await RepositoryUtils.insert(
       KnexCompositionRepository._COMPOSITIONS,
       CompositionDO

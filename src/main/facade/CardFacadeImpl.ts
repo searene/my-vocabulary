@@ -104,7 +104,7 @@ export class CardFacadeImpl implements CardFacade {
     const reviewRepo = await container.getAsync<ReviewRepository>(
       types.ReviewRepository
     );
-    await reviewRepo.insert({
+    await reviewRepo.upsert({
       cardInstanceId: reviewRequest.cardInstanceId,
       reviewTime: new Date().getTime(),
       level: reviewRequest.level,

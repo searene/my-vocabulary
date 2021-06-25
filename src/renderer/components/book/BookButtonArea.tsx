@@ -41,10 +41,7 @@ export const BookButtonArea = (props: BookButtonAreaProps) => {
     if (lastProcessedWord === undefined) {
       return;
     }
-    await serviceProvider.wordService.updateWord({
-      word: lastProcessedWord,
-      status: wordStatus,
-    });
+    await serviceProvider.wordService.updateWordStatus(props.bookId, lastProcessedWord, wordStatus);
     dispatch(removeLastProcessedWord());
     dispatch(retrieveWord())
   };
@@ -80,10 +77,7 @@ export const BookButtonArea = (props: BookButtonAreaProps) => {
     if (word === undefined) {
       return;
     }
-    await serviceProvider.wordService.updateWord({
-      word,
-      status: WordStatus.KNOWN,
-    });
+    await serviceProvider.wordService.updateWordStatus(props.bookId, word, WordStatus.KNOWN);
     dispatch(markCurrentWordAsProcessed());
     dispatch(retrieveWord());
   };
@@ -100,10 +94,7 @@ export const BookButtonArea = (props: BookButtonAreaProps) => {
     if (word == undefined) {
       return;
     }
-    await serviceProvider.wordService.updateWord({
-      word,
-      status: WordStatus.SKIPPED,
-    });
+    await serviceProvider.wordService.updateWordStatus(props.bookId, word, WordStatus.SKIPPED);
     dispatch(markCurrentWordAsProcessed());
     dispatch(retrieveWord());
   }

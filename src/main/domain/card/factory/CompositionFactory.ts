@@ -20,7 +20,7 @@ export class CompositionFactory {
     if (compositions.length > 1) {
       return await Composition.fromCompositionDO(compositions[0]);
     }
-    const compositionDO = await compositionRepository.insert({
+    const compositionDO = await compositionRepository.upsert({
       name: "simple",
       frontTypeIds: `${frontFieldType.id}`,
       backTypeIds: `${backFieldType.id}`,
