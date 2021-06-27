@@ -39,7 +39,7 @@ export class WordContextService {
     const startPos = Math.max(0, wordPos.startWordPos - contextStep);
     const endPos = Math.min(bookContents.length, wordPos.startWordPos + contextStep);
     const plainContents = bookContents.substring(startPos, endPos);
-    const htmlContents = `${bookContents.substring(startPos, endPos)}
+    const htmlContents = `${bookContents.substring(startPos, wordPos.startWordPos)}
       <span class="highlight">${bookContents.substring(
         wordPos.startWordPos,
         wordPos.endWordPos,
