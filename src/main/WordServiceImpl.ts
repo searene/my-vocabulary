@@ -32,7 +32,7 @@ export class WordServiceImpl implements WordService {
       bookId,
       status: status,
       word,
-      countOriginalWord: true,
+      onlyCountOriginalWords: true,
     }, {
       offset: (pageNo - 1) * pageSize,
       limit: pageSize
@@ -68,7 +68,12 @@ export class WordServiceImpl implements WordService {
 
   async getWordCount(bookId: number): Promise<WordCount> {
     const wordRepo = await container.getAsync<WordRepository>(types.WordRepository);
-    return await wordRepo.getWordCount(bookId);
+    const configRepo = await container.getAsync<ConfigRepository>(types.ConfigRepository);
+    const configContents = await configRepo.queryConfigContents();
+    if (configContents === undefined) {
+      throw new Error("Config is missing.");
+    }
+    return await wordRepo.getWordCount(bookId, configContents.onlyCountOriginalWords as boolean);
   }
 
   async importKnownWords(words: string[]): Promise<void> {

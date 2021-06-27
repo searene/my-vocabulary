@@ -4,7 +4,7 @@ import { BaseWordQuery } from "./BaseWordQuery";
 export type WordQuery = BaseWordQuery & {
 
   /**
-   * Whether count original words.
+   * Whether only count original words.
    */
-  countOriginalWord?: boolean;
+  onlyCountOriginalWords?: boolean;
 };

@@ -122,11 +122,13 @@ export class KnexWordRepository implements WordRepository {
     throw new Error("KnexWordRepository.queryCount is not implemented.");
   }
 
-  async getWordCount(bookId: number): Promise<WordCount> {
-    const rows = await this.getQueryInterfaceWithoutSelect({ bookId })
-                               .select("status")
-                               .count("* AS cnt")
-                               .groupBy("status");
+  async getWordCount(bookId: number, onlyCountOriginalWords: boolean): Promise<WordCount> {
+    const rows = await knex(KnexWordRepository._WORDS)
+                        .select("status")
+                        .countDistinct(onlyCountOriginalWords ? "original_word" : "word",
+                                       {as: "cnt"})
+                        .where({ bookId })
+                        .groupBy("status");
     const wordCount = {
       ...ALL_ZEROS_WORD_COUNT
     };
@@ -149,24 +151,24 @@ export class KnexWordRepository implements WordRepository {
   }
 
   private async getQueryInterface(query: WordQuery, options?: Options) {
-    if (!query.countOriginalWord || query.status === WordStatus.SKIPPED) {
+    if (!query.onlyCountOriginalWords || query.status === WordStatus.SKIPPED) {
       return this.getQueryInterfaceWithoutSelect(query, options)
-        .select("*", `word || ":" || positions || ";" as word_with_positions`);
+        .select("*", knex.raw(`word || ":" || positions || ";" as word_with_positions`));
     } else {
       return this.getQueryInterfaceWithoutSelect(query, options).select("a.*");
     }
   }
 
   private getQueryInterfaceWithoutSelect(query: WordQuery, options?: Options): QueryBuilder {
-    if (!query.countOriginalWord || query.status === WordStatus.SKIPPED) {
-      delete query.countOriginalWord;
+    if (!query.onlyCountOriginalWords || query.status === WordStatus.SKIPPED) {
+      delete query.onlyCountOriginalWords;
       return RepositoryUtils.getQueryInterfaceWithoutSelect(
         KnexWordRepository._WORDS,
         query,
         options
       );
     }
-    delete query.countOriginalWord;
+    delete query.onlyCountOriginalWords;
     let queryInterface;
     if (query.status === WordStatus.UNKNOWN) {
       queryInterface = knex(
@@ -191,11 +193,13 @@ export class KnexWordRepository implements WordRepository {
     } else if (query.status === WordStatus.KNOWN) {
       queryInterface = knex(
         knex("words")
-        .select("original_word as word", `GROUP_CONCAT(word || ":" || positions || ";", "") as word_with_positions`)
+        .select("original_word as word",
+                "original_word",
+                knex.raw(`GROUP_CONCAT(word || ":" || positions || ";", "") as word_with_positions`))
         .where(query)
         .as("a")
+        .groupBy("original_word")
       )
-      .select("a.*")
       .join(
         knex("words")
         .distinct("original_word")
