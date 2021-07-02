@@ -123,12 +123,7 @@ export class KnexWordRepository implements WordRepository {
   }
 
   async getWordCount(bookId: number, onlyCountOriginalWords: boolean): Promise<WordCount> {
-    const rows = await knex(KnexWordRepository._WORDS)
-                        .select("status")
-                        .countDistinct(onlyCountOriginalWords ? "original_word" : "word",
-                                       {as: "cnt"})
-                        .where({ bookId })
-                        .groupBy("status");
+    const rows = await this.getWordCountQueryInterface(bookId, onlyCountOriginalWords);
     const wordCount = {
       ...ALL_ZEROS_WORD_COUNT
     };
@@ -151,21 +146,28 @@ export class KnexWordRepository implements WordRepository {
   }
 
   private async getQueryInterface(query: WordQuery, options?: Options) {
+    let queryInterface;
     if (!query.onlyCountOriginalWords || query.status === WordStatus.SKIPPED) {
-      return this.getQueryInterfaceWithoutSelect(query, options)
-        .select("*", knex.raw(`word || ":" || positions || ";" as word_with_positions`));
+      queryInterface = this.getQueryInterfaceWithoutLimit(query)
+        .select("*", knex.raw(`word || ":" || positions || ";" as word_with_positions`))
     } else {
-      return this.getQueryInterfaceWithoutSelect(query, options).select("a.*");
+      queryInterface = this.getQueryInterfaceWithoutLimit(query);
     }
+    if (options?.offset !== undefined) {
+      queryInterface.offset(options?.offset);
+    }
+    if (options?.limit !== undefined) {
+      queryInterface.limit(options?.limit);
+    }
+    return queryInterface;
   }
 
-  private getQueryInterfaceWithoutSelect(query: WordQuery, options?: Options): QueryBuilder {
+  private getQueryInterfaceWithoutLimit(query: WordQuery): QueryBuilder {
     if (!query.onlyCountOriginalWords || query.status === WordStatus.SKIPPED) {
       delete query.onlyCountOriginalWords;
-      return RepositoryUtils.getQueryInterfaceWithoutSelect(
+      return RepositoryUtils.getQueryInterfaceWithoutLimit(
         KnexWordRepository._WORDS,
         query,
-        options
       );
     }
     delete query.onlyCountOriginalWords;
@@ -183,13 +185,12 @@ export class KnexWordRepository implements WordRepository {
       .leftJoin(
         knex("words")
         .distinct("original_word")
-        .where({ status: query.status })
+        .whereIn('status', [WordStatus.KNOWN, WordStatus.SKIPPED])
         .as("b"),
-        function() {
-          this.on("a.original_word", "b.original_word")
-              .onNull("b.original_word")
-        }
+        "a.original_word", "b.original_word"
       )
+      .whereNull("b.original_word")
+      .select("a.*")
     } else if (query.status === WordStatus.KNOWN) {
       queryInterface = knex(
         knex("words")
@@ -207,14 +208,9 @@ export class KnexWordRepository implements WordRepository {
         .as("b"),
         "a.original_word", "b.original_word"
       )
+      .select("a.*")
     } else {
       throw new Error("Unsupported word status: " + status);
-    }
-    if (options?.offset !== undefined) {
-      queryInterface.offset(options.offset);
-    }
-    if (options?.limit !== undefined) {
-      queryInterface.limit(options.limit);
     }
     return queryInterface;
   }
@@ -238,6 +234,31 @@ export class KnexWordRepository implements WordRepository {
       }
     }
     return { word, originalWord, positions };
+  }
+
+  private getWordCountQueryInterface(bookId: number, onlyCountOriginalWords: boolean) {
+    if (!onlyCountOriginalWords) {
+      return knex(KnexWordRepository._WORDS)
+            .select("status")
+            .countDistinct("word", {as: "cnt"})
+            .where({ bookId })
+            .groupBy("status");
+    }
+    return knex(knex(KnexWordRepository._WORDS)
+                .select("original_word as word",
+
+                        // If all the words are unknown, then the original word is unknown.
+                        // If there is at least one known word, then the original word is known.
+                        // If there is at least on skipped word, then the original word is skipped.
+                        knex.raw(`case when max(status) = 0 then 0
+                                      when max(status) = 1 then 1
+                                      when max(status) = 2 then 2
+                                  end as status`))
+
+                .groupBy("original_word"))
+          .select("status")
+          .count("word", {as: "cnt"})
+          .groupBy("status")
   }
 
 }
