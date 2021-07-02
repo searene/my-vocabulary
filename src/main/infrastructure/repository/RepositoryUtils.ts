@@ -36,26 +36,24 @@ export class RepositoryUtils {
     query: Q,
     options?: Options
   ) {
-    const queryInterface = this.getQueryInterfaceWithoutSelect(tableName, query, options)
-                               .select("*");
+    const queryInterface = this.getQueryInterfaceWithoutLimit(tableName, query)
+    if (options?.offset !== undefined) {
+      queryInterface.offset(options?.offset);
+    }
+    if (options?.limit !== undefined) {
+      queryInterface.limit(options?.limit);
+    }
     return queryInterface;
   }
 
-  static getQueryInterfaceWithoutSelect<Q extends BaseQuery>(
+  static getQueryInterfaceWithoutLimit<Q extends BaseQuery>(
     tableName: string,
     query: Q,
-    options?: Options
   ): QueryBuilder {
-    const queryInterface = knex.from(`${tableName} as a`)
-    if (options !== undefined) {
-      if (options.offset !== undefined) {
-        queryInterface.offset(options.offset);
-      }
-      if (options.limit !== undefined) {
-        queryInterface.limit(options.limit);
-      }
-    }
-    queryInterface.where(removeUndefinedKeys(query)).orderBy("id");
+    const queryInterface = knex.from(tableName)
+    queryInterface.where(removeUndefinedKeys(query))
+                  .orderBy("id")
+                  .select("*");
     return queryInterface;
   }
   static async queryCount<Q extends BaseQuery>(tableName: string, query: Q): Promise<number> {
