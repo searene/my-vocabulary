@@ -254,7 +254,7 @@ export class KnexWordRepository implements WordRepository {
                                       when max(status) = 1 then 1
                                       when max(status) = 2 then 2
                                   end as status`))
-
+                .where({ bookId })
                 .groupBy("original_word"))
           .select("status")
           .count("word", {as: "cnt"})
