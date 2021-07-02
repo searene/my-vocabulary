@@ -32,7 +32,7 @@ export class AddBookModal extends React.Component<
     this.state = {
       // TODO this is only for test, remove it after testing
       bookFilePath:
-        "/home/searene/WebstormProjects/my-vocabulary/resources/test-book.txt",
+        "/home/searene/Downloads/test.txt",
       loading: false,
     };
   }

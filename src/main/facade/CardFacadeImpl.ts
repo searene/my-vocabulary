@@ -10,7 +10,6 @@ import { CardFactory } from "../domain/card/factory/CardFactory";
 import { FieldTypeFactory } from "../domain/card/factory/FieldTypeFactory";
 import { types } from "../config/types";
 import { WordStatus } from "../enum/WordStatus";
-import { WordRepository } from "../infrastructure/repository/WordRepository";
 import { container } from "../config/inversify.config";
 import { Scheduler } from "../domain/scheduler/Scheduler";
 import { CardInstanceRepository } from "../infrastructure/repository/CardInstanceRepository";
@@ -27,6 +26,7 @@ import { FieldVO } from "./vo/FieldVO";
 import { FieldContents } from "../domain/card/FieldContents";
 import { CardInstanceFactory } from "../domain/card/instance/CardInstanceFactory";
 import { CardInstanceVO, fromCardInstance } from "./vo/CardInstanceVO";
+import { WordService } from "../WordService";
 
 @injectable()
 export class CardFacadeImpl implements CardFacade {
@@ -70,16 +70,13 @@ export class CardFacadeImpl implements CardFacade {
     );
     await cardInstanceRepo.batchInsert(cardInstanceDOs);
 
-    const wordRepository = await this.getWordRepository();
-    await wordRepository.updateByWord({
-      word: saveCardParam.word,
-      status: WordStatus.KNOWN,
-    });
+    const wordService = container.get<WordService>(types.WordService);
+    await wordService.updateWordStatus(
+      saveCardParam.bookId,
+      saveCardParam.word,
+      WordStatus.KNOWN,
+    );
     return card.id;
-  }
-
-  private async getWordRepository(): Promise<WordRepository> {
-    return container.getAsync(types.WordRepository);
   }
 
   async getNextReviewCardInstanceByBookId(
