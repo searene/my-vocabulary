@@ -30,7 +30,7 @@ export interface WordService {
    */
   delete(bookId: number): Promise<number>
 
-  query(query: WordQuery, options: Options): Promise<WordDO[]>
+  baseQuery(baseQuery: BaseWordQuery, options: Options): Promise<WordDO[]>
 
   upsert(wordDO: WordDO): Promise<WordDO>;
 }

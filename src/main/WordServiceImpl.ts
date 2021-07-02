@@ -24,9 +24,9 @@ export class WordServiceImpl implements WordService {
     return await wordRepo.upsert(wordDO);
   }
 
-  async query(query: WordQuery, options: Options): Promise<WordDO[]> {
+  async baseQuery(query: BaseWordQuery, options: Options): Promise<WordDO[]> {
     const wordRepo = await container.getAsync<WordRepository>(types.WordRepository);
-    return await wordRepo.query(query, options);
+    return await wordRepo.baseQuery(query, options);
   }
 
   async delete(bookId: number): Promise<number> {
