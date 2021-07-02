@@ -122,8 +122,25 @@ export class KnexWordRepository implements WordRepository {
     throw new Error("KnexWordRepository.queryCount is not implemented.");
   }
 
-  async getWordCount(bookId: number, onlyCountOriginalWords: boolean): Promise<WordCount> {
-    const rows = await this.getWordCountQueryInterface(bookId, onlyCountOriginalWords);
+  async getWordCount(bookId: number): Promise<WordCount> {
+    const rows = await this.getWordCountQueryInterface(bookId, false);
+    const wordCount = {
+      ...ALL_ZEROS_WORD_COUNT
+    };
+    for (const row of rows) {
+      if (row.status === WordStatus.UNKNOWN) {
+        wordCount.unknown = row.cnt as number;
+      } else if (row.status === WordStatus.KNOWN) {
+        wordCount.known = row.cnt as number;
+      } else if (row.status === WordStatus.SKIPPED) {
+        wordCount.skipped = row.cnt as number;
+      }
+    }
+    return wordCount;
+  }
+
+  async getOriginalWordCount(bookId: number): Promise<WordCount> {
+    const rows = await this.getWordCountQueryInterface(bookId, true);
     const wordCount = {
       ...ALL_ZEROS_WORD_COUNT
     };

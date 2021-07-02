@@ -12,9 +12,27 @@ import { WordRepository } from "./infrastructure/repository/WordRepository";
 import { getPositionsAsNumberArray, WordDO } from "./infrastructure/do/word/WordDO";
 import { ImportKnownWordsService } from "./import/ImportKnownWordsService";
 import { ConfigRepository } from "./infrastructure/repository/ConfigRepository";
+import { BaseWordQuery } from "./infrastructure/query/word/BaseWordQuery";
+import { WordQuery } from "./domain/WordQuery";
+import { Options } from "./infrastructure/query/Options";
 
 @injectable()
 export class WordServiceImpl implements WordService {
+
+  async upsert(wordDO: WordDO): Promise<WordDO> {
+    const wordRepo = await container.getAsync<WordRepository>(types.WordRepository);
+    return await wordRepo.upsert(wordDO);
+  }
+
+  async query(query: WordQuery, options: Options): Promise<WordDO[]> {
+    const wordRepo = await container.getAsync<WordRepository>(types.WordRepository);
+    return await wordRepo.query(query, options);
+  }
+
+  async delete(bookId: number): Promise<number> {
+    const wordRepo = await container.getAsync<WordRepository>(types.WordRepository);
+    return await wordRepo.delete({ bookId });
+  }
 
   async getWords(
     bookId: number,
@@ -73,7 +91,11 @@ export class WordServiceImpl implements WordService {
     if (configContents === undefined) {
       throw new Error("Config is missing.");
     }
-    return await wordRepo.getWordCount(bookId, configContents.onlyCountOriginalWords as boolean);
+    if (configContents.onlyCountOriginalWords as boolean) {
+      return await wordRepo.getOriginalWordCount(bookId);
+    } else {
+      return await wordRepo.getWordCount(bookId);
+    }
   }
 
   async importKnownWords(words: string[]): Promise<void> {

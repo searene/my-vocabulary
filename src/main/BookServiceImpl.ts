@@ -7,8 +7,8 @@ import { EBookReadAgent } from "./EBookReadAgent";
 import * as path from "path";
 import { WordFactory } from "./domain/card/factory/WordFactory";
 import { BookDO, BookType } from "./infrastructure/do/BookDO";
-import { WordRepository } from "./infrastructure/repository/WordRepository";
 import { injectable } from "@parisholley/inversify-async";
+import { WordService } from "./WordService";
 
 @injectable()
 export class BookServiceImpl implements BookService {
@@ -55,7 +55,7 @@ export class BookServiceImpl implements BookService {
   async removeBook(bookId: number): Promise<void> {
     const bookRepo = await container.getAsync<BookRepository>(types.BookRepository);
     await bookRepo.deleteById(bookId);
-    const wordRepo = await container.getAsync<WordRepository>(types.WordRepository);
-    await wordRepo.delete({bookId});
+    const wordService = container.get<WordService>(types.WordService);
+    await wordService.delete(bookId);
   }
 }
