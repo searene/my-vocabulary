@@ -79,7 +79,7 @@ export class WordServiceImpl implements WordService {
       throw new Error("Config is missing.");
     }
     if(configContents.onlyCountOriginalWords) {
-      await wordRepo.updateByOriginalWord({ bookId, originalWord: word, status });
+      await wordRepo.updateStatusByBookIdAndOriginalWord(bookId, word, status);
     }
     await wordRepo.updateByWord({ bookId, word, status });
   }
