@@ -9,7 +9,7 @@ import { BaseWordQuery } from "../query/word/BaseWordQuery";
 export interface WordRepository extends BaseRepository<WordQuery, WordDO> {
   updateByWord(wordDO: WordDO): Promise<void>;
 
-  updateByOriginalWord(wordDO: WordDO): Promise<void>;
+  updateStatusByBookIdAndOriginalWord(bookId: number, originalWord: string, status: WordStatus): Promise<void>;
 
   updateWordStatus(): Promise<void>;
 

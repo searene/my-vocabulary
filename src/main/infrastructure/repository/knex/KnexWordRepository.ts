@@ -156,10 +156,10 @@ export class KnexWordRepository implements WordRepository {
     return wordCount;
   }
 
-  async updateByOriginalWord(wordDO: WordDO): Promise<void> {
+  async updateStatusByBookIdAndOriginalWord(bookId: number, originalWord: string, status: WordStatus): Promise<void> {
     await knex(KnexWordRepository._WORDS)
-      .where({ originalWord: wordDO.originalWord })
-      .update(wordDO);
+      .where({ originalWord, bookId, status })
+      .update({ status });
   }
 
   private async getQueryInterface(query: WordQuery, options?: Options) {
