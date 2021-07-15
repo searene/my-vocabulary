@@ -18,7 +18,6 @@ interface StringToStringArrayType {
 }
 
 interface BookState {
-  word: string | undefined;
   wordId: number | undefined;
   wordStatus: WordStatus;
   wordStatusToPageNoMap: StringToNumberType;
@@ -51,7 +50,6 @@ const initWordStatusToProcessedWordIdsMap = (): StringToStringArrayType => {
 }
 
 const initialState: BookState = {
-  word: "",
   wordId: undefined,
   wordStatus: WordStatus.UNKNOWN,
   wordStatusToPageNoMap: initWordStatusToPageNoMap(),
@@ -94,7 +92,7 @@ export const refreshBookName = createAsyncThunk<
 });
 
 export const retrieveWord = createAsyncThunk<
-  { word: string | undefined, originalWord: string | undefined, contextList: WordContext[], wordCount: WordCount},
+  { originalWord: string | undefined, contextList: WordContext[], wordCount: WordCount},
   void,
   {state: State}
 >("book/retrieveWord", async (_, {getState}) => {
@@ -102,7 +100,6 @@ export const retrieveWord = createAsyncThunk<
   const wordVO = await getCurrentWord(getState().book.bookId as number, pageNo, getState().book.wordStatus);
   const wordCount = await serviceProvider.wordService.getWordCount(getState().book.bookId as number);
   return {
-    word: wordVO === undefined ? undefined : wordVO.word,
     originalWord: wordVO === undefined ? undefined : wordVO.originalWord,
     contextList: wordVO === undefined ? [] : wordVO.contextList,
     wordCount: wordCount,
@@ -110,7 +107,7 @@ export const retrieveWord = createAsyncThunk<
 });
 
 export const searchWord = createAsyncThunk<
-  {word: string | undefined, originalWord: string | undefined, contextList: WordContext[]},
+  { originalWord: string | undefined, contextList: WordContext[]},
   {bookId: number, word: string},
   {state: State}
 >("book/searchWord", async ({bookId, word}, {getState}) => {
@@ -132,7 +129,6 @@ export const searchWord = createAsyncThunk<
   }
   const wordVO = wordVOArray[0];
   return {
-    word: wordVO.word,
     originalWord: wordVO.originalWord,
     contextList: wordVO.contextList
   }
@@ -142,12 +138,6 @@ const bookSlice = createSlice({
   name: "book",
   initialState: initialState,
   reducers: {
-    setWord: (state, action) => {
-      state.word = action.payload;
-    },
-    setWordId: (state, action) => {
-      state.wordId = action.payload;
-    },
     setWordStatus: (state, action) => {
       state.wordStatus = action.payload;
     },
@@ -158,7 +148,7 @@ const bookSlice = createSlice({
       state.bookId = action.payload;
     },
     markCurrentWordAsProcessed: (state) => {
-      state.wordStatusToProcessedWordsMap[state.wordStatus.toString()].push(state.word as string);
+      state.wordStatusToProcessedWordsMap[state.wordStatus.toString()].push(state.originalWord as string);
     },
     removeLastProcessedWord: (state) => {
       state.wordStatusToProcessedWordsMap[state.wordStatus.toString()].pop();
@@ -166,7 +156,6 @@ const bookSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(retrieveWord.fulfilled, (state, action) => {
-      state.word = action.payload.word;
       state.originalWord = action.payload.originalWord;
       state.contextList = action.payload.contextList;
       state.wordCount = action.payload.wordCount;
@@ -176,7 +165,6 @@ const bookSlice = createSlice({
       console.error(action.error);
     });
     builder.addCase(searchWord.fulfilled, (state, action) => {
-      state.word = action.payload.word;
       state.originalWord = action.payload.originalWord;
       state.contextList = action.payload.contextList;
     });
@@ -194,9 +182,8 @@ const bookSlice = createSlice({
   },
 });
 
-export const { markCurrentWordAsProcessed, setWord, setWordId, setBookId, setWordStatus, setPageNo, removeLastProcessedWord } = bookSlice.actions;
+export const { markCurrentWordAsProcessed, setBookId, setWordStatus, setPageNo, removeLastProcessedWord } = bookSlice.actions;
 export const bookReducer = bookSlice.reducer;
-export const selectWord = (state: State) => state.book.word;
 export const selectOriginalWord = (state: State) => state.book.originalWord;
 export const selectContextList = (state: State) => state.book.contextList;
 export const selectWordStatus = (state: State) => state.book.wordStatus;

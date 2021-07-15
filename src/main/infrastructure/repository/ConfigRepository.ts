@@ -19,10 +19,6 @@ export interface ConfigRepository
 
   queryOneOrThrowError(): Promise<ConfigDO>;
 
-  setOnlyCountOriginalWords(onlyCountOriginalWords: boolean): Promise<void>;
-
-  onlyCountOriginalWords(): Promise<boolean | undefined>;
-
   upsertByConfigContents(configContents: ConfigContents): Promise<ConfigDO>;
 
   queryConfigContents(): Promise<ConfigContents | undefined>;

@@ -9,7 +9,7 @@ import { WordContextStep } from "./domain/WordContextStep";
 import { container } from "./config/inversify.config";
 import { BookRepository } from "./infrastructure/repository/BookRepository";
 import { WordRepository } from "./infrastructure/repository/WordRepository";
-import { getPositionsAsNumberArray, WordDO } from "./infrastructure/do/word/WordDO";
+import { WordDO } from "./infrastructure/do/word/WordDO";
 import { ImportKnownWordsService } from "./import/ImportKnownWordsService";
 import { ConfigRepository } from "./infrastructure/repository/ConfigRepository";
 import { WordQuery } from "./domain/WordQuery";
@@ -45,18 +45,12 @@ export class WordServiceImpl implements WordService {
     const bookRepo = await container.getAsync<BookRepository>(types.BookRepository);
     const bookDO = await bookRepo.queryByIdOrThrow(bookId);
     const wordRepo = await container.getAsync<WordRepository>(types.WordRepository);
-    const configRepo = await container.getAsync<ConfigRepository>(types.ConfigRepository);
-    const onlyCountOriginalWords = await configRepo.onlyCountOriginalWords();
     const options = { offset: (pageNo - 1) * pageSize, limit: pageSize };
-    const wordWithPositionsArray = onlyCountOriginalWords
-      ? await wordRepo.queryOriginalWordWithPositionsArray(bookId, status, word, options)
-      : await wordRepo.queryWordWithPositionsArray({ bookId, status, word }, options);
-    return wordWithPositionsArray.map((wordWithPositions) => {
+    const originalWordWithPositionsArray = await wordRepo.queryOriginalWordWithPositionsArray(bookId, status, word, options);
+    return originalWordWithPositionsArray.map((wordWithPositions) => {
       return {
-        word: wordWithPositions.word,
         originalWord: wordWithPositions.originalWord,
         contextList: WordContextService.getContextList(
-          wordWithPositions.word as string,
           wordWithPositions.positions,
           bookDO.contents as string,
           contextStep,
@@ -67,17 +61,15 @@ export class WordServiceImpl implements WordService {
     });
   }
 
-  async updateWordStatus(bookId: number, word: string, status: WordStatus): Promise<void> {
+  async updateWordStatus(bookId: number, originalWord: string, status: WordStatus): Promise<void> {
     const configRepo = await container.getAsync<ConfigRepository>(types.ConfigRepository);
     const wordRepo = await container.getAsync<WordRepository>(types.WordRepository);
     const configContents = await configRepo.queryConfigContents();
     if (configContents === undefined) {
       throw new Error("Config is missing.");
     }
-    if(configContents.onlyCountOriginalWords) {
-      await wordRepo.updateStatusByBookIdAndOriginalWord(bookId, word, status);
-    }
-    await wordRepo.updateByWord({ bookId, word, status });
+    await wordRepo.updateStatusByBookIdAndOriginalWord(bookId, originalWord, status);
+    await wordRepo.updateByOriginalWord({ bookId, originalWord, status });
   }
 
   async getWordCount(bookId: number): Promise<WordCount> {
@@ -87,11 +79,7 @@ export class WordServiceImpl implements WordService {
     if (configContents === undefined) {
       throw new Error("Config is missing.");
     }
-    if (configContents.onlyCountOriginalWords as boolean) {
-      return await wordRepo.getOriginalWordCount(bookId);
-    } else {
-      return await wordRepo.getWordCount(bookId);
-    }
+    return await wordRepo.getOriginalWordCount(bookId);
   }
 
   async importKnownWords(words: string[]): Promise<void> {

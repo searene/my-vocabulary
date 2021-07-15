@@ -9,16 +9,15 @@ import { CardInstanceDO } from "../../do/CardInstanceDO";
 import { CardDO } from "../../do/CardDO";
 import { ALL_ZEROS_WORD_COUNT, WordCount } from "../../../domain/WordCount";
 import { WordStatus } from "../../../enum/WordStatus";
-import { QueryBuilder } from "knex";
 import { isNullOrUndefined, removeUndefinedKeys } from "../../../utils/ObjectUtils";
 
 @injectable()
 export class KnexWordRepository implements WordRepository {
   private static readonly _WORDS = "words";
 
-  async updateByWord(wordDO: WordDO): Promise<void> {
+  async updateByOriginalWord(wordDO: WordDO): Promise<void> {
     await knex(KnexWordRepository._WORDS)
-      .where("word", wordDO.word)
+      .where("original_word", wordDO.originalWord)
       .update(wordDO);
   }
   async init(): Promise<void> {
@@ -55,14 +54,29 @@ export class KnexWordRepository implements WordRepository {
     if (isNullOrUndefined(rows) || rows.length === 0) {
       return [];
     }
-    return rows.map(row => this.toWordWithPositionsObject(row.word, row.originalWord, row.wordWithPositions));
+    return rows.map(row => this.toWordWithPositionsObject(row.originalWord, row.wordWithPositions));
   }
-  async queryOriginalWordWithPositionsArray(bookId: number, status: WordStatus, wordOrOriginalWord: string, options?: Options): Promise<WordWithPositions[]> {
-    const rows: any[] = await this.getOriginalWordAndPositionsQueryInterface(bookId, status, wordOrOriginalWord, options);
+  async queryOriginalWordWithPositionsArray(bookId: number, status: WordStatus, originalWord?: string, options?: Options): Promise<WordWithPositions[]> {
+    const query = knex("words")
+        .select("original_word",
+                knex.raw(`GROUP_CONCAT(word || ":" || positions || ";", "") as word_with_positions`))
+        .groupBy("original_word");
+    if (originalWord === undefined) {
+      query.where({ bookId, status });
+    } else {
+      query.where({ bookId, status, originalWord });
+    }
+    if (options !== undefined && options.offset !== undefined) {
+      query.offset(options.offset);
+    }
+    if (options !== undefined && options.limit !== undefined) {
+      query.limit(options.limit);
+    }
+    const rows: any[] = await query;
     if (isNullOrUndefined(rows) || rows.length === 0) {
       return [];
     }
-    return rows.map(row => this.toWordWithPositionsObject(row.word, row.originalWord, row.wordWithPositions));
+    return rows.map(row => this.toWordWithPositionsObject(row.originalWord, row.wordWithPositions));
   }
   async batchQueryByIds(ids: number[]): Promise<WordDO[]> {
     return await RepositoryUtils.batchQueryByIds(
@@ -125,25 +139,8 @@ export class KnexWordRepository implements WordRepository {
     throw new Error("KnexWordRepository.queryCount is not implemented.");
   }
 
-  async getWordCount(bookId: number): Promise<WordCount> {
-    const rows = await this.getWordCountQueryInterface(bookId, false);
-    const wordCount = {
-      ...ALL_ZEROS_WORD_COUNT
-    };
-    for (const row of rows) {
-      if (row.status === WordStatus.UNKNOWN) {
-        wordCount.unknown = row.cnt as number;
-      } else if (row.status === WordStatus.KNOWN) {
-        wordCount.known = row.cnt as number;
-      } else if (row.status === WordStatus.SKIPPED) {
-        wordCount.skipped = row.cnt as number;
-      }
-    }
-    return wordCount;
-  }
-
   async getOriginalWordCount(bookId: number): Promise<WordCount> {
-    const rows = await this.getWordCountQueryInterface(bookId, true);
+    const rows = await this.getWordCountQueryInterface(bookId);
     const wordCount = {
       ...ALL_ZEROS_WORD_COUNT
     };
@@ -165,111 +162,10 @@ export class KnexWordRepository implements WordRepository {
       .update({ status });
   }
 
-  private getOriginalWordAndPositionsQueryInterface(bookId: number, status: WordStatus, wordOrOriginalWord?: string, options?: Options): QueryBuilder {
-    if (status === WordStatus.UNKNOWN) {
-      const innerQueryInterface = knex("words")
-        .select("original_word as word",
-                "original_word",
-                knex.raw(`GROUP_CONCAT(word || ":" || positions || ";", "") as word_with_positions`))
-        .where({ bookId, status })
-        .as("a")
-        .groupBy("original_word");
-      if (wordOrOriginalWord !== undefined) {
-        innerQueryInterface.andWhere(function() {
-          this.where("word", wordOrOriginalWord)
-            .orWhere("original_word", wordOrOriginalWord);
-        })
-      }
-      const queryInterface = knex(innerQueryInterface)
-
-      // Make sure the word is not marked known anywhere
-      .leftJoin(
-        knex("words")
-        .distinct("original_word")
-        .where('status', WordStatus.KNOWN)
-        .as("b"),
-        "a.original_word", "b.original_word"
-      )
-      .whereNull("b.original_word")
-      .select("a.*")
-
-      // Make sure the word is not skipped
-      queryInterface.leftJoin(
-        knex("words")
-        .distinct("original_word")
-        .where({ bookId, status: WordStatus.SKIPPED })
-        .as("c"),
-        "a.original_word", "c.original_word"
-      )
-      .whereNull("c.original_word")
-      this.addOptions(queryInterface, options);
-      return queryInterface;
-    } else if (status === WordStatus.KNOWN) {
-      const innerQueryInterface = 
-        knex("words")
-        .select("original_word as word",
-                "original_word",
-                knex.raw(`GROUP_CONCAT(word || ":" || positions || ";", "") as word_with_positions`))
-        .where({ bookId })
-        .as("a")
-        .groupBy("original_word");
-      if (wordOrOriginalWord !== undefined) {
-        innerQueryInterface.andWhere(function() {
-          this.where("word", wordOrOriginalWord)
-            .orWhere("original_word", wordOrOriginalWord);
-        })
-      }
-      const queryInterface = knex(innerQueryInterface)
-
-      // Make sure the word is marked known anywhere
-      .join(
-        knex("words")
-        .distinct("original_word")
-        .where({ status })
-        .as("b"),
-        "a.original_word", "b.original_word"
-      )
-      .select("a.*")
-      this.addOptions(queryInterface, options);
-      return queryInterface;
-    } else if (status === WordStatus.SKIPPED) {
-       const queryInterface = RepositoryUtils.getQueryInterface<WordQuery>(
-        KnexWordRepository._WORDS,
-        { bookId, status },
-        options,
-      );
-      if (wordOrOriginalWord !== undefined) {
-        queryInterface.andWhere(function() {
-          this.where("word", wordOrOriginalWord)
-            .orWhere("original_word", wordOrOriginalWord);
-        })
-      }
-      return queryInterface;
-    } else {
-      throw new Error("Unsupported word status: " + status);
-    }
-  }
-
-  private addOptions(queryInterface: QueryBuilder, options?: Options) {
-    if (options?.offset !== undefined) {
-      queryInterface.offset(options?.offset);
-    }
-    if (options?.limit !== undefined) {
-      queryInterface.limit(options?.limit);
-    }
-  }
-
-  private getWordAndPositionsQueryInterface(query: WordQuery, options?: Options): QueryBuilder {
-    return RepositoryUtils.getQueryInterface(
-      KnexWordRepository._WORDS,
-      query,
-      options
-    );
-  }
   /**
    * @param wordWithPositions example: clock:30;clocks:36;
    */
-  private toWordWithPositionsObject(word: string, originalWord: string, wordWithPositions: string): WordWithPositions {
+  private toWordWithPositionsObject(originalWord: string, wordWithPositions: string): WordWithPositions {
     const wordWithPositionsArray = wordWithPositions.split(";");
     const positions: WordPosition[] = [];
     for (const wordWithPositionsElement of wordWithPositionsArray) {
@@ -285,31 +181,16 @@ export class KnexWordRepository implements WordRepository {
         });
       }
     }
-    return { word, originalWord, positions };
+    return { originalWord, positions };
   }
 
-  private getWordCountQueryInterface(bookId: number, onlyCountOriginalWords: boolean) {
-    if (!onlyCountOriginalWords) {
-      return knex(KnexWordRepository._WORDS)
-            .select("status")
-            .countDistinct("word", {as: "cnt"})
-            .where({ bookId })
-            .groupBy("status");
-    }
+  private getWordCountQueryInterface(bookId: number) {
     return knex(knex(KnexWordRepository._WORDS)
-                .select("original_word as word",
-
-                        // If all the words are unknown, then the original word is unknown.
-                        // If there is at least one known word, then the original word is known.
-                        // If there is at least on skipped word, then the original word is skipped.
-                        knex.raw(`case when max(status) = 0 then 0
-                                      when max(status) = 1 then 1
-                                      when max(status) = 2 then 2
-                                  end as status`))
+                .select("original_word", "status")
                 .where({ bookId })
                 .groupBy("original_word"))
           .select("status")
-          .count("word", {as: "cnt"})
+          .count("*", {as: "cnt"})
           .groupBy("status")
   }
 
