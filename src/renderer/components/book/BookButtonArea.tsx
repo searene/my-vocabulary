@@ -10,8 +10,8 @@ import {
   removeLastProcessedWord,
   retrieveWord,
   selectLastProcessedWord,
+  selectOriginalWord,
   selectPageNo,
-  selectWord,
   selectWordStatus,
   setPageNo,
 } from "./bookSlice";
@@ -26,9 +26,9 @@ export const BookButtonArea = (props: BookButtonAreaProps) => {
   const dispatch = useAppDispatch();
   const globalShortcutEnabled = useSelector(selectGlobalShortcutEnabled);
   const pageNo = useSelector(selectPageNo);
-  const word = useSelector(selectWord);
   const lastProcessedWord = useSelector(selectLastProcessedWord);
   const wordStatus = useSelector(selectWordStatus);
+  const originalWord = useSelector(selectOriginalWord);
 
   useEffect(() => {
     if (globalShortcutEnabled) {
@@ -74,16 +74,16 @@ export const BookButtonArea = (props: BookButtonAreaProps) => {
     dispatch(retrieveWord());
   };
   const handleKnowAndNext = async (): Promise<void> => {
-    if (word === undefined) {
+    if (originalWord === undefined) {
       return;
     }
-    await serviceProvider.wordService.updateWordStatus(props.bookId, word, WordStatus.KNOWN);
+    await serviceProvider.wordService.updateWordStatus(props.bookId, originalWord, WordStatus.KNOWN);
     dispatch(markCurrentWordAsProcessed());
     dispatch(retrieveWord());
   };
 
   const handleNext = async (): Promise<void> => {
-    if (word === undefined) {
+    if (originalWord === undefined) {
       return;
     }
     dispatch(setPageNo(pageNo + 1));
@@ -91,16 +91,16 @@ export const BookButtonArea = (props: BookButtonAreaProps) => {
   };
 
   const handleSkip = async (): Promise<void> => {
-    if (word == undefined) {
+    if (originalWord == undefined) {
       return;
     }
-    await serviceProvider.wordService.updateWordStatus(props.bookId, word, WordStatus.SKIPPED);
+    await serviceProvider.wordService.updateWordStatus(props.bookId, originalWord, WordStatus.SKIPPED);
     dispatch(markCurrentWordAsProcessed());
     dispatch(retrieveWord());
   }
 
   const handleAdd = async (): Promise<void> => {
-    Router.toAddCardPage(props.bookId, word as string);
+    Router.toAddCardPage(props.bookId, originalWord as string);
   };
 
 
@@ -114,15 +114,15 @@ export const BookButtonArea = (props: BookButtonAreaProps) => {
         Previous (p)
       </Button>
       <Button
-        disabled={word == undefined}
+        disabled={originalWord == undefined}
         onClick={handleKnowAndNext}
       >
         Know and Next (k)
       </Button>
-      <Button disabled={word == undefined}
+      <Button disabled={originalWord == undefined}
               onClick={handleSkip}>Skip (s) </Button>
       <Button
-        disabled={word == undefined}
+        disabled={originalWord == undefined}
         onClick={handleNext}
       >
         Next (n)

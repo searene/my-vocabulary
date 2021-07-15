@@ -9,12 +9,9 @@ import { GoBack } from "../back/GoBack";
 import { ContextItem } from "./ContextItem";
 import {
   retrieveWord, searchWord, selectContextList, selectOriginalWord,
-  selectPageNo,
-  selectWord, selectWordCount,
+  selectWordCount,
   selectWordStatus,
   setBookId,
-  setWord,
-  setWordId,
   setWordStatus,
 } from "./bookSlice";
 import { useAppDispatch } from "../../redux/store";
@@ -37,7 +34,6 @@ export const Book = (props: BookProps) => {
 
   const [initiated, setInitiated] = useState(false);
   const wordStatus = useSelector(selectWordStatus);
-  const word = useSelector(selectWord);
   const originalWord = useSelector(selectOriginalWord);
   const contextList = useSelector(selectContextList);
   /**
@@ -106,11 +102,10 @@ export const Book = (props: BookProps) => {
           {wordCount!.unknown}
         </Grid.Column>
       </Grid.Row>
-      {word == undefined ? (
+      {originalWord == undefined ? (
         <div>No more words.</div>
       ) : (
         <>
-          <Grid.Row><Grid.Column>Word: {word}</Grid.Column></Grid.Row>
           <Grid.Row><Grid.Column>Original Word: {originalWord}</Grid.Column></Grid.Row>
           <Grid.Row><Grid.Column>Status: {WordStatus[wordStatus]}</Grid.Column></Grid.Row>
           <Grid.Row><Grid.Column>

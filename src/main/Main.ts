@@ -93,7 +93,6 @@ async function initialization(): Promise<void> {
   if ((await configRepository.query({})).length === 0) {
     await createSimpleCard();
     await createStandardCard();
-    await configRepository.setOnlyCountOriginalWords(true);
   }
 }
 

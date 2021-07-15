@@ -4,7 +4,6 @@ import { WordContextInner } from "./domain/WordContextInner";
 
 export class WordContextService {
   static getContextList(
-    word: string,
     positions: WordPosition[],
     bookContents: string,
     contextStep: WordContextStep,
@@ -14,13 +13,11 @@ export class WordContextService {
     for (const pos of positions.slice(0, contextLimit)) {
       contextList.push({
         long: WordContextService.getWordContextInner(
-          word,
           bookContents,
           pos,
           contextStep.long
         ),
         short: WordContextService.getWordContextInner(
-          word,
           bookContents,
           pos,
           contextStep.short
@@ -31,7 +28,6 @@ export class WordContextService {
   }
 
   private static getWordContextInner(
-    word: string,
     bookContents: string,
     wordPos: WordPosition,
     contextStep: number

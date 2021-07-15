@@ -35,15 +35,6 @@ export class KnexConfigRepository implements ConfigRepository {
     return configs.length === 0 ? undefined : JSON.parse(configs[0].configs).defaultCardTypeId;
   }
 
-  async setOnlyCountOriginalWords(onlyCountOriginalWords: boolean): Promise<void> {
-    await this.upsertByConfigContents({ onlyCountOriginalWords });
-  }
-
-  async onlyCountOriginalWords(): Promise<boolean | undefined> {
-    const configs = await this.query({});
-    return configs.length === 0 ? undefined : JSON.parse(configs[0].configs).onlyCountOriginalWords;
-  }
-
   async updateById(configDO: ConfigDO): Promise<void> {
     await RepositoryUtils.updateById(KnexConfigRepository._CONFIGS, configDO);
   }
