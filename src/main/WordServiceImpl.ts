@@ -12,7 +12,6 @@ import { WordRepository } from "./infrastructure/repository/WordRepository";
 import { getPositionsAsNumberArray, WordDO } from "./infrastructure/do/word/WordDO";
 import { ImportKnownWordsService } from "./import/ImportKnownWordsService";
 import { ConfigRepository } from "./infrastructure/repository/ConfigRepository";
-import { BaseWordQuery } from "./infrastructure/query/word/BaseWordQuery";
 import { WordQuery } from "./domain/WordQuery";
 import { Options } from "./infrastructure/query/Options";
 
@@ -24,9 +23,9 @@ export class WordServiceImpl implements WordService {
     return await wordRepo.upsert(wordDO);
   }
 
-  async baseQuery(query: BaseWordQuery, options: Options): Promise<WordDO[]> {
+  async query(query: WordQuery, options: Options): Promise<WordDO[]> {
     const wordRepo = await container.getAsync<WordRepository>(types.WordRepository);
-    return await wordRepo.baseQuery(query, options);
+    return await wordRepo.query(query, options);
   }
 
   async delete(bookId: number): Promise<number> {
@@ -46,15 +45,12 @@ export class WordServiceImpl implements WordService {
     const bookRepo = await container.getAsync<BookRepository>(types.BookRepository);
     const bookDO = await bookRepo.queryByIdOrThrow(bookId);
     const wordRepo = await container.getAsync<WordRepository>(types.WordRepository);
-    const wordWithPositionsArray = await wordRepo.queryWordWithPositionsArray({
-      bookId,
-      status: status,
-      word,
-      onlyCountOriginalWords: true,
-    }, {
-      offset: (pageNo - 1) * pageSize,
-      limit: pageSize
-    })
+    const configRepo = await container.getAsync<ConfigRepository>(types.ConfigRepository);
+    const onlyCountOriginalWords = await configRepo.onlyCountOriginalWords();
+    const options = { offset: (pageNo - 1) * pageSize, limit: pageSize };
+    const wordWithPositionsArray = onlyCountOriginalWords
+      ? await wordRepo.queryOriginalWordWithPositionsArray(bookId, status, word, options)
+      : await wordRepo.queryWordWithPositionsArray({ bookId, status, word }, options);
     return wordWithPositionsArray.map((wordWithPositions) => {
       return {
         word: wordWithPositions.word,

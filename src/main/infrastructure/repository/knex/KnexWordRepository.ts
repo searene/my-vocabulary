@@ -1,7 +1,7 @@
 import { injectable } from "@parisholley/inversify-async";
 import { WordDO } from "../../do/word/WordDO";
 import { Options } from "../../query/Options";
-import { WordQuery } from "../../query/word/WordQuery";
+import { WordQuery } from "../../query/WordQuery";
 import { RepositoryUtils } from "../RepositoryUtils";
 import { WordRepository } from "../WordRepository";
 import { knex } from "./KnexFactory";
@@ -11,7 +11,6 @@ import { ALL_ZEROS_WORD_COUNT, WordCount } from "../../../domain/WordCount";
 import { WordStatus } from "../../../enum/WordStatus";
 import { QueryBuilder } from "knex";
 import { isNullOrUndefined, removeUndefinedKeys } from "../../../utils/ObjectUtils";
-import { BaseWordQuery } from "../../query/word/BaseWordQuery";
 
 @injectable()
 export class KnexWordRepository implements WordRepository {
@@ -47,15 +46,19 @@ export class KnexWordRepository implements WordRepository {
   async batchInsert(wordDOs: WordDO[]): Promise<WordDO[]> {
     throw new Error("Method not implemented.");
   }
-  async baseQuery(query: BaseWordQuery, options?: Options): Promise<WordDO[]> {
-    return await RepositoryUtils.query(KnexWordRepository._WORDS, query, options);
-  }
   async query(query: WordQuery, options?: Options): Promise<WordDO[]> {
-    throw new Error("KnexWordRepository.query is not implemented");
+    return await RepositoryUtils.query(KnexWordRepository._WORDS, query, options);
   }
   async queryWordWithPositionsArray(query: WordQuery, options?: Options): Promise<WordWithPositions[]> {
     query = removeUndefinedKeys(query);
-    const rows: any[] = await this.getQueryInterface(query, options);
+    const rows: any[] = await RepositoryUtils.getQueryInterface(KnexWordRepository._WORDS, query, options);
+    if (isNullOrUndefined(rows) || rows.length === 0) {
+      return [];
+    }
+    return rows.map(row => this.toWordWithPositionsObject(row.word, row.originalWord, row.wordWithPositions));
+  }
+  async queryOriginalWordWithPositionsArray(bookId: number, status: WordStatus, wordOrOriginalWord: string, options?: Options): Promise<WordWithPositions[]> {
+    const rows: any[] = await this.getOriginalWordAndPositionsQueryInterface(bookId, status, wordOrOriginalWord, options);
     if (isNullOrUndefined(rows) || rows.length === 0) {
       return [];
     }
@@ -96,7 +99,7 @@ export class KnexWordRepository implements WordRepository {
   }
 
   async queryOne(query: WordQuery): Promise<WordDO | undefined> {
-    const queryInterface = this.getQueryInterface(query, { offset: 0, limit: 1 });
+    const queryInterface = RepositoryUtils.getQueryInterface(KnexWordRepository._WORDS, query, { offset: 0, limit: 1 });
     const rows = await queryInterface;
     if (rows === undefined || rows === null || rows.length === 0) {
       return undefined;
@@ -162,74 +165,106 @@ export class KnexWordRepository implements WordRepository {
       .update({ status });
   }
 
-  private async getQueryInterface(query: WordQuery, options?: Options) {
-    let queryInterface;
-    if (!query.onlyCountOriginalWords || query.status === WordStatus.SKIPPED) {
-      queryInterface = this.getQueryInterfaceWithoutLimit(query)
-        .select("*", knex.raw(`word || ":" || positions || ";" as word_with_positions`))
+  private getOriginalWordAndPositionsQueryInterface(bookId: number, status: WordStatus, wordOrOriginalWord?: string, options?: Options): QueryBuilder {
+    if (status === WordStatus.UNKNOWN) {
+      const innerQueryInterface = knex("words")
+        .select("original_word as word",
+                "original_word",
+                knex.raw(`GROUP_CONCAT(word || ":" || positions || ";", "") as word_with_positions`))
+        .where({ bookId, status })
+        .as("a")
+        .groupBy("original_word");
+      if (wordOrOriginalWord !== undefined) {
+        innerQueryInterface.andWhere(function() {
+          this.where("word", wordOrOriginalWord)
+            .orWhere("original_word", wordOrOriginalWord);
+        })
+      }
+      const queryInterface = knex(innerQueryInterface)
+
+      // Make sure the word is not marked known anywhere
+      .leftJoin(
+        knex("words")
+        .distinct("original_word")
+        .where('status', WordStatus.KNOWN)
+        .as("b"),
+        "a.original_word", "b.original_word"
+      )
+      .whereNull("b.original_word")
+      .select("a.*")
+
+      // Make sure the word is not skipped
+      queryInterface.leftJoin(
+        knex("words")
+        .distinct("original_word")
+        .where({ bookId, status: WordStatus.SKIPPED })
+        .as("c"),
+        "a.original_word", "c.original_word"
+      )
+      .whereNull("c.original_word")
+      this.addOptions(queryInterface, options);
+      return queryInterface;
+    } else if (status === WordStatus.KNOWN) {
+      const innerQueryInterface = 
+        knex("words")
+        .select("original_word as word",
+                "original_word",
+                knex.raw(`GROUP_CONCAT(word || ":" || positions || ";", "") as word_with_positions`))
+        .where({ bookId })
+        .as("a")
+        .groupBy("original_word");
+      if (wordOrOriginalWord !== undefined) {
+        innerQueryInterface.andWhere(function() {
+          this.where("word", wordOrOriginalWord)
+            .orWhere("original_word", wordOrOriginalWord);
+        })
+      }
+      const queryInterface = knex(innerQueryInterface)
+
+      // Make sure the word is marked known anywhere
+      .join(
+        knex("words")
+        .distinct("original_word")
+        .where({ status })
+        .as("b"),
+        "a.original_word", "b.original_word"
+      )
+      .select("a.*")
+      this.addOptions(queryInterface, options);
+      return queryInterface;
+    } else if (status === WordStatus.SKIPPED) {
+       const queryInterface = RepositoryUtils.getQueryInterface<WordQuery>(
+        KnexWordRepository._WORDS,
+        { bookId, status },
+        options,
+      );
+      if (wordOrOriginalWord !== undefined) {
+        queryInterface.andWhere(function() {
+          this.where("word", wordOrOriginalWord)
+            .orWhere("original_word", wordOrOriginalWord);
+        })
+      }
+      return queryInterface;
     } else {
-      queryInterface = this.getQueryInterfaceWithoutLimit(query);
+      throw new Error("Unsupported word status: " + status);
     }
+  }
+
+  private addOptions(queryInterface: QueryBuilder, options?: Options) {
     if (options?.offset !== undefined) {
       queryInterface.offset(options?.offset);
     }
     if (options?.limit !== undefined) {
       queryInterface.limit(options?.limit);
     }
-    return queryInterface;
   }
 
-  private getQueryInterfaceWithoutLimit(query: WordQuery): QueryBuilder {
-    if (!query.onlyCountOriginalWords || query.status === WordStatus.SKIPPED) {
-      delete query.onlyCountOriginalWords;
-      return RepositoryUtils.getQueryInterfaceWithoutLimit(
-        KnexWordRepository._WORDS,
-        query,
-      );
-    }
-    delete query.onlyCountOriginalWords;
-    let queryInterface;
-    if (query.status === WordStatus.UNKNOWN) {
-      queryInterface = knex(
-        knex("words")
-        .select("original_word as word",
-                "original_word",
-                knex.raw(`GROUP_CONCAT(word || ":" || positions || ";", "") as word_with_positions`))
-        .where(query)
-        .as("a")
-        .groupBy("original_word")
-      )
-      .leftJoin(
-        knex("words")
-        .distinct("original_word")
-        .whereIn('status', [WordStatus.KNOWN, WordStatus.SKIPPED])
-        .as("b"),
-        "a.original_word", "b.original_word"
-      )
-      .whereNull("b.original_word")
-      .select("a.*")
-    } else if (query.status === WordStatus.KNOWN) {
-      queryInterface = knex(
-        knex("words")
-        .select("original_word as word",
-                "original_word",
-                knex.raw(`GROUP_CONCAT(word || ":" || positions || ";", "") as word_with_positions`))
-        .where(query)
-        .as("a")
-        .groupBy("original_word")
-      )
-      .join(
-        knex("words")
-        .distinct("original_word")
-        .where({ status: query.status })
-        .as("b"),
-        "a.original_word", "b.original_word"
-      )
-      .select("a.*")
-    } else {
-      throw new Error("Unsupported word status: " + status);
-    }
-    return queryInterface;
+  private getWordAndPositionsQueryInterface(query: WordQuery, options?: Options): QueryBuilder {
+    return RepositoryUtils.getQueryInterface(
+      KnexWordRepository._WORDS,
+      query,
+      options
+    );
   }
   /**
    * @param wordWithPositions example: clock:30;clocks:36;

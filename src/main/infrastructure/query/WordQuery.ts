@@ -1,6 +1,6 @@
-import { BaseQuery } from "../BaseQuery";
+import { BaseQuery } from "./BaseQuery";
 
-export type BaseWordQuery = BaseQuery & {
+export type WordQuery = BaseQuery & {
 
   bookId?: number;
 
@@ -23,4 +23,4 @@ export type BaseWordQuery = BaseQuery & {
    * @see WordStatus
    */
   status?: number;
-}
+};

@@ -31,12 +31,15 @@ export class RepositoryUtils {
     return rows as D[];
   }
 
-  static async getQueryInterface<Q extends BaseQuery>(
+  static getQueryInterface<Q extends BaseQuery>(
     tableName: string,
     query: Q,
     options?: Options
-  ) {
-    const queryInterface = this.getQueryInterfaceWithoutLimit(tableName, query)
+  ): QueryBuilder {
+    const queryInterface = knex.from(tableName)
+                  .where(removeUndefinedKeys(query))
+                  .orderBy("id")
+                  .select("*");
     if (options?.offset !== undefined) {
       queryInterface.offset(options?.offset);
     }
@@ -46,16 +49,6 @@ export class RepositoryUtils {
     return queryInterface;
   }
 
-  static getQueryInterfaceWithoutLimit<Q extends BaseQuery>(
-    tableName: string,
-    query: Q,
-  ): QueryBuilder {
-    const queryInterface = knex.from(tableName)
-    queryInterface.where(removeUndefinedKeys(query))
-                  .orderBy("id")
-                  .select("*");
-    return queryInterface;
-  }
   static async queryCount<Q extends BaseQuery>(tableName: string, query: Q): Promise<number> {
     const queryInterface = knex
       .from(tableName)

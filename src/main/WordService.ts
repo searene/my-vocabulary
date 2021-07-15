@@ -4,7 +4,6 @@ import { WordQuery } from "./domain/WordQuery";
 import { WordCount } from "./domain/WordCount";
 import { WordContextStep } from "./domain/WordContextStep";
 import { Optional } from "typescript-optional";
-import { BaseWordQuery } from "./infrastructure/query/word/BaseWordQuery";
 import { WordDO } from "./infrastructure/do/word/WordDO";
 import { Options } from "./infrastructure/query/Options";
 
@@ -30,7 +29,7 @@ export interface WordService {
    */
   delete(bookId: number): Promise<number>
 
-  baseQuery(baseQuery: BaseWordQuery, options: Options): Promise<WordDO[]>
-
   upsert(wordDO: WordDO): Promise<WordDO>;
+
+  query(query: WordQuery, options: Options): Promise<WordDO[]>;
 }

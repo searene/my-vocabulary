@@ -26,7 +26,7 @@ export class WordFactory {
     positions: number[],
   ): Promise<Word> {
     const wordService = container.get<WordService>(types.WordService);
-    const wordDOs = await wordService.baseQuery(
+    const wordDOs = await wordService.query(
       {
         word: word,
         status: WordStatus.KNOWN,
