@@ -15,14 +15,22 @@ export class WordFormReader {
 
   private readlineInterface?: Interface;
 
-  async getOriginalWord(changedWord: string): Promise<Optional<string>> {
-    await this.init();
-    if (!this.variousWordToOriginalWordMap.has(changedWord)) {
-      return Optional.empty();
+  async getWordToOriginalWordMap(words: string[]): Promise<Map<string, string>> {
+    const result: Map<string, string> = new Map();
+    for (const word of words) {
+      const originalWord = await this.getOriginalWord(word);
+      result.set(word, originalWord);
     }
-    return Optional.ofNullable(
-      this.variousWordToOriginalWordMap.get(changedWord)
-    );
+    return result;
+  }
+
+  async getOriginalWord(changedWord: string): Promise<string> {
+    await this.init();
+    if (!this.variousWordToOriginalWordMap.has(changedWord) ||
+        this.variousWordToOriginalWordMap.get(changedWord) === undefined) {
+      return changedWord;
+    }
+    return this.variousWordToOriginalWordMap.get(changedWord) as string;
   }
 
   public async init(): Promise<void> {

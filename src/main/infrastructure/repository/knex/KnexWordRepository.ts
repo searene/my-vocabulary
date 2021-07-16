@@ -32,7 +32,6 @@ export class KnexWordRepository implements WordRepository {
       await knex.schema.createTable(KnexWordRepository._WORDS, (table) => {
         table.increments();
         table.integer("book_id");
-        table.string("word");
         table.string("original_word");
         table.string("positions");
         table.integer("status");
@@ -59,7 +58,7 @@ export class KnexWordRepository implements WordRepository {
   async queryOriginalWordWithPositionsArray(bookId: number, status: WordStatus, originalWord?: string, options?: Options): Promise<WordWithPositions[]> {
     const query = knex("words")
         .select("original_word",
-                knex.raw(`GROUP_CONCAT(word || ":" || positions || ";", "") as word_with_positions`))
+                knex.raw(`GROUP_CONCAT(positions, ";") as word_with_positions`))
         .groupBy("original_word");
     if (originalWord === undefined) {
       query.where({ bookId, status });
@@ -83,22 +82,6 @@ export class KnexWordRepository implements WordRepository {
       KnexWordRepository._WORDS,
       ids
     );
-  }
-
-  async updateWordStatus(): Promise<void> {
-    const knownWords: WordDO[] = await knex
-      .from(KnexWordRepository._WORDS)
-      .select("word")
-      .distinct()
-      .where("status", 1);
-    for (const knownWord of knownWords) {
-      console.log("updating: " + knownWord.word);
-      await knex(KnexWordRepository._WORDS)
-        .where("word", knownWord.word)
-        .update({
-          status: 1,
-        });
-    }
   }
 
   async queryById(id: number): Promise<CardInstanceDO | undefined> {

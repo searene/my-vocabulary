@@ -10,8 +10,6 @@ export interface WordRepository extends BaseRepository<WordQuery, WordDO> {
 
   updateStatusByBookIdAndOriginalWord(bookId: number, originalWord: string, status: WordStatus): Promise<void>;
 
-  updateWordStatus(): Promise<void>;
-
   getOriginalWordCount(bookId: number): Promise<WordCount>;
 
   queryWordWithPositionsArray(query: WordQuery, options?: Options): Promise<WordWithPositions[]>;

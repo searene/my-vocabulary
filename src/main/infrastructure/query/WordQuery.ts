@@ -5,11 +5,6 @@ export type WordQuery = BaseQuery & {
   bookId?: number;
 
   /**
-   * word shown in the book
-   */
-  word?: string;
-
-  /**
    * the original word of the word shown in the book
    */
   originalWord?: string;
