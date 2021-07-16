@@ -140,9 +140,17 @@ export class KnexWordRepository implements WordRepository {
   }
 
   async updateStatusByBookIdAndOriginalWord(bookId: number, originalWord: string, status: WordStatus): Promise<void> {
-    await knex(KnexWordRepository._WORDS)
-      .where({ originalWord, bookId, status })
-      .update({ status });
+    if (status === WordStatus.UNKNOWN || status === WordStatus.KNOWN) {
+      await knex(KnexWordRepository._WORDS)
+        .where({ originalWord, status })
+        .update({ status });
+    } else if (status === WordStatus.SKIPPED) {
+      await knex(KnexWordRepository._WORDS)
+        .where({ originalWord, bookId, status })
+        .update({ status });
+    } else {
+      throw new Error("Unsupported status: " + status);
+    }
   }
 
   /**
