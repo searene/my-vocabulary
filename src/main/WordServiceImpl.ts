@@ -62,14 +62,12 @@ export class WordServiceImpl implements WordService {
   }
 
   async updateWordStatus(bookId: number, originalWord: string, status: WordStatus): Promise<void> {
-    const configRepo = await container.getAsync<ConfigRepository>(types.ConfigRepository);
     const wordRepo = await container.getAsync<WordRepository>(types.WordRepository);
-    const configContents = await configRepo.queryConfigContents();
-    if (configContents === undefined) {
-      throw new Error("Config is missing.");
+    if (status === WordStatus.SKIPPED) {
+      await wordRepo.updateByOriginalWord({ bookId, originalWord, status });
+    } else {
+      await wordRepo.updateByOriginalWord({ originalWord, status });
     }
-    await wordRepo.updateStatusByBookIdAndOriginalWord(bookId, originalWord, status);
-    await wordRepo.updateByOriginalWord({ bookId, originalWord, status });
   }
 
   async getWordCount(bookId: number): Promise<WordCount> {

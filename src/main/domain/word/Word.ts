@@ -4,7 +4,6 @@ export class Word {
   constructor(
     private readonly _id: number,
     private readonly _bookId: number,
-    private readonly _word: string,
     private readonly _originalWord: string,
     private readonly _positions: number[],
     private readonly _status: WordStatus
@@ -18,9 +17,6 @@ export class Word {
   }
   public get originalWord(): string {
     return this._originalWord;
-  }
-  public get word(): string {
-    return this._word;
   }
   public get bookId(): number {
     return this._bookId;
