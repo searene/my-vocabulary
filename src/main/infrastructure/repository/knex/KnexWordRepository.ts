@@ -59,6 +59,7 @@ export class KnexWordRepository implements WordRepository {
     const query = knex("words")
         .select("original_word",
                 knex.raw(`GROUP_CONCAT(positions, ";") as word_with_positions`))
+        .orderBy("id")
         .groupBy("original_word");
     if (originalWord === undefined) {
       query.where({ bookId, status });
