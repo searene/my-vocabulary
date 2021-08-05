@@ -43,7 +43,7 @@ export class KnexConfigRepository implements ConfigRepository {
     if (!tablesExists) {
       await knex.schema.createTable("configs", (table) => {
         table.increments();
-        table.json("configs");
+        table.text("configs");
       });
     }
   }

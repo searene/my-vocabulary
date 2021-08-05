@@ -9,6 +9,7 @@ import { Level } from "../card/Level";
 import { container } from "../../config/inversify.config";
 import { types } from "../../config/types";
 import { ReviewRepository } from "../../infrastructure/repository/ReviewRepository";
+import { NumberUtils } from "../../utils/NumberUtils";
 
 @injectable()
 export class DefaultScheduler implements Scheduler {
@@ -21,20 +22,32 @@ export class DefaultScheduler implements Scheduler {
     if (reviewArray.length == 0) {
       return this.getInitialReviewTimeMap();
     } else {
-      const lastReview: Review = reviewArray[reviewArray.length - 1];
       return {
-        [Level.FORGOTTEN]: this.getNextTimeInterval(Level.FORGOTTEN, lastReview),
-        [Level.HARD]: this.getNextTimeInterval(Level.HARD, lastReview),
-        [Level.GOOD]: this.getNextTimeInterval(Level.GOOD, lastReview),
-        [Level.EASY]: this.getNextTimeInterval(Level.EASY, lastReview),
+        [Level.FORGOTTEN]: this.getNextTimeInterval(Level.FORGOTTEN, reviewArray),
+        [Level.HARD]: this.getNextTimeInterval(Level.HARD, reviewArray),
+        [Level.GOOD]: this.getNextTimeInterval(Level.GOOD, reviewArray),
+        [Level.EASY]: this.getNextTimeInterval(Level.EASY, reviewArray),
       };
     }
   }
 
+  private getLongestKnownDays(reviewArray: Review[]): number {
+    const reviewInDaysArray = reviewArray.filter(review =>
+        review.timeInterval.timeUnit === TimeUnit.DAYS)
+    if (reviewInDaysArray.length === 0) {
+      return 0;
+    }
+    return reviewInDaysArray
+        .map(review => review.timeInterval)
+        .map(timeInterval => timeInterval.value)
+        .reduce((a, b) => Math.max(a, b));
+  }
+
   private getNextTimeInterval(
     level: Level,
-    lastReview: Review,
+    reviewArray: Review[],
   ): TimeInterval {
+    const lastReview: Review = reviewArray[reviewArray.length - 1];
     if (level === Level.FORGOTTEN) {
       return ofMinutes(10);
     }
@@ -46,12 +59,15 @@ export class DefaultScheduler implements Scheduler {
       throw new Error("Unsupported time unit: " + lastTimeInterval.timeUnit);
     }
     const hardIntervalInDays = Math.ceil(lastTimeInterval.value * lastReview.easinessFactor);
+
+    // Add random days in case we always see some words together, which is not good for memorization.
+    const randomDays = NumberUtils.getRandomNumber(0, 3);
     if (level === Level.HARD) {
-      return ofDays(hardIntervalInDays);
+      return ofDays(Math.floor(this.getLongestKnownDays(reviewArray) / 4) + hardIntervalInDays + randomDays);
     } else if (level === Level.GOOD) {
-      return ofDays(Math.ceil(hardIntervalInDays / 3 * 4));
+      return ofDays(Math.floor(this.getLongestKnownDays(reviewArray) / 2) + Math.ceil(hardIntervalInDays / 3 * 4) + randomDays);
     } else if (level === Level.EASY) {
-      return ofDays(Math.ceil(hardIntervalInDays / 3 * 5));
+      return ofDays(this.getLongestKnownDays(reviewArray) + Math.ceil(hardIntervalInDays / 3 * 5) + randomDays);
     } else {
       throw new Error("Unsupported level: " + level);
     }
