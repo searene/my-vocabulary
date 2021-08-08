@@ -63,11 +63,17 @@ export class DefaultScheduler implements Scheduler {
     // Add random days in case we always see some words together, which is not good for memorization.
     const randomDays = NumberUtils.getRandomNumber(0, 3);
     if (level === Level.HARD) {
-      return ofDays(Math.floor(this.getLongestKnownDays(reviewArray) / 4) + hardIntervalInDays + randomDays);
+      return reviewArray[reviewArray.length - 1].level === Level.FORGOTTEN
+          ? ofDays(hardIntervalInDays + randomDays)
+          : ofDays(Math.floor(this.getLongestKnownDays(reviewArray) / 4) + hardIntervalInDays + randomDays);
     } else if (level === Level.GOOD) {
-      return ofDays(Math.floor(this.getLongestKnownDays(reviewArray) / 2) + Math.ceil(hardIntervalInDays / 3 * 4) + randomDays);
+      return reviewArray[reviewArray.length - 1].level === Level.FORGOTTEN
+          ? ofDays(Math.ceil(hardIntervalInDays / 3 * 4) + randomDays)
+          : ofDays(Math.floor(this.getLongestKnownDays(reviewArray) / 2) + Math.ceil(hardIntervalInDays / 3 * 4) + randomDays);
     } else if (level === Level.EASY) {
-      return ofDays(this.getLongestKnownDays(reviewArray) + Math.ceil(hardIntervalInDays / 3 * 5) + randomDays);
+      return reviewArray[reviewArray.length - 1].level === Level.FORGOTTEN
+          ? ofDays(Math.ceil(hardIntervalInDays / 3 * 5) + randomDays)
+          : ofDays(this.getLongestKnownDays(reviewArray) + Math.ceil(hardIntervalInDays / 3 * 5) + randomDays);
     } else {
       throw new Error("Unsupported level: " + level);
     }
