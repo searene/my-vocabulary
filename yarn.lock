@@ -1845,6 +1845,11 @@
   resolved "https://registry.npm.taobao.org/@types/stack-utils/download/@types/stack-utils-2.0.0.tgz#7036640b4e21cc2f259ae826ce843d277dad8cff"
   integrity sha1-cDZkC04hzC8lmugmzoQ9J32tjP8=
 
+"@types/trusted-types@^2.0.2":
+  version "2.0.2"
+  resolved "https://registry.nlark.com/@types/trusted-types/download/@types/trusted-types-2.0.2.tgz?cache=0&other_urls=https%3A%2F%2Fregistry.nlark.com%2F%40types%2Ftrusted-types%2Fdownload%2F%40types%2Ftrusted-types-2.0.2.tgz#fc25ad9943bcac11cceb8168db4f275e0e72e756"
+  integrity sha1-/CWtmUO8rBHM64Fo208nXg5y51Y=
+
 "@types/webdriverio@^4.8.7":
   version "4.13.3"
   resolved "https://registry.npm.taobao.org/@types/webdriverio/download/@types/webdriverio-4.13.3.tgz#c1571c4e62724135c0b11e7d7e36b07af5168856"
