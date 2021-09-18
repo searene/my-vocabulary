@@ -1,5 +1,14 @@
 import { ipcRenderer } from "electron";
 
+// Solve the problem that the context menu cannot be shown due to security concerns.
+// There might be some security problems if we use the code, but I have no time to
+// dig into it for now.
+if (window.trustedTypes && window.trustedTypes.createPolicy) {
+  window.trustedTypes.createPolicy('default', {
+    createHTML: s => s
+  });
+}
+
 function initContextMenu() {
 
   document.addEventListener("contextmenu", (event) => {
@@ -84,4 +93,3 @@ document.addEventListener("DOMContentLoaded", () => {
   initContextMenu();
   initCSS();
 });
-
