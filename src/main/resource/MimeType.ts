@@ -13,6 +13,10 @@ export class MimeType {
     ext: "jpg",
   }, {
     mainType: "image",
+    subType: "jpg",
+    ext: "jpg",
+  }, {
+    mainType: "image",
     subType: "svg+xml",
     ext: "svg",
   }, {
