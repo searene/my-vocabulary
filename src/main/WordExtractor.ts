@@ -3,7 +3,7 @@ import { Word } from "./domain/Word";
 export class WordExtractor implements IterableIterator<Word> {
   private _contents: string;
   private _currentPos = -1;
-  private static splitters = "\n↵\"',:.[]/#* \t()-_{};~$1234567890>|?“”&•©—’!";
+  private static splitters = "\n↵\"',:.[]/#* \t()-_{};~$1234567890>|?“”&•©—’!…";
   private _currentWord = "";
 
   constructor(contents: string) {
