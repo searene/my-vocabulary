@@ -18,6 +18,8 @@ export type CardInstanceVO = {
 
   back: string;
 
+  bookId: number;
+
   reviewTimeRecord: Record<Level, TimeInterval>;
 };
 
@@ -30,6 +32,7 @@ export const fromCardInstance = async (cardInstance: CardInstance): Promise<Card
       id: cardInstance.id,
       front: contents[0],
       back: contents[1],
+      bookId: cardInstance.book_id,
       reviewTimeRecord: reviewTimeRecord,
     };
 }

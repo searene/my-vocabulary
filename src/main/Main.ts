@@ -153,7 +153,7 @@ const createWindow = async () => {
   });
 
   win.webContents.session.setProxy({
-    proxyRules: "http://127.0.0.1:7890"
+    proxyRules: "http://127.0.0.1:1081"
   });
 
   const onHeadersReceived = (details: OnHeadersReceivedListenerDetails, callback: (headersReceivedResponse: HeadersReceivedResponse) => void) => {
@@ -166,7 +166,7 @@ const createWindow = async () => {
   win.webContents.session.webRequest.onHeadersReceived({ urls: [] }, onHeadersReceived);
 };
 
-app.commandLine.appendSwitch("proxy-server", "127.0.0.1:7890");
+app.commandLine.appendSwitch("proxy-server", "127.0.0.1:1081");
 
 app.on("ready", createWindow);
 

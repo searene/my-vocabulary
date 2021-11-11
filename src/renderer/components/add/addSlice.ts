@@ -8,13 +8,27 @@ interface State {
 }
 interface AddState {
   fieldTypeIdToFieldVOMap: Record<number, FieldVO>; // fieldTypeId -> field contents
+  bookId: number;
+}
+interface GetBookIdParam {
+  bookIdFromUrl: number | undefined;
+  cardInstanceId: number | undefined;
 }
 const initialState: AddState = {
   fieldTypeIdToFieldVOMap: {},
+  bookId: -1,
 };
 
 export const getFieldTypes = createAsyncThunk("add/getFieldTypes", async () => {
   return await serviceProvider.cardFacade.getFieldTypes();
+});
+
+export const getBookId = createAsyncThunk("/add/getBookId",
+    async (getBookIdParam: GetBookIdParam) => {
+  if (getBookIdParam.bookIdFromUrl !== undefined) {
+    return getBookIdParam.bookIdFromUrl;
+  }
+  return (await serviceProvider.cardFacade.getCardInstanceById(getBookIdParam.cardInstanceId as number)).bookId;
 });
 
 export const addCard = createAsyncThunk<
@@ -100,6 +114,13 @@ const addSlice = createSlice({
       console.error("fetchFieldTypeIdToFieldVOMap was rejected");
       console.error(action.error);
     })
+    builder.addCase(getBookId.fulfilled, (state, action) => {
+      state.bookId = action.payload;
+    });
+    builder.addCase(getBookId.rejected, (state, action) => {
+      console.error("getBookId was rejected");
+      console.error(action.error);
+    })
   },
 });
 
@@ -107,3 +128,4 @@ export const selectFieldTypeIdToFieldVOMap = (state: State) =>
   state.add.fieldTypeIdToFieldVOMap;
 export const { changeFieldContents } = addSlice.actions;
 export const addReducer = addSlice.reducer;
+export const selectBookId = (state: State) => state.add.bookId;

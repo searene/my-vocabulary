@@ -4,6 +4,7 @@ import { CardInstanceDO } from "../do/CardInstanceDO";
 
 export interface CardInstanceRepository
   extends BaseRepository<CardInstanceQuery, CardInstanceDO> {
-  queryNextDueCardInstance(bookId: number): Promise<CardInstanceDO | undefined>;
+  queryNextDueCardInstance(): Promise<CardInstanceDO | undefined>;
+  queryNextDueCardInstanceByBookId(bookId: number): Promise<CardInstanceDO | undefined>;
   queryDueCardInstanceCount(bookId: number): Promise<number>;
 }
