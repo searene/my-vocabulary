@@ -27,4 +27,12 @@ export class UrlUtils {
     }
     return ext;
   }
+
+  static getParamValue(urlSearchParams: string, key: string): string | undefined {
+    const param = new URLSearchParams(urlSearchParams);
+    if (!param.has(key)) {
+      return undefined;
+    }
+    return param.get(key) as string;
+  }
 }

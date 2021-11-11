@@ -15,6 +15,7 @@ import history from "../../route/History";
 import * as React from 'react';
 import { Router } from "../../route/Router";
 import { CardInstanceVO } from "../../../main/facade/vo/CardInstanceVO";
+import { UrlUtils } from "../../../main/utils/UrlUtils";
 
 interface MatchParams {
   bookId: string;
@@ -24,9 +25,12 @@ interface MatchParams {
 interface ReviewProps extends RouteComponentProps<MatchParams> {}
 
 export function Review(props: ReviewProps) {
-  const bookId = props.match.params.bookId === undefined
-      ? undefined
-      : parseInt(props.match.params.bookId);
+  const getBookIdFromUrl = (urlSearchParams: string) => {
+    const bookId = UrlUtils.getParamValue(urlSearchParams, "bookId");
+    console.log(props.location)
+    return bookId === undefined ? undefined : parseInt(bookId);
+  }
+  const bookId = getBookIdFromUrl(props.location.search);
   const cardInstanceId = props.match.params.cardInstanceId;
   const [initiated, setInitiated] = useState(false);
   const [showBack, setShowBack] = useState(false);

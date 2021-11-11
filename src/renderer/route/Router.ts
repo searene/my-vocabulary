@@ -12,13 +12,15 @@ export class Router {
   }
 
   static toReviewPage(bookId?: number, cardInstanceId?: number) {
-    if (bookId === undefined) {
-      history.push(`/review`);
-    } else if (cardInstanceId === undefined) {
-      history.push(`/review/${bookId}`);
-    } else {
-      history.push(`/review/${bookId}/${cardInstanceId}`);
+    const urlSearchParams = new URLSearchParams();
+    if (bookId !== undefined) {
+      urlSearchParams.set("bookId", bookId.toString());
     }
+    if (cardInstanceId !== undefined) {
+      urlSearchParams.set("cardInstanceId", cardInstanceId.toString());
+    }
+    const url = `/review?${urlSearchParams.toString()}`;
+    history.push(url);
   }
 
   static toAddCardPage(bookId: number, word: string) {
@@ -29,9 +31,10 @@ export class Router {
   }
 
   static toEditCardPage(cardInstanceId: number, word: string) {
+    console.log(cardInstanceId);
     const urlSearchParams = new URLSearchParams();
     urlSearchParams.set("word", word);
     urlSearchParams.set("cardInstanceId", cardInstanceId.toString());
-    history.push(`/add/edit/${urlSearchParams.toString()}`);
+    history.push(`/add/edit?${urlSearchParams.toString()}`);
   }
 }
