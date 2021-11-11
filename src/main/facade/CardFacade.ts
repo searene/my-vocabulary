@@ -62,6 +62,8 @@ export type CardCount = {
 
 export interface CardFacade {
 
+  getNextReviewCard(): Promise<CardInstanceVO | undefined>;
+
   /**
    * Get field types of the given cardType, if no cardType was given,
    * the default cardType would be used.

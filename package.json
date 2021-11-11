@@ -165,7 +165,7 @@
     "axios": "^0.21.1",
     "cheerio": "^1.0.0-rc.10",
     "copy-webpack-plugin": "^7.0.0",
-    "electron-fetch": "^1.7.3",
+    "electron-fetch": "^1.7.4",
     "epub": "^1.2.1",
     "html-to-text": "^5.1.1",
     "immutable": "^4.0.0-rc.12",

@@ -33,6 +33,17 @@ export class CardFacadeImpl implements CardFacade {
   private _cardFactory = new CardFactory();
   private _fieldTypeFactory = FieldTypeFactory.get();
 
+  async getNextReviewCard(): Promise<CardInstanceVO | undefined> {
+    const cardInstanceRepository = await container.getAsync<CardInstanceRepository>(types.CardInstanceRepository);
+    const dueCardInstanceDO = await cardInstanceRepository.queryNextDueCardInstance();
+    if (dueCardInstanceDO == undefined) {
+      return undefined;
+    }
+    const dueCardInstance = await CardInstance.fromCardInstanceDO(
+      dueCardInstanceDO
+    );
+    return await fromCardInstance(dueCardInstance);
+  }
   async getFieldTypes(cardTypeId?: number): Promise<FieldTypeVO[]> {
     const fieldTypes = await this._fieldTypeFactory.getFieldTypes(cardTypeId);
     return fieldTypes.map((fieldType) => {
@@ -85,7 +96,7 @@ export class CardFacadeImpl implements CardFacade {
     const cardInstanceRepository = await container.getAsync<
       CardInstanceRepository
     >(types.CardInstanceRepository);
-    const dueCardInstanceDO = await cardInstanceRepository.queryNextDueCardInstance(
+    const dueCardInstanceDO = await cardInstanceRepository.queryNextDueCardInstanceByBookId(
       bookId
     );
     if (dueCardInstanceDO == undefined) {

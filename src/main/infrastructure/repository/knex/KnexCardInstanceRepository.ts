@@ -10,8 +10,21 @@ const knex = KnexFactory.knex;
 
 @injectable()
 export class KnexCardInstanceRepository implements CardInstanceRepository {
+
   private static readonly _CARD_INSTANCES = "card_instances";
 
+  async queryNextDueCardInstance(): Promise<CardInstanceDO | undefined> {
+    const queryBuilder = knex
+      .from(KnexCardInstanceRepository._CARD_INSTANCES)
+      .select("*")
+      .andWhere("due_time", "<=", Date.now())
+      .limit(1);
+    const rows = (await queryBuilder) as CardInstanceDO[];
+    if (rows.length == 0) {
+      return undefined;
+    }
+    return rows[0];
+  }
   async init(): Promise<void> {
     await this.createTableIfNotExists();
   }
@@ -79,7 +92,7 @@ export class KnexCardInstanceRepository implements CardInstanceRepository {
     );
   }
 
-  async queryNextDueCardInstance(
+  async queryNextDueCardInstanceByBookId(
     bookId: number
   ): Promise<CardInstanceDO | undefined> {
     const queryBuilder = knex

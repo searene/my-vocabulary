@@ -62,6 +62,8 @@ export class MimeType {
   
   static async buildImageMimeTypeFromUrl(url: string): Promise<MimeType> {
     let blobType = null;
+    const b = await (await fetch(url)).blob();
+    console.log(b);
     try {
       blobType = (await (await fetch(url)).blob()).type;
     } catch (e) {

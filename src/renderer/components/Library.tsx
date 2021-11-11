@@ -74,6 +74,10 @@ export function Library(props: LibraryProps) {
                 </Button>
               }
             />
+              <Button icon labelPosition={"left"}
+                      onClick={() => Router.toReviewPage()}>
+                <Icon name={"book"}/> Review All
+              </Button>
           </Grid.Column>
         </Grid.Row>
       </Grid>

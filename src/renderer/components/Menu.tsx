@@ -43,8 +43,8 @@ export const Menu = function () {
             <Switch>
               <Route path={"/"} component={Library} exact />
               <Route path={"/book/:bookId"} component={Book} />
-              <Route path={"/add/:editType/:bookId"} component={Add} />
-              <Route path={"/review/:bookId"} component={Review} />
+              <Route path={"/add/:editType"} component={Add} />
+              <Route path={"/review"} component={Review} />
             </Switch>
           </HashRouter>
         </Segment>

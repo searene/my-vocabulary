@@ -24,7 +24,9 @@ interface MatchParams {
 interface ReviewProps extends RouteComponentProps<MatchParams> {}
 
 export function Review(props: ReviewProps) {
-  const bookId = parseInt(props.match.params.bookId);
+  const bookId = props.match.params.bookId === undefined
+      ? undefined
+      : parseInt(props.match.params.bookId);
   const cardInstanceId = props.match.params.cardInstanceId;
   const [initiated, setInitiated] = useState(false);
   const [showBack, setShowBack] = useState(false);
@@ -49,8 +51,10 @@ export function Review(props: ReviewProps) {
     }
   }
 
-  const getReviewCard = async (bookId: number, cardInstanceId?: string): Promise<CardInstanceVO | undefined> => {
-    if (cardInstanceId === undefined) {
+  const getReviewCard = async (bookId?: number, cardInstanceId?: string): Promise<CardInstanceVO | undefined> => {
+    if (bookId === undefined) {
+      return await serviceProvider.cardFacade.getNextReviewCard();
+    } else if (cardInstanceId === undefined) {
       return await serviceProvider.cardFacade.getNextReviewCardInstanceByBookId(bookId);
     } else {
       return await serviceProvider.cardFacade.getCardInstanceById(parseInt(cardInstanceId));
@@ -122,9 +126,9 @@ export function Review(props: ReviewProps) {
       level,
       timeInterval,
     });
-    const nextReviewCard = await serviceProvider.cardFacade.getNextReviewCardInstanceByBookId(
-      bookId
-    );
+    const nextReviewCard = bookId == undefined
+        ? await serviceProvider.cardFacade.getNextReviewCard()
+        : await serviceProvider.cardFacade.getNextReviewCardInstanceByBookId(bookId);
     setReviewCard(nextReviewCard);
     if (nextReviewCard !== undefined) {
       pronounce(nextReviewCard.front);
@@ -142,7 +146,7 @@ export function Review(props: ReviewProps) {
   }
 
   const edit = () => {
-    Router.toEditCardPage(bookId, reviewCard!.id, reviewCard!.word);
+    Router.toEditCardPage(reviewCard!.id, reviewCard!.word);
   }
 
   if (!initiated) {
