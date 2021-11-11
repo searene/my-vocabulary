@@ -82,10 +82,10 @@ const getCurrentWord = async (bookId: number, pageNo: number, wordStatus: WordSt
 
 export const refreshBookName = createAsyncThunk<
   { bookName: string },
-  void,
+  number,
   { state: State }
->("book/refreshBookName", async (_, { getState }) => {
-  const bookVO = await serviceProvider.bookService.getBook(getState().book.bookId as number);
+>("book/refreshBookName", async (bookId: number, { getState }) => {
+  const bookVO = await serviceProvider.bookService.getBook(bookId);
   return {
     bookName: bookVO.name
   };

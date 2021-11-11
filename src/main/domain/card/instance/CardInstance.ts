@@ -14,7 +14,7 @@ export class CardInstance {
     private readonly _composition: Composition,
     private readonly _card: Card,
     private readonly _dueTime: Date,
-    private readonly _book_id: number
+    private readonly _bookId: number
   ) {}
 
   get id(): number {
@@ -33,8 +33,8 @@ export class CardInstance {
     return this._dueTime;
   }
 
-  get book_id(): number {
-    return this._book_id;
+  get bookId(): number {
+    return this._bookId;
   }
 
   static async fromCardInstanceDO(

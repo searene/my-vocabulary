@@ -19,6 +19,9 @@ import { Router } from "../../route/Router";
 import { GoBack } from "../back/GoBack";
 import { CardInstance } from "../../../main/domain/card/instance/CardInstance";
 import serviceProvider from "../../ServiceProvider";
+import { unwrapResult } from "@reduxjs/toolkit";
+import { unwrap } from "cheerio/lib/api/manipulation";
+import { UrlUtils } from "../../../main/utils/UrlUtils";
 
 export type EditType = "new" | "edit";
 
@@ -38,9 +41,7 @@ export function Add(props: AddProps) {
   const bookId = useSelector(selectBookId);
   const dispatch = useAppDispatch();
   const [initiated, setInitiated] = useState(false);
-  const [word, setWord] = useState(
-    new URLSearchParams(props.location.search).get("word") as string
-  );
+  const [word, setWord] = useState(UrlUtils.getParamValue(props.location.search, "word") as string);
   const editType = props.match.params.editType;
 
   const fieldComponents = Object.entries(fieldTypeIdToFieldVOMap).map(
@@ -58,43 +59,45 @@ export function Add(props: AddProps) {
 
   const tryGetCardInstanceIdFromUrl = (): number | undefined => {
     const url = props.location.search;
-    const cardInstanceIdStr = new URLSearchParams(url).get("cardInstanceId");
-    if (cardInstanceIdStr === undefined) {
+    const param = new URLSearchParams(url);
+    if (!param.has("cardInstanceId")) {
       return undefined;
     }
-    return parseInt(cardInstanceIdStr as string);
+    return parseInt(param.get("cardInstanceId") as string);
   }
 
   const tryGetBookIdFromUrl = (): number | undefined => {
     const url = props.location.search;
-    const cardInstanceIdStr = new URLSearchParams(url).get("bookId");
-    if (cardInstanceIdStr === undefined) {
+    const param = new URLSearchParams(url);
+    if (!param.has("bookId")) {
       return undefined;
     }
-    return parseInt(cardInstanceIdStr as string);
+    return parseInt(param.get("bookId") as string);
   }
 
   useEffect(() => {
     dispatch(getBookId({
       bookIdFromUrl: tryGetBookIdFromUrl(),
       cardInstanceId: tryGetCardInstanceIdFromUrl()
-    }));
-    if (!initiated) {
-      if (editType === "new") {
-        dispatch(getFieldTypes());
-      } else if (editType === "edit") {
-        dispatch(fetchFieldTypeIdToFieldVOMap({
-          cardInstanceId: tryGetCardInstanceIdFromUrl() as number
-        }));
+    }))
+    .then(_ => {
+      if (!initiated) {
+        if (editType === "new") {
+          return dispatch(getFieldTypes()).then(_ => true)
+        } else if (editType === "edit") {
+          return dispatch(fetchFieldTypeIdToFieldVOMap({
+            cardInstanceId: tryGetCardInstanceIdFromUrl() as number
+          })).then(_ => true)
+        }
       }
-    }
-    setInitiated(true);
+    })
+    .then(_ => setInitiated(true))
   }, [initiated, dispatch]);
 
   const save = async () => {
     if (editType === "new") {
-      dispatch(addCard({ word, bookId: bookId as number}))
-        .then(() => Router.toBookPage(bookId as number))
+      dispatch(addCard({ word, bookId }))
+        .then(() => Router.toBookPage(bookId))
         .catch((e) => {
           console.error("An error occurred when dispatching addCard");
           console.error(e);
@@ -114,7 +117,7 @@ export function Add(props: AddProps) {
     <Grid divided={"vertically"}>
       <Grid.Row columns={1}>
         <Grid.Column>
-          <GoBack/>Book: <BookName bookId={bookId as number} />
+          <GoBack/>Book: <BookName bookId={bookId} />
         </Grid.Column>
       </Grid.Row>
       <Grid.Row>
