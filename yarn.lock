@@ -8558,9 +8558,9 @@ nan@~2.10.0:
   integrity sha1-ltDNYQ69WNS03pzAxoKM2pnHVI8=
 
 nanoid@^3.1.15:
-  version "3.1.15"
-  resolved "https://registry.npm.taobao.org/nanoid/download/nanoid-3.1.15.tgz?cache=0&sync_timestamp=1603417563737&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fnanoid%2Fdownload%2Fnanoid-3.1.15.tgz#28e7c4ce56aff2d0c2d37814c7aef9d6c5b3e6f3"
-  integrity sha1-KOfEzlav8tDC03gUx6751sWz5vM=
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.2.0.tgz#62667522da6673971cca916a6d3eff3f415ff80c"
+  integrity sha512-fmsZYa9lpn69Ad5eDn7FMcnnSR+8R34W9qJEijxYhTbfOWzr22n1QxCMzXLK+ODyW2973V3Fux959iQoUxzUIA==
 
 nanomatch@^1.2.9:
   version "1.2.13"
